@@ -7,6 +7,5 @@ layout: default
     <p class="post-meta"><time class="dt-published" datetime="{{ page.date | date_to_xmlschema }}" itemprop="datePublished">{{ page.date | date: "%Y.%m.%d %H:%M:%S %z" }}</time>{% if page.categories.size > 0 %} · {{ page.categories | join: ' / ' | escape }}{% endif %}</p>
   </header>
   <div class="post-content e-content" itemprop="articleBody">{{ content }}</div>
-  {% if page.source_url %}<p><a href="{{ page.source_url | escape }}">원문 보기</a></p>{% endif %}
   <a class="u-url" href="{{ page.url | relative_url }}" hidden></a>
 </article>
