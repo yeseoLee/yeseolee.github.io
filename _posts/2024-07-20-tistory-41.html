@@ -1,0 +1,111 @@
+---
+layout: post
+title: '[강의노트] 05-3 Text Representation II - Distributed Representation Part 3 (GloVe
+  & FastText)'
+date: '2024-07-20T02:51:08+09:00'
+categories:
+- 강의노트
+- Text Analytics (강필성 교수님)
+source_url: https://ohge.tistory.com/41
+source_blog: tistory
+permalink: /tistory/41/
+---
+{% raw %}
+<blockquote data-ke-style="style1"><p data-ke-size="size16"><span style="font-family: 'Noto Serif KR';"><p>위 강의노트는 고려대학교 산업경영공학부 대학원 강필성 교수님의<br/><a href="https://www.youtube.com/playlist?list=PLetSlH8YjIfVzHuSXtG4jAC2zbEAErXWm">비정형데이터분석 (Text Analytics)</a> 을 듣고 정리한 강의노트입니다.  </p>
+</span></p></blockquote><h1>Word-level: GloVe</h1>
+<h3>Limitations of Word2Vec</h3>
+<ul>
+<li>과도하게 사용된 단어에 대해 너무 많이 학습</li>
+<li>e.g.) 관사 the가 나올 확률이 너무 높음 P(w|the)</li>
+</ul>
+<h2>Glove</h2>
+<ul>
+<li>matrix factorization method 기반</li>
+<li>V x V 크기의 큰 행렬</li>
+<li>$X_{ij}$ = i가 j와 함께 등장하는 빈도, $X_i$ = 전체 코퍼스에서 단어 i가 등장한 횟수</li>
+<li>$P_{ij} = P(j|i) = \frac{X_{ij}}{X_i}$</li>
+</ul>
+<h3>Motivation</h3>
+<ul>
+<li>특정 k라는 단어가 ice와 연관이 높고 steam과는 아니라면 $P_{ik} / P_{jk}$ 가 커야함</li>
+<li>단어 k가 steam과 관련성이 높지만 ice와는 아니라면 $P_{ik} / P_{jk}$ 는 작아야함</li>
+<li>단어 k가 둘 다 관련있다면 비율은 1에 가까워져야함</li>
+</ul>
+<h3>Formulation</h3>
+<ul>
+<li>함수 F를 이용하여 세 단어들의 관계를 표현<br/>$$F(w_i,w_j, w_k) \frac{P_{ik}}{P_{jk}}$$</li>
+<li>$w_i$와 $w_j$의 관계를 substraction(뺄셈)으로 표현<br/>$$F(w_i - w_j, w_k) = \frac{P_{ik}}{P_{jk}}$$</li>
+<li>두 단어 사이의 차이(관계) $w_i - w_j$ 와 context word $w_k$ 사이의 링크를 만들어 주기 위해 내적으로 하나의 스칼라 값을 만들어줌<br/>$$F \left((w_i - w_j)^T w_k \right) = \frac{P_{ik}}{P_{jk}}$$</li>
+</ul>
+<h3>Homomorphism</h3>
+<p>아래 수식 대신, 아까 변형한 수식을 이용하여 표현한다.<br/>$$\frac{P(solid|ice)}{P(solid|steam)}$$</p>
+<p>$$F\left((w_i - w_j)^T w_k \right) = \frac{P_{ik}}{P_{jk}}$$</p>
+<p>그렇다면 다음과 같이 표현할 수 있다.<br/>$$\frac{P(solid|ice)}{P(solid|steam)} = F \left((ice - stream)^T solid \right)$$<br/>ice와 steam의 위치를 바꾸면 아래와 같이 빼기 순서가 달라진다.<br/>$$\frac{P(solid|steam)}{P(solid|ice)} = F \left((steam - ice)^T solid \right)$$<br/>두 식을 정리하면 다음과 같다. (즉, ice와 steam의 위치를 바꾸면 역수가 된다.)<br/>$$F \left((ice - steam)^T solid \right) = \frac{P(solid|ice)}{P(solid|steam)} = \frac{1}{F \left((steam - ice)^T solid \right)}$$</p>
+<p><code>Input</code>에 대한 항등원 관계를 정리<br/>$$(ice - steam)^T solid = - (steam - ice)^T solid $$<br/><code>F의 output</code>에 대한 항등원 관계를 정리<br/>$$F \left((ice - steam)^T solid \right) = \frac{1}{F \left((steam - ice)^T solid \right)}$$</p>
+<ul>
+<li>Need a homomorphism <strong>from $(R,+)$ to $(R_{&gt;0},\times)$</strong><br/><strong>= 입력을 덧셈의 항등원으로 바꿔주면 함수의 출력값은 곱셉의 항등원으로 나오게 되는 Mapping이 필요</strong>하다.<br/><strong>= 입력에서의 덧셈은 함수값에서의 곱셈으로 빠져나올 수 있어야 한다.</strong></li>
+<li>f(a+b) = f(a)f(b)를 만족해야 하므로, 그 중 우리가 아는 가장 쉬운 함수인 <strong>F(x) = exp(x)</strong></li>
+</ul>
+<h3>Solution</h3>
+<p>위 식에서 F(x) 대신 exp(x)로 정리하고 로그를 씌우면<br/>$$w_i^T w_k = logP_{ik} = logX_{ik} - logX_i$$<br/>$logX_i$ 를 $b_i+b_k$ 로 표현하여 정리하면<br/>$$w_i^T w_k + b_i+b_k = logX_{ik}$$</p>
+<h3>Objective Function</h3>
+<p>$$J = \sum^V_{i,j=1}f(X_{ij})\left(w_i^T w_k + b_i+b_k \right)^2$$</p>
+<p>$f(X_{ij})$</p>
+<ul>
+<li>고 빈도 단어들의 학습에 대한 가중치를 낮춰주는 역할</li>
+<li>$(x / x_{max})^a$ if $x &lt; x_{max}$ otherwise $1$</li>
+</ul>
+<hr/>
+<h1>Word-level: FastText</h1>
+<h3>Limitations of NNLM, Word2Vec, and GloVe</h3>
+<ul>
+<li>단어가 가지는 morphology 특성을 무시하고 있음</li>
+<li>morphologically rich languages에 대해 적용하기 어렵다 (터키어, 필란드어 등)</li>
+</ul>
+<h3>Goal</h3>
+<ul>
+<li>character n-grams 표현을 학습</li>
+<li>단어의 분산 표상은 n-gram vectors의 총합으로 표현</li>
+</ul>
+<h3>Revisit Negative Sampling in Word2Vec</h3>
+<ul>
+<li>Word2Vec의 Score는 두 임베딩 사이의 내적을 통해 계산</li>
+<li>FastText의 Score는 w에 대한 n-grams를 정의한 다음, 벡터 표현을 전부다 더해서 내적</li>
+<li>$score(w,c) = \sum_{g \in g_w}z_{g}^Tv_c$</li>
+<li>e.g.) apple 하나만 embedding하는 것이 아닌 a부터 ap, app ... apple 전부 더한 것이 apple의 embedding이다. 라는 개념</li>
+</ul>
+<h3>subword model</h3>
+<ul>
+<li>n-gram representation</li>
+</ul>
+<h3>Word Embedding Examples</h3>
+<ul>
+<li>Word Embedding with two different langauges<br/>한 언어만 하는 것이 아닌 서로 다른 언어들과 임베딩</li>
+<li>Word Embedding with Images<br/>단어만 임베딩하는 것이 아닌 이미지, 영상 등의 멀티모달 데이터를 통해서도 임베딩</li>
+</ul>
+<hr/>
+<h1>요약</h1>
+<ul>
+<li>GloVe<ul>
+<li>Word2Vec는 고빈도 단어를 과도하게 학습하는 문제를 해결하고자 등장</li>
+<li>F(x)<ul>
+<li>입력을 덧셈의 항등원으로 바꿔주면 함수의 출력값은 곱셉의 항등원으로 나오게 되는 Mapping이 필요</li>
+<li>입력에서의 덧셈은 함수값에서의 곱셈으로 빠져나올 수 있어야 함</li>
+<li>F(x) = exp(x)</li>
+</ul>
+</li>
+<li>목적 함수<ul>
+<li>$f(X_{ij})$ 는 고 빈도 단어들의 학습에 대한 가중치를 낮춰주는 역할</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>FastText<ul>
+<li>기존 임베딩들이 단어가 가지는 morphology 특성을 무시하는 문제를 해결하고자 등장</li>
+<li>character n-grams 표현을 학습</li>
+<li>단어의 분산 표상은 n-gram vectors의 총합으로 표현</li>
+<li>subword model</li>
+</ul>
+</li>
+</ul>
+{% endraw %}

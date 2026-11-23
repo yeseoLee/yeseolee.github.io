@@ -1,0 +1,223 @@
+---
+layout: post
+title: '[강의 노트] 06-1 Dimensionality Reduction Part 1 (Variable Selection)'
+date: '2024-08-26T10:43:20+09:00'
+categories:
+- 강의노트
+- Text Analytics (강필성 교수님)
+source_url: https://ohge.tistory.com/54
+source_blog: tistory
+permalink: /tistory/54/
+---
+{% raw %}
+<blockquote data-ke-style="style1"><span style="font-family: 'Noto Serif KR';"><span style="color: #666666; text-align: center;">위 강의노트는 고려대학교 산업경영공학부 대학원 강필성 교수님의</span><br/><a href="https://www.youtube.com/playlist?list=PLetSlH8YjIfVzHuSXtG4jAC2zbEAErXWm" style="color: #0070d1; text-align: center;">비정형데이터분석 (Text Analytics)</a><span style="color: #666666; text-align: center;"><span> </span>을 듣고 정리한 강의노트입니다.</span></span></blockquote>
+<h1 style="color: #000000; text-align: start;">Dimensionality Reduction</h1>
+<h3 data-ke-size="size23" style="color: #000000; text-align: start;">Common features of text data</h3>
+<ul data-ke-list-type="disc" style="list-style-type: disc; color: #333333; text-align: start;">
+<li>일반적으로 전부 Bag-of-words 방식으로 표현된 Document는 매우 많은 수의 terms(words)를 가지고 있음</li>
+<li>그중 일부만인 text mining task에 relevant하다</li>
+<li>Problem 1: High dimensionality (N.terms &gt;&gt; N.documents)<br/>통계학적인 관점에서 관측치의 수가 최소한 변수의 수보다는 많아야 다중 공산성과 같은 여러 통계적 가정을 만족할 가능성이 있음 -&gt; 전통적인 통계적 방법론을 사용하기에 무리가 있다</li>
+<li>Problem 2: Sparseness (Most elements in a term-document matrix are zero)<br/>기껏해야 한 Paragraph는 100~200 단어로 구성이 된다면 영어가 13만 단어가 있으므로 나머지 단어가 전부 0이 되므로 저장과 처리 측면에서 효율성 문제가 발생</li>
+</ul>
+<h3 data-ke-size="size23" style="color: #000000; text-align: start;">Why is dimensionality reduction necessary?</h3>
+<ul data-ke-list-type="disc" style="list-style-type: disc; color: #333333; text-align: start;">
+<li>계산 효율성을 높임
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>시간, 저장 공간, 네트워크 리소스 절감</li>
+</ul>
+</li>
+<li>텍스트 마이닝 결과의 품질 향상
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>분류 정확도, clustering modularity향상</li>
+<li>일정한 퍼포먼스를 얻기 위해 훈련 데이터의 수를 줄임</li>
+</ul>
+</li>
+</ul>
+<p data-ke-size="size16" style="color: #333333; text-align: start;">(Clustering Modularity: 네트워크나 그래프의 군집화 품질을 측정하는 지표 중 하나로, 군집화된 네트워크 내에서의 노드 연결의 밀도를 나타냄)</p>
+<h2 data-ke-size="size26" style="color: #000000; text-align: start;">taxonomy of dimensionality reduction techniques</h2>
+<p><figure class="imageblock alignCenter" data-ke-mobilestyle="widthOrigin" data-origin-height="1120" data-origin-width="2344"><span data-phocus="https://blog.kakaocdn.net/dna/b5U3er/btsJfHWHWdt/AAAAAAAAAAAAAAAAAAAAAEv_xK4ulwp8GZKr-mnYH6GBnWwgD1-J6VeTjSu3tM0Z/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&amp;expires=1796050799&amp;allow_ip=&amp;allow_referer=&amp;signature=fUnSbfGP4HX%2FL2L4SE4hxso%2BNX8%3D" data-url="https://blog.kakaocdn.net/dna/b5U3er/btsJfHWHWdt/AAAAAAAAAAAAAAAAAAAAAEv_xK4ulwp8GZKr-mnYH6GBnWwgD1-J6VeTjSu3tM0Z/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&amp;expires=1796050799&amp;allow_ip=&amp;allow_referer=&amp;signature=fUnSbfGP4HX%2FL2L4SE4hxso%2BNX8%3D"><img data-origin-height="1120" data-origin-width="2344" height="1120" loading="lazy" onerror="this.onerror=null; this.src='//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png'; this.srcset='//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png';" src="/assets/images/bd495b97220f4958dcd2b8a5.png" width="2344"/></span></figure>
+</p>
+<ul data-ke-list-type="disc" style="list-style-type: disc; color: #333333; text-align: start;">
+<li>Feature Selection: $X-&gt; X^\prime$
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>Filter vs Wrapper: feedback loop 여부, Learning Algorithm 사용 여부</li>
+</ul>
+</li>
+<li>Feature Extraction: $X-&gt;Z$
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>Max.Variance: PCA(주성분 분석)</li>
+<li>Max.Dist.Info.: Multidimensional scaling</li>
+<li>Reveal Latent Structure: Latent semantic indexing<br/>전부 비지도 학습 방식이므로 Class Label 사용하지 않으며 학습 알고리즘에도 Independent함</li>
+</ul>
+</li>
+</ul>
+<h3 data-ke-size="size23" style="color: #000000; text-align: start;">Feature Selection vs. feature extraction</h3>
+<ul data-ke-list-type="disc" style="list-style-type: disc; color: #333333; text-align: start;">
+<li>Feature selection: select a small subset of original variables</li>
+<li>Feature extraction: construct/extract a new set of features based on the original variables<br/>$V -&gt; Z$ , 오리지널 변수들의 조합으로써 새 변수가 만들어짐</li>
+</ul>
+<h3 data-ke-size="size23" style="color: #000000; text-align: start;">Filter approach vs. Wrapper approach</h3>
+<ul data-ke-list-type="disc" style="list-style-type: disc; color: #333333; text-align: start;">
+<li>Filter: select a set of features based on pre-defined criteria
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li><b>no feedback loop</b>, independent of the learning algorithm</li>
+</ul>
+</li>
+<li>Wrapper: evaluate a subset with a learning algorithm and repeat the process until a certain level of performance is achived
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li><b>Feedback loop exists</b>, dependent on the learning algorithm</li>
+</ul>
+</li>
+</ul>
+<h1 style="color: #000000; text-align: start;">Feature Selection</h1>
+<h2 data-ke-size="size26" style="color: #000000; text-align: start;">Artificial Data set</h2>
+<p data-ke-size="size16" style="color: #333333; text-align: start;">10 Documents with 10 Terms</p>
+<ul data-ke-list-type="disc" style="list-style-type: disc; color: #333333; text-align: start;">
+<li>Binary classification/categorization problem(긍정/부정)</li>
+<li>6 positive documents &amp; 4 negative documents</li>
+<li>Binary Term-Document matrix<br/><figure class="imageblock alignCenter" data-ke-mobilestyle="widthOrigin" data-origin-height="718" data-origin-width="1352"><span data-phocus="https://blog.kakaocdn.net/dna/xOQGX/btsJfa573Px/AAAAAAAAAAAAAAAAAAAAAH_j1fJ5tp6Fgyf6VbwfkdySCkfQkgaI9woDQxzUWv_w/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&amp;expires=1796050799&amp;allow_ip=&amp;allow_referer=&amp;signature=wGiM2vIeb%2FTX4zHLaEMpGoVBkfI%3D" data-url="https://blog.kakaocdn.net/dna/xOQGX/btsJfa573Px/AAAAAAAAAAAAAAAAAAAAAH_j1fJ5tp6Fgyf6VbwfkdySCkfQkgaI9woDQxzUWv_w/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&amp;expires=1796050799&amp;allow_ip=&amp;allow_referer=&amp;signature=wGiM2vIeb%2FTX4zHLaEMpGoVBkfI%3D"><img data-origin-height="718" data-origin-width="1352" height="718" loading="lazy" onerror="this.onerror=null; this.src='//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png'; this.srcset='//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png';" src="/assets/images/155f2e878f118fcb00dc8f8a.png" width="1352"/></span></figure>
+<br/>가장 중요한 term(Pos/Neg를 구분하는데 가장 유용한 term)이 무엇인가?<br/>아마 T1과 T2일 가능성이 높을 것.</li>
+</ul>
+<h2 data-ke-size="size26" style="color: #000000; text-align: start;">Feature Selection Metric 1-4</h2>
+<h3 data-ke-size="size23" style="color: #000000; text-align: start;">Document Fequency (DF)</h3>
+<p data-ke-size="size16" style="color: #333333; text-align: start;">Simply count the number of total documents in which a word w is presented</p>
+<p data-ke-size="size16" style="color: #333333; text-align: start;">$$DF(w) = N_D(w)$$</p>
+<p data-ke-size="size16" style="color: #333333; text-align: start;">과연 DF가 높다고 classification 변별력이 높은가?</p>
+<h3 data-ke-size="size23" style="color: #000000; text-align: start;">Accuracy (Acc)</h3>
+<p data-ke-size="size16" style="color: #333333; text-align: start;">해당하는 단어의 존재 유무만을 가지고 분류기를 만들었을 때 얼마나 잘 분류가 될 것인가<br/>$<br/>$Acc(w) = N(Pos,w) - N(Neg,w)$$</p>
+<p data-ke-size="size16" style="color: #333333; text-align: start;">음수 값이 나오기 때문에 Positive 범주에는 유리하지만 Negative 범주에는 불리(T1&gt;T2)</p>
+<h3 data-ke-size="size23" style="color: #000000; text-align: start;">Accuracy ratio (AccR)</h3>
+<p data-ke-size="size16" style="color: #333333; text-align: start;">$$AccR(w) = \left\vert \frac{N(Pos,w)}{N(Pos)} - \frac{N(Neg,w)}{N(Neg)} \right\vert$$</p>
+<p data-ke-size="size16" style="color: #333333; text-align: start;">음수 값에 대한 문제가 해결됨(T1=T2&gt;T3)</p>
+<h3 data-ke-size="size23" style="color: #000000; text-align: start;">Probability Ratio (PR)</h3>
+<ul data-ke-list-type="disc" style="list-style-type: disc; color: #333333; text-align: start;">
+<li>The probability of the word given the positive class divided by the probability of the word given the negative class</li>
+</ul>
+<p data-ke-size="size16" style="color: #333333; text-align: start;">$$PR(w) = \frac{N(Pos,w)}{N(Pos)} / \frac{N(Neg,w)}{N(Neg)}$$</p>
+<p data-ke-size="size16" style="color: #333333; text-align: start;">T1이 무한대,T2는 0, T3는 1로 그다지 좋은 지표라고 보기 어려움.</p>
+<h3 data-ke-size="size23" style="color: #000000; text-align: start;">Compute the metric 1-4 for the data set</h3>
+<p data-ke-size="size16" style="color: #333333; text-align: start;">그나마 AccR가 설명력 좋은 지표로서 동작했음</p>
+<h2 data-ke-size="size26" style="color: #000000; text-align: start;">Feature Selection Metric 5-7</h2>
+<h3 data-ke-size="size23" style="color: #000000; text-align: start;">Odds ratio (OddR)</h3>
+<ul data-ke-list-type="disc" style="list-style-type: disc; color: #333333; text-align: start;">
+<li>Reflect the odds of the word occuring in the positive class normalized by that of the negative class</li>
+</ul>
+<p data-ke-size="size16" style="color: #333333; text-align: start;">$$OddR(w) = \frac{N(Pos,w)}{N(Neg,w)} \times \frac{N(Neg,\bar{w})}{N(Pos,\bar{w})}$$</p>
+<p data-ke-size="size16" style="color: #333333; text-align: start;">= Positive Odds / Negative Odds의 비율로 볼 수 있음(Odds = P/(1-p) 이므로)</p>
+<h3 data-ke-size="size23" style="color: #000000; text-align: start;">Odds Ratio Numerator (OddN)</h3>
+<p data-ke-size="size16" style="color: #333333; text-align: start;">$$OddN(w) = N(Pos,w) \times N(Neg, \bar{w})$$</p>
+<p data-ke-size="size16" style="color: #333333; text-align: start;">계산식을 단순화 하기위해 이전 식의 분자만 뽑아온 것이므로 대소관계는 유지됨</p>
+<h3 data-ke-size="size23" style="color: #000000; text-align: start;">F1-Measure</h3>
+<p data-ke-size="size16" style="color: #333333; text-align: start;">Expected accuracy of a simple classifier built from the single feature</p>
+<p data-ke-size="size16" style="color: #333333; text-align: start;">$$F1(w) = \frac{2 \times Recall(w) \times Precision(w)}{Recall(w) + Precision(w)}$$</p>
+<p data-ke-size="size16" style="color: #333333; text-align: start;">$$ Recall(w) = \frac{N(Pos, w)}{N(Pos, w) + N(Pos, \overline{w})}$$</p>
+<p data-ke-size="size16" style="color: #333333; text-align: start;">$$ Precision(w) = \frac{N(Pos, w)}{N(Pos, w) + N(Neg, w)}$$</p>
+<p data-ke-size="size16" style="color: #333333; text-align: start;">By doing some arthmetic operations, we can drive</p>
+<p data-ke-size="size16" style="color: #333333; text-align: start;">$$F1(w) = \frac{2 \times N(Pos, w)}{N(Pos) + N(w)}$$</p>
+<p data-ke-size="size16" style="color: #333333; text-align: start;">In F1 meature, negative features are devalued compared to positive features (Neg가 Pos에 비해 평가절하됨, Pos 범주를 기준으로 계산하기 때문에)
+특정 범주를 기준으로 했을 때 값은 그다지 좋은 평가지표가 아니다 라고 볼 수 있음</p>
+<h3 data-ke-size="size23" style="color: #000000; text-align: start;">Compute the metric 5-7 for the data set</h3>
+<ul data-ke-list-type="disc" style="list-style-type: disc; color: #333333; text-align: start;">
+<li>Pos 범주에 대해서는 높은 점수를 주지만 Neg 범주를 잘 구분하는 Term에 대해서는 낮은 점수를 줌</li>
+<li>asymmetric matrix(비대칭성을 가지는) 특징을 가진 지표들이다.</li>
+</ul>
+<h2 data-ke-size="size26" style="color: #000000; text-align: start;">Feature Selection Metric 8-10</h2>
+<h3 data-ke-size="size23" style="color: #000000; text-align: start;">Information Gain: IG</h3>
+<ul data-ke-list-type="disc" style="list-style-type: disc; color: #333333; text-align: start;">
+<li>Meatures the decrease in entropy when the feature is given vs. absent. (엔트로피 차이(감소분)을 계산)</li>
+<li>Entropy without the information provided by the term w</li>
+</ul>
+<p data-ke-size="size16" style="color: #333333; text-align: start;">$$Entropy(absent\ w) = \sum_{C \in {Pos, Neg}} -P(C) \times \log(P(C))$$</p>
+<p data-ke-size="size16" style="color: #333333; text-align: start;">$$Entropy(given\ w) = P(w) \left[ \sum_{C \in {Pos, Neg}} -P(C | w) \times \log(P(C | w)) \right] + P(\overline{w}) \left[ \sum_{C \in {Pos, Neg}} -P(C | \overline{w}) \times \log(P(C | \overline{w})) \right]$$</p>
+<p data-ke-size="size16" style="color: #333333; text-align: start;">$$IG(w) = Entropy(absent\ w) - Entropy(given\ w)$$</p>
+<h3 data-ke-size="size23" style="color: #000000; text-align: start;">Chi-squared statistic ($\chi^2$)</h3>
+<p data-ke-size="size16" style="color: #333333; text-align: start;">Measures divergence from the distribution expected if one assumes the feature occurrence is independent of the class label</p>
+<p data-ke-size="size16" style="color: #333333; text-align: start;">$$\chi^2(w) = \frac{N \times \left[ P(Pos, w) \times P(Neg, \overline{w}) - P(Neg, w) \times P(Pos, \overline{w}) \right]^2}{P(w) \times P(\overline{w}) \times P(Pos) \times P(Neg)}$$</p>
+<h3 data-ke-size="size23" style="color: #000000; text-align: start;">Bi-Normal Separation (BNS)</h3>
+<p data-ke-size="size16" style="color: #333333; text-align: start;">Measures the degree of separation assuming that the occurrence of a feature in a document is a random process following a normal distribution</p>
+<p data-ke-size="size16" style="color: #333333; text-align: start;">$$ BNS(w) = \left\vert F^{-1}\left(\frac{N(Pos, w)}{N(Pos)}\right) - F^{-1}\left(\frac{N(Neg, w)}{N(Neg)}\right) \right\vert$$</p>
+<p data-ke-size="size16" style="color: #333333; text-align: start;">정규분포를 가정하고 cumulative distribution function(누적 확률 밀도 함수)에 대해서 함수값을 갖는 x값을 찾아서 그 차이의 절대값을 사용하자</p>
+<h3 data-ke-size="size23" style="color: #000000; text-align: start;">Compute the metric 8-10 for the data set</h3>
+<ul data-ke-list-type="disc" style="list-style-type: disc; color: #333333; text-align: start;">
+<li>1,2 term에 대해서는 높은 값을 가짐</li>
+<li>3,8 term은 매우 낮은 0의 값을 가짐</li>
+</ul>
+<h2 data-ke-size="size26" style="color: #000000; text-align: start;">Feature Selection Metric: Summary</h2>
+<ul data-ke-list-type="disc" style="list-style-type: disc; color: #333333; text-align: start;">
+<li>요즘은 분산 표상 방식을 많이 써서 전통적인 term 선택 방식을 많이 쓰지는 않으나 굳이 추천한다면 IG나 카이 제곱 2가지 정도를 추천함</li>
+</ul>
+<h2 data-ke-size="size26" style="color: #000000; text-align: start;">Empirical Study (참고)</h2>
+<h3 data-ke-size="size23" style="color: #000000; text-align: start;">Empirical study conducted by Forman (2003)</h3>
+<ul data-ke-list-type="disc" style="list-style-type: disc; color: #333333; text-align: start;">
+<li>Data sets: 229 text classification tasks (from Reuters, TREC, OHSUMED, etc.)</li>
+<li>SVM as a base classifier, one-against-all method for multiclass problems</li>
+<li>Performances are evaluated in terms of accuracy, precision, recall, and F-1 measure</li>
+</ul>
+<h3 data-ke-size="size23" style="color: #000000; text-align: start;">Analysis purpose</h3>
+<ul data-ke-list-type="disc" style="list-style-type: disc; color: #333333; text-align: start;">
+<li>To obtain the best overall classification performance regardless of the number of<br/>features</li>
+<li>To find the best metric when only a very small number of features is selected
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>For limited resources, fast classification, and large scalability</li>
+</ul>
+</li>
+<li>Contract the performance under high-skew and low-skew class distribution situations</li>
+</ul>
+<h3 data-ke-size="size23" style="color: #000000; text-align: start;">Metrics considered</h3>
+<p data-ke-size="size16" style="color: #333333; text-align: start;">앞서 살펴봤던 Metrics 사용함</p>
+<h3 data-ke-size="size23" style="color: #000000; text-align: start;">Experimental result</h3>
+<ul data-ke-list-type="disc" style="list-style-type: disc; color: #333333; text-align: start;">
+<li>500~1000 features 에서 BNS가 최고의 성능을 보임</li>
+<li>모든 features 사용하는 것보다 IG 통해서 feature selection 했을 때 약간의 성능 향상이 있다.</li>
+</ul>
+<h1 style="color: #000000; text-align: start;">요약</h1>
+<ul data-ke-list-type="disc" style="list-style-type: disc; color: #333333; text-align: start;">
+<li>Problem
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>Bag-of-words 방식으로 표현된 Document는 매우 많은 수의 terms(words)를 가지고 있고 그중 일부만인 text mining task에 relevant함</li>
+<li>High dimensionality (N.terms &gt;&gt; N.documents)</li>
+<li>Sparseness</li>
+</ul>
+</li>
+<li>Dimensionality Reduction
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>Feature Selection: $X-&gt; X^\prime$
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>Filter vs Wrapper: Learning Algorithm 사용 여부</li>
+</ul>
+</li>
+<li>Feature Extraction: $X-&gt;Z$
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>Max.Variance: PCA(주성분 분석)</li>
+<li>Max.Dist.Info.: Multidimensional scaling</li>
+<li>Reveal Latent Structure: Latent semantic indexing</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>Feature Selection Metrics
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>Document Fequency (DF)</li>
+<li>Accuracy (Acc)</li>
+<li>Accuracy ratio (AccR)</li>
+</ul>
+<hr data-ke-style="style1"/>
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>Probability Ratio (PR)</li>
+<li>Odds ratio (OddR)</li>
+<li>Odds ratio Numerator (OddN)</li>
+<li>F1-Measure</li>
+</ul>
+<hr data-ke-style="style1"/>
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li><b>Information Gain: IG</b></li>
+<li><b>Chi-squared statistic ($\chi^2$)</b></li>
+<li>Bi-Normal Separation (BNS)</li>
+</ul>
+<hr data-ke-style="style1"/>
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>요즘은 분산 표상 방식을 많이 써서 전통적인 term 선택 방식을 많이 쓰지는 않으나 굳이 추천한다면 IG나 카이 제곱 2가지 정도를 추천할 수 있다.</li>
+</ul>
+</li>
+</ul>
+{% endraw %}

@@ -1,0 +1,57 @@
+---
+layout: post
+title: 코딩 폰트 추천 및 VSCode 폰트 적용방법
+date: '2023-07-02T16:23:48.568000+09:00'
+categories:
+- etc
+source_url: https://velog.io/@yeseolee/VSCode-폰트-적용방법
+source_blog: velog
+permalink: /velog/c76b25b3/
+---
+{% raw %}
+<h2>추천 폰트</h2>
+<h3>D2 Coding</h3>
+<p><img alt="D2 Coding" src="/assets/images/e983807d78696bcaea9a0224.png"/></p>
+<p>특징</p>
+<ul>
+<li>고정폭 서체
+모든 글자 폭이 동일하여 코드를 가지런하게 볼 수 있다.</li>
+<li>한글 가독성
+한글 폰트이기 때문에 한글 가독성이 뛰어나다.</li>
+</ul>
+<p>다운로드</p>
+<ul>
+<li>https://github.com/naver/d2codingfont</li>
+</ul>
+<h3>Fira</h3>
+<p><img alt="fira" src="/assets/images/dd04d239962f4fd98ec9dbd6.png"/>
+특징</p>
+<ul>
+<li>엄청난 특수 기호 표현</li>
+</ul>
+<p>'크거나 같다' 같은 수학기호를 <code>&gt;=</code>와 같이 두 기호를 합쳐 작성하지만, 화면 상에서 하나의 기호로 표현해주어 가독성과 직관성이 매우 좋아진다.
+<img alt="sample" src="/assets/images/9473108a4a933bc149c34959.png"/></p>
+<p>아래 코드 예시처럼, 화살표 기호 뿐만 아니라 여러 부등호 또한 직관적인 기호로 변환하여 화면에서 볼 수 있다.</p>
+<p>다운로드</p>
+<ul>
+<li>https://github.com/tonsky/FiraCode</li>
+</ul>
+<h3>VSCode 폰트 적용</h3>
+<ul>
+<li>
+<p><code>Setting.json</code></p>
+<pre><code class="language-json">// 하나만 적용
+{
+	"editor.fontFamily": "'D2Coding'",
+	"editor.fontLigatures": true,
+}
+// 여러 개 적용 (순서대로 적용되며 없는 거는 뒤에서 적용)
+{
+    "editor.fontFamily": "'Fira Code', Monaco, 'Courier New', monospace",
+    "editor.fontLigatures": true
+}
+</code></pre>
+</li>
+</ul>
+
+{% endraw %}

@@ -1,0 +1,66 @@
+---
+layout: post
+title: '[네이버 부스트캠프 AI Tech 7기] Level2 MRC - ODQA 프로젝트 1주차 회고'
+date: '2024-10-12T13:04:17+09:00'
+categories:
+- 강의노트
+- 네이버 부스트캠프 AI Tech 7기
+source_url: https://ohge.tistory.com/63
+source_blog: tistory
+permalink: /tistory/63/
+---
+{% raw %}
+<h1>네이버 부스트캠프 AI Tech 8주차</h1>
+<h2 data-ke-size="size26">강의 &amp; 세션</h2>
+<p data-ke-size="size16">이번 주차는 MRC(Machine Reading Comprehension)이다. ODQA(Open-domain Question Answering) Task를 풀기 위한 여러 이론 강의들로 구성되어 있었다. ODQA는 주어지는 지문이 따로 존재하지 않고 사전에 구축되어있는 Knowledge resource에서 질문에 대답할 수 있는 문서를 찾기 때문에 질문에 관련된 문서를 찾아주는 "retriever" 단계와 관련된 문서를 읽고 적절한 답변을 찾거나 만들어주는 "reader" 단계로 구성된다. 약 3주 동안 진행될 프로젝트의 이론 강의이기 때문에 서둘러 듣고 바로 프로젝트를 시작하게 되었다.</p>
+<h2 data-ke-size="size26">프로젝트</h2>
+<p data-ke-size="size16">두번째 프로젝트이자 Level2의 첫 번째 프로젝트가 밝았다. 앞서 말했던 ODQA Task를 푸는 대회로, 평가지표로 EM과 보조지표로 F1 Score를 사용한다. 지난 프로젝트를 회고하며 아쉬웠던 부분들이 많았는데 그중 몇가지를 꼽자면 다음과 같다.</p>
+<ol data-ke-list-type="decimal" style="list-style-type: decimal;">
+<li>협업
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>하나의 프로젝트를 함께 수행하는 형태보다는 각 팀원들이 개별적으로 달성한 성과들을 취합한 형태에 가까웠다는 점</li>
+<li>깃과 노션과 같은 협업 도구를 잘 활용하지 못한 점</li>
+</ul>
+</li>
+<li>근거
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>이유에 대한 집요함보다는 당장 눈 앞의 결과에 집착하여 근거있는 실험을 수행하지 못한 점</li>
+<li>논문이나 이론에 대한 많은 리서치를 하지 못한 점</li>
+</ul>
+</li>
+<li>코드 작성
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>데이터 EDA, 전처리, 증강 등 데이터 관련 task만 다뤘다.</li>
+<li>모델 및 코드를 거의 건드리지 못하였으며, 구현보다는 실험 위주로 진행했다.</li>
+</ul>
+</li>
+</ol>
+<p data-ke-size="size16">그래서 이번 프로젝트에서는 팀원들과 나의 성장을 최대 목표로 잡고 내가 PM을 맡아 매니징에 많은 시간을 쏟고 있다.</p>
+<h3 data-ke-size="size23">마일스톤 &amp; 작업카드</h3>
+<p><figure class="imageblock alignCenter" data-ke-mobilestyle="widthOrigin" data-origin-height="1610" data-origin-width="1734"><span data-phocus="https://blog.kakaocdn.net/dna/27Jws/btsJ2Sdi0Lp/AAAAAAAAAAAAAAAAAAAAAIf9C1iD5Dgjw8vT5Rntn0XHiGfcZOd0hFAl661DMBqv/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&amp;expires=1796050799&amp;allow_ip=&amp;allow_referer=&amp;signature=z7uPRR4ZIO1xB8JmLFZ%2FY8CYvDY%3D" data-url="https://blog.kakaocdn.net/dna/27Jws/btsJ2Sdi0Lp/AAAAAAAAAAAAAAAAAAAAAIf9C1iD5Dgjw8vT5Rntn0XHiGfcZOd0hFAl661DMBqv/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&amp;expires=1796050799&amp;allow_ip=&amp;allow_referer=&amp;signature=z7uPRR4ZIO1xB8JmLFZ%2FY8CYvDY%3D"><img data-origin-height="1610" data-origin-width="1734" height="1610" loading="lazy" onerror="this.onerror=null; this.src='//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png'; this.srcset='//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png';" src="/assets/images/5dffe07d859f2282c8454ba2.png" width="1734"/></span></figure>
+</p>
+<p data-ke-size="size16"> </p>
+<p><figure class="imageblock alignCenter" data-ke-mobilestyle="widthOrigin" data-origin-height="0" data-origin-width="0"><span data-phocus="https://blog.kakaocdn.net/dna/9ZYWt/btsJ2SxCxdh/AAAAAAAAAAAAAAAAAAAAAEoQT9Z4TIgX8mtDb7lIuRHCSrM0Gh4BHYosXJFEx7mc/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&amp;expires=1796050799&amp;allow_ip=&amp;allow_referer=&amp;signature=GW5o0nleZLj6%2Fr8ImDlAV8%2F3Bss%3D" data-url="https://blog.kakaocdn.net/dna/9ZYWt/btsJ2SxCxdh/AAAAAAAAAAAAAAAAAAAAAEoQT9Z4TIgX8mtDb7lIuRHCSrM0Gh4BHYosXJFEx7mc/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&amp;expires=1796050799&amp;allow_ip=&amp;allow_referer=&amp;signature=GW5o0nleZLj6%2Fr8ImDlAV8%2F3Bss%3D"><img data-origin-height="0" data-origin-width="0" loading="lazy" onerror="this.onerror=null; this.src='//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png'; this.srcset='//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png';" src="/assets/images/adfbe06f4b150414609155c6.png"/></span></figure>
+</p>
+<p data-ke-size="size16"> </p>
+<p><figure class="imageblock alignCenter" data-ke-mobilestyle="widthOrigin" data-origin-height="0" data-origin-width="0"><span data-phocus="https://blog.kakaocdn.net/dna/bH7yDF/btsJ3Z93ZVn/AAAAAAAAAAAAAAAAAAAAAE0uSpECaUWccCYzeCoq9jgO5o3iWDE-bNBGRcW5Hs5t/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&amp;expires=1796050799&amp;allow_ip=&amp;allow_referer=&amp;signature=DnT4v9bUG38rFTN7j8%2F3dZQ%2FKmI%3D" data-url="https://blog.kakaocdn.net/dna/bH7yDF/btsJ3Z93ZVn/AAAAAAAAAAAAAAAAAAAAAE0uSpECaUWccCYzeCoq9jgO5o3iWDE-bNBGRcW5Hs5t/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&amp;expires=1796050799&amp;allow_ip=&amp;allow_referer=&amp;signature=DnT4v9bUG38rFTN7j8%2F3dZQ%2FKmI%3D"><img data-origin-height="0" data-origin-width="0" loading="lazy" onerror="this.onerror=null; this.src='//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png'; this.srcset='//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png';" src="/assets/images/e700f300231fe60ae1115e1b.png"/></span></figure>
+</p>
+<p data-ke-size="size16"><br/>프로젝트 페이지를 만들고, 마일스톤과 하위 작업카드를 만들었다. 현재 필요한 작업들을 생성하고 할당하며, 각자 어떤 작업을 진행 중인지 자연스럽게 기록과 공유를 할 수 있도록 유도했다. 협업할 때 데이터만 다루는 팀, 모델만 다루는 팀 이런 식으로 나눈다면 작업을 분배한다는 것은 간단한 일이지만 데이터, 모델, 실험 등등 모든 테스크를 경험하기 위해서는 이런 형태가 가장 협업에 적합하다고 생각했다.</p>
+<h3 data-ke-size="size23">Git Issue &amp; PR</h3>
+<p><figure class="imageblock alignCenter" data-ke-mobilestyle="widthOrigin" data-origin-height="0" data-origin-width="0"><span data-phocus="https://blog.kakaocdn.net/dna/puXrk/btsJ3NINWYi/AAAAAAAAAAAAAAAAAAAAAC1eIOdCfXXABBdxFbo9w0L3SN3CO9Ep3zzWCA_XB8Pw/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&amp;expires=1796050799&amp;allow_ip=&amp;allow_referer=&amp;signature=WTu8YAxldo9ObknBXxa3LbokYqY%3D" data-url="https://blog.kakaocdn.net/dna/puXrk/btsJ3NINWYi/AAAAAAAAAAAAAAAAAAAAAC1eIOdCfXXABBdxFbo9w0L3SN3CO9Ep3zzWCA_XB8Pw/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&amp;expires=1796050799&amp;allow_ip=&amp;allow_referer=&amp;signature=WTu8YAxldo9ObknBXxa3LbokYqY%3D"><img data-origin-height="0" data-origin-width="0" loading="lazy" onerror="this.onerror=null; this.src='//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png'; this.srcset='//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png';" src="/assets/images/ce590ece44d9782448386400.png"/></span></figure>
+</p>
+<p data-ke-size="size16"><br/>먼저 Git Branch 전략을 세웠다. 대부분 git에 익숙하지 않았기 때문에 최대한 단순한 규칙이 필요했고, Experiment Branch와 Feature Branch 두 가지 브랜치로만 관리하기로 헀다. 그리고 이슈와 PR 템플릿을 만들었어 노션 작업 카드와 이슈를 서로 링크하도록 했다.<br/>jira와 같은 툴을 쓰면 자동으로 연계할 수 있어 좋겠지만 팀원들에게는 기존에 팀 페이지로 사용하고 있던 노션이 익숙헀기 떄문에, 새로운 툴을 익혀가며 없던 규칙을 지켜가며 프로젝트를 해야 한다는 것은 설득하기 어려울 것이라고 생각했다. 어쩌면 내가 프로젝트를 매니징하며 도입하려는 많은 부분이 욕심일 수 있을거라 생각했기 때문이다.</p>
+<p data-ke-size="size16">그 다음으로는 이번 프로젝트에서 실무적인 역할로는 인프라 환경 구축과 베이스라인 코드 작업에 많은 시간을 쏟고 있다.</p>
+<h3 data-ke-size="size23">실험하기 좋은 환경 만들기</h3>
+<p data-ke-size="size16">PM으로서의 목표와 비슷하게 나와 팀원들의 성장을 위하여 밀도있는 작업이 필요했다. 그래서 인프라 관련 세팅을 스크립트로 작성하여 주어진 GPU 서버에서 스크립트 한번이면 모든 팀원이 동일하게 개발 환경 구축을 가능하도록 만들었다. 또한 파이썬 패키지나 GPU 관련 오류 신고를 받고 바로 처리하고 공유하는 과정을 통해 팀원들이 같은 에러를 반복하지 않도록 만들었다.</p>
+<h3 data-ke-size="size23">실험하기 좋은 코드 만들기</h3>
+<p data-ke-size="size16">코드 분리를 통해 높은 응집도와 낮은 의존성의 코드를 만들어 최소한의 코드 수정과 구현으로 효율적인 실험을 진행할 수 있도록 하였다. 역할과 구현의 분리<br/>를 통해 인자로 받아 처리할 수 있도록 작성했다. 예를 들어, inference.py 에서는 Retrieval Class에만 의존하고 인자를 통해 어떤 Retrieval를 사용할 것인지(TF-IDF, BM25, Dense ...) 선택하도록 만들었다.</p>
+<h2 data-ke-size="size26">느낀점</h2>
+<p data-ke-size="size16">프로젝트를 진행하면서 많은 것들을 배우고 있다. 마스터님과 조교님과 멘토님에게서, 다른 팀에서, 우리 팀 팀원들에서, 나 스스로에서도 배우고 있다. 이번 프로젝트는 지난 프로젝트보다 더 성공적일 것이고, 또 이번 프로젝트가 끝나고 다음 프로젝트가 진행될 때는 더 많은 것을 복기한 상태로 출발하게 될 테니 점점 성장할 내 모습이 기대된다.</p>
+<h1>네이버 부스트캠프 AI Tech 9주차 (TODO)</h1>
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>코드 베이스 리펙토링</li>
+<li>실험 환경 고도화</li>
+<li>토크나이저 관련 리서치</li>
+</ul>
+{% endraw %}

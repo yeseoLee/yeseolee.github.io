@@ -1,0 +1,108 @@
+---
+layout: post
+title: Velog 사용법 정리
+date: '2020-12-11T00:03:35.973000+09:00'
+categories:
+- etc
+source_url: https://velog.io/@yeseolee/Velog-사용법-정리
+source_blog: velog
+permalink: /velog/0502e613/
+---
+{% raw %}
+<h2>📒 Velog 기본 문법</h2>
+<h3>📌 제목</h3>
+<p><code>h1</code> 부터 <code>h6</code> 로 제목을 표현할 수 있다.</p>
+<p><strong>Velog 에서는 제목을 통해 목차를 알아서 생성해준다는 점이 참 매력적이다.</strong></p>
+<p>✍ <code>마크다운 작성시</code></p>
+<pre><code># h1
+## h2
+### h3
+#### h4
+##### h5
+###### h6
+</code></pre>
+<p>참고: <code>h1</code>, <code>h6</code> 처럼 회색 박스로 감싼 부분은 인라인 코드라고 하는데, <code>백틱( ` )</code>으로 감싸서 작성한다.</p>
+<hr/>
+<h3>📌 코드블럭 만들기</h3>
+<p>한줄짜리 코드블럭은 간단하게 <code>Tab</code>을 이용하여 작성한다.</p>
+<pre><code>Tab 이후에 입력한 텍스트
+</code></pre>
+<p>여러줄의 코드블럭은 <code>백틱( ` )</code> 3개를 감싸서 작성한다.</p>
+<pre><code>안녕 안녕
+나는 코드블럭이야
+백틱으로 감쌌더니 이렇게 됐지
+</code></pre>
+<p>코드블럭을 이용해서 특정 언어의 코드를 작성할 수 있다.
+✍ <code>입력</code>
+<code>java 	public class HelloWorld {     public void main(String[] args) {      	//hello world     	System.out.println("Hello World");         } 	} 	</code>
+👉 <code>결과</code></p>
+<pre><code class="language-java">public class HelloWorld {
+    public void main(String[] args) {
+    	//hello world
+        System.out.println("Hello World");
+    }
+}
+</code></pre>
+<hr/>
+<h3>📌 인용문</h3>
+<p>'&gt;'를 이용한다. 한번만 사용할 수도 있고, 여러개로 중첩하여 사용할 수도 있다.</p>
+<p>✍ <code>입력</code></p>
+<pre><code>&gt;인용문 사용하는 법
+문단 맨 앞에 '&gt;'을 쓴다.
+
+&gt;인용문 사용하기
+&gt;&gt;중첩 사용하기
+&gt;&gt;&gt;중첩중첩 사용하기
+</code></pre>
+<p>👉 <code>결과	</code></p>
+<blockquote>
+<p>인용문 사용하는법
+문단 맨 앞에 '&gt;'을 쓴다.</p>
+</blockquote>
+<blockquote>
+<p>인용문 사용하기</p>
+<blockquote>
+<p>중첩 사용하기</p>
+<blockquote>
+<p>중첩 중첩 사용하기</p>
+</blockquote>
+</blockquote>
+</blockquote>
+<hr/>
+<h3>📌 링크 삽입</h3>
+<p>✍ <code>입력</code></p>
+<pre><code>인라인 링크 작성
+[인라인 링크](https://velog.io/)
+
+url 링크 작성
+&lt;https://velog.io/&gt;
+</code></pre>
+<p>👉 <code>결과	</code></p>
+<p><a href="https://velog.io/">인라인 링크</a>
+<a href="https://velog.io/">https://velog.io/</a></p>
+<hr/>
+<h3>📌 이미지 삽입</h3>
+<p>✍ <code>입력</code></p>
+<pre><code>![이미지 설명](이미지 링크)
+</code></pre>
+<p><code>이미지에 링크 추가하려면</code></p>
+<pre><code>[![이미지 설명](이미지 링크)](연결하고자하는 url "마우스 오버 시 나타낼 링크 title")
+</code></pre>
+<hr/>
+<h3>📌 이모지</h3>
+<p>아래 주소의 이모지를 복사+붙여넣기로 사용하면 된다.
+https://kr.piliapp.com/twitter-symbols/
+단축키 <code>윈도우 키</code> + <code>마침표(.)</code> 로만 사용했는데, 이건 처음 알았다.</p>
+<hr/>
+<h3>📌 수평선</h3>
+<p><code>-</code>또는 <code>*</code> 또는 <code>_</code>를 3개 이상 작성
+(단, <code>-</code>를 사용할 경우 header로 인식할 수 있어 이 전 라인은 비워야 한다고 하니, 일반적으로 <code>*</code>을 쓰는게 편할 듯하다.)</p>
+<hr/>
+<blockquote>
+<p>다음은 내가 참고한 사이트이다.
+내 입장에서 자주 사용할만한 기능 위주로 정리했다.
+https://velog.io/@yuuuye/velog-마크다운MarkDown-작성법
+https://velog.io/@jinuku/Velog-간단-사용법</p>
+</blockquote>
+
+{% endraw %}

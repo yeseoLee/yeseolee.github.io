@@ -1,0 +1,56 @@
+---
+layout: post
+title: 소스코드를 블로그에 올릴때
+date: '2020-12-12T15:28:35.670000+09:00'
+categories:
+- etc
+source_url: https://velog.io/@yeseolee/소스코드를-블로그에-올릴때
+source_blog: velog
+permalink: /velog/e3d916c5/
+---
+{% raw %}
+<h2>💡 코드를 텍스트로 삽입하기</h2>
+<h3>📌Color Scriper</h3>
+<p>https://colorscripter.com/
+간단하게 웹에서 복사 붙여넣기로 만들 수 있다.
+코드 하이라이트를 지원하는 것이 특징이다.
+블로그 배경색에 어울리는 적절한 스타일을 선택할 수 있다.
+(Velog에서는 잘 사용하지 않는다.)
+<img alt="" src="/assets/images/8bd11142ae20a41b20bb88b5.png"/>
+<img alt="" src="/assets/images/9207e823691439454fe4240c.png"/></p>
+<h3>📌GitHub Gist</h3>
+<p>https://gist.github.com/
+내 코드를 모아서 관리할 수 있다는 점이 장점.
+깃허브 아이디가 필요하다.
+velog에서는 불가능하다.
+<img alt="" src="/assets/images/e0f848bfd9f8e2c7998b51fd.png"/></p>
+<h3>📌Velog에서는? 코드블럭</h3>
+<p>백틱 3개 <code>```</code>로 코드를 감싸면 된다. 여러 언어로 설정도 가능하다.</p>
+<p>👉 예시
+<code>java 	public class HelloWorld {     public void main(String[] args) {      	System.out.println("Hello World");         } 	} 	</code></p>
+<p>👉 결과</p>
+<pre><code class="language-java">public class HelloWorld {
+    public void main(String[] args) {
+        System.out.println("Hello World");
+    }
+}
+</code></pre>
+<h2>💡 코드를 이미지로 변환하여 삽입하기</h2>
+<h3>📌 Polacode</h3>
+<p>https://marketplace.visualstudio.com/items?itemName=pnp.polacode
+VScode에서 사용 가능한 플러그인이다.
+마우스 드래그만으로 만들 수 있고, 코드 작업 도중에 따로 창을 열지 않아도 바로 만들 수 있다.
+<img alt="polacode" src="/assets/images/04c5a4030c145fdbcc578816.gif"/></p>
+<h3>📌 Carbon</h3>
+<p>https://carbon.now.sh/</p>
+<p>👉간편하다.
+간단하게 웹에서 복사 붙여넣기로 만들 수 있다.
+VScode에서도 carbon-now-sh 라는 이름으로 지원한다.
+배경색을 바꿀 때도 배경색에 맞는 폰트와 글자색을 가진 프리셋을 지원한다.</p>
+<p>👉이쁘다.
+스타일이 다양하고, 커스터마이징을 지원한다.
+<strong>(패딩, 그림자 효과, 윈도우 모양, 사이즈 등의 디자인과 폰트, 줄간격, 줄번호 등의 가독성과 관련된 부분까지 모두 지원한다.)</strong></p>
+<p><img alt="Carbon" src="/assets/images/4b27f10662a1cb0e29949f90.png"/><img alt="carbon 예시" src="/assets/images/490a6e18b1c4dcd9f4827b54.png"/>기본적으로 지원하는 디자인 예시를 그대로 활용하였다.</p>
+<p><img alt="carbon 커스터마이징 예시" src="/assets/images/1867fc2ef48b3a2571ec75a5.png"/>간략하게 어떤 기능이 있는지 보여주기 위해 커스터마이징을 해보았다. 윈도우 창 디자인을 바꾸고, 가로길이를 늘리고 세로길이를 줄였다. 그림자 효과를 추가하였고, 줄간격을 늘리고, 줄 번호를 부여하였다.</p>
+
+{% endraw %}

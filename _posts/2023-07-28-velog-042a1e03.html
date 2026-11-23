@@ -1,0 +1,197 @@
+---
+layout: post
+title: Cookie(쿠키) / Session(세션)
+date: '2023-07-28T09:44:18.230000+09:00'
+categories:
+- CS
+source_url: https://velog.io/@yeseolee/Cookie-Session
+source_blog: velog
+permalink: /velog/042a1e03/
+---
+{% raw %}
+<h2>Cookie(쿠키)</h2>
+<ul>
+<li>웹 사이트에 접속할 때 서버에 의해 사용자의 컴퓨터(브라우저)에 저장되는 정보</li>
+<li><code>&lt;이름&gt;=&lt;값&gt;</code> 형태의 단순한 문자열</li>
+<li>유실, 변조, 도난 등 보안에 취약하여 개인정보 등은 저장해서는 안됨</li>
+</ul>
+<hr/>
+<h3>쿠키를 다루는 방법</h3>
+<ul>
+<li><strong>HTTP</strong> 메시지의 <strong>헤더(header)</strong> 영역을 통해서 송/수신</li>
+<li><code>Set-Cookie:user=홍길동</code> 서버에서 클라이언트로 쿠키 전달(응답)</li>
+<li><code>Cookie:user=홍길동;</code> 클라이언트가 서버에서 받은 쿠키를 저장하고, HTTP 요청시 서버로 전달</li>
+</ul>
+<p><img alt="Set-Cookie (HTTP Response)" src="/assets/images/dfc01e9c77fd4c91027b424a.png"/></p>
+<p><img alt="Cookie (HTTP Request)" src="/assets/images/39080ee03ee1a003b1e719e0.png"/></p>
+<hr/>
+<h3>쿠키를 사용하는 이유</h3>
+<ul>
+<li>HTTP는 무상태(Stateless) 비연결지향(Connectionless) 프로토콜</li>
+<li>클라이언트와 서버가 요청과 응답을 주고 받으면 연결이 끊어지고, 다시 요청할 때 서버는 이전 요청을 기억하지 못함</li>
+<li>사용자 로그인 세션 관리, 장바구니, 광고 정보 트래킹(서드파티 쿠키) 등으로 활용</li>
+</ul>
+<hr/>
+<h3>쿠키의 속성</h3>
+<p><strong>생명주기 - expires, max-ages</strong></p>
+<ul>
+<li>expires (만료일이 되면 쿠키 삭제)
+<ul>
+<li><code>Set-Cookie: expires=Sat, 26-Dec-2020 04:39:21 GMT</code></li>
+</ul>
+</li>
+<li>max-ages (지정 시간이 지나면 쿠키 삭제)
+<ul>
+<li><code>Set-Cookie: max-age=3600</code> (3600초)</li>
+</ul>
+</li>
+<li>expires나 max-ages를 통해 만료 시점을 관리하는 쿠키를 영속쿠키 / 그렇지 않은 쿠키를 세션쿠키라고 하며, 세션 쿠키는 브라우저 종료시 삭제되고 영속 쿠키는 브라우저 종료에도 유지</li>
+</ul>
+<p><strong>도메인 - domain</strong></p>
+<ul>
+<li>명시: 명시한 문서 기준 도메인 + 서브 도메인 포함
+<ul>
+<li><code>domain=example.org</code> → dev.example.org도 쿠키 접근 가능</li>
+</ul>
+</li>
+<li>생략: 현재 문서 기준 도메인만 적용
+<ul>
+<li>현재 문서인 example.org에서만 쿠키 접근 가능</li>
+</ul>
+</li>
+</ul>
+<p><strong>경로 - path</strong></p>
+<ul>
+<li>이 경로를 포함한 하위 경로 페이지만 쿠키 접근
+<ul>
+<li><code>path=/home</code> → /home/* 가능</li>
+<li><code>path=/</code> → (루트 경로 지정: 모든 요청에 쿠키 전달)</li>
+</ul>
+</li>
+</ul>
+<p><strong>보안 - Secure, HttpOnly, SameSite</strong></p>
+<ul>
+<li>Secure
+<ul>
+<li>https인 경우에만 전송 (http X)</li>
+</ul>
+</li>
+<li>HttpOnly
+<ul>
+<li>XSS 공격 방지</li>
+<li>자바스크립트에서 접근 불가</li>
+</ul>
+</li>
+<li>SameSite
+<ul>
+<li>CSRF(XSRF) 공격 방지</li>
+<li>요청 도메인과 쿠키에 설정된 도메인이 같은 경우(= 퍼스트 파티 쿠키)만 전송</li>
+<li><code>None</code>, <code>Lax</code>, <code>Strict</code> 세 가지 옵션(정책)</li>
+</ul>
+</li>
+</ul>
+<hr/>
+<h2>Session(세션)</h2>
+<ul>
+<li>웹 사이트의 여러 페이지에 걸쳐 사용되는 사용자 정보를 저장하는 방법</li>
+<li>일정 시간동안 같은 브라우저로 부터 들어오는 일련의 요구를 하나의 상태로 보고 그 상태를 일정하게 유지시키는 기술</li>
+<li>서비스가 돌아가는 서버 측에 데이터를 저장하고, 세션의 키값만을 클라이언트 측에 남겨둠</li>
+<li>브라우저는 필요할 때마다 이 키값을 이용하여 서버에 저장된 데이터를 사용</li>
+</ul>
+<hr/>
+<h3>세션을 다루는 방법</h3>
+<p><img alt="session-create" src="/assets/images/6657641bdbfe09bdc5b19962.png"/>
+<img alt="session-read" src="/assets/images/24fc7d330557df46452a4d0a.png"/></p>
+<hr/>
+<h3>세션을 사용하는 이유</h3>
+<ul>
+<li>쿠키를 통해 세션 ID만 노출시키고 개인정보나 민감한 데이터를 노출시키지 않음</li>
+<li>보안에 취약한 쿠키를 보완해주는 역할</li>
+<li>매 요청마다 전송하는 쿠키의 크기가 커지면 상당한 트래픽을 유발할 수 있음</li>
+</ul>
+<hr/>
+<h3><strong>다중 서버 환경에서의 세션 관리</strong></h3>
+<ul>
+<li>세션에 대한 처리가 없는 로드 밸런싱(Load Balancing) 환경
+<ul>
+<li>데이터 불일치(<strong>정합성</strong>)</li>
+<li>ex) A 유저가 1번 서버에서 로그인 한 뒤  2번 서버에 요청을 보내면 2번 서버에는 세션 정보가 없어 실패한다.</li>
+</ul>
+</li>
+<li>스티키 세션(Sticky Session)
+<ul>
+<li>장애 발생시 세션 유실(<strong>가용성</strong>)</li>
+<li>하나의 서버로 요청이 몰릴 수 있음</li>
+<li>분산 환경을 완벽히 사용할 수 없음</li>
+</ul>
+</li>
+<li>세션 클러스터링(Session Clustering)
+<ul>
+<li>all-to-all Session Replication
+<ul>
+<li>모든 세션이 동일한 데이터를 가질 수 있도록 복사</li>
+<li>세션 수가 늘어날 수록 불필요한 메모리 사용이 늘고 성능 저하 발생</li>
+</ul>
+</li>
+<li>primary-secondary Session Replication
+<ul>
+<li>primary node/ backup(secondary) node / 나머지 proxy node 들로 구성</li>
+<li>primary node의 세션 데이터는 오직 backup node에만 저장</li>
+<li>proxy는 주소값만 들고있어 해당 주소로 세션 데이터 요청</li>
+<li>primary node가 다운되어도 backup node로부터 데이터를 복사해서 가져온 뒤 해당 노드가 primary로 승격</li>
+<li>대용량 트래픽은 빈번한 데이터 복사를 발생시켜 성능 저하 발생할 수 있음</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>세션 스토리지(Session Storage)
+<ul>
+<li>Disk based vs In-Memory
+<ul>
+<li>데이터의 영속성(permanence), 내구성(dutability) vs 빠른 응답시간</li>
+<li>세션은 빠른 응답이 더 중요할 수 있음</li>
+</ul>
+</li>
+<li>Redis
+<ul>
+<li>Key-Value</li>
+<li>Replication(Master-Slave, failover)을 통한 장애 극복</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<hr/>
+<h3>출처</h3>
+<ul>
+<li>
+<p>쿠키</p>
+<p><a href="https://inf.run/vyK5">모든 개발자를 위한 HTTP 웹 기본 지식</a>
+<a href="https://www.daleseo.com/http-cookies/">쿠키 1부: HTTP로 설명하는 쿠키(cookie)</a></p>
+</li>
+<li>
+<p>세션</p>
+<p><a href="https://smjeon.dev/web/sticky-session/">Sticky Session과 Session Clustering</a><br/>
+<a href="https://code-lab1.tistory.com/298">쿠키(Cookie)와 세션(Session)의 차이, 쿠키란? 세션이란?</a>
+<a href="https://hyuntaeknote.tistory.com/4">다중 서버 환경에서 세션을 어떻게 공유하고 관리할까?</a></p>
+</li>
+<li>
+<p>In-Memory-DB</p>
+<p><a href="https://jane096.github.io/project/how-to-solve-server-overload-p3/">서버 분산 처리 환경에서 세션 불일치를 어떻게 해결할까? Part 2</a></p>
+</li>
+</ul>
+<h3>더 알아보기</h3>
+<ul>
+<li>
+<p>보안</p>
+<p><a href="https://seob.dev/posts/%EB%B8%8C%EB%9D%BC%EC%9A%B0%EC%A0%80-%EC%BF%A0%ED%82%A4%EC%99%80-SameSite-%EC%86%8D%EC%84%B1/">브라우저-쿠키와-SameSite-속성/</a>
+<a href="https://program-developer.tistory.com/99">XSS와 CSRF(XSRF)의 차이점</a>
+<a href="https://nsinc.tistory.com/121">HTTP Only와 Secure Cookie 이해하기</a></p>
+</li>
+<li>
+<p>JWT 인증</p>
+<p><a href="https://inpa.tistory.com/entry/WEB-%F0%9F%93%9A-JWTjson-web-token-%EB%9E%80-%F0%9F%92%AF-%EC%A0%95%EB%A6%AC">JWT 토큰 인증 이란? (쿠키 vs 세션 vs 토큰)</a></p>
+</li>
+</ul>
+
+{% endraw %}

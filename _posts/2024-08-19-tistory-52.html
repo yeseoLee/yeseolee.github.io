@@ -1,0 +1,117 @@
+---
+layout: post
+title: PyTorch로 직접 구현하는 Linear Regression
+date: '2024-08-19T15:05:51+09:00'
+categories:
+- 강의노트
+- 네이버 부스트캠프 AI Tech 7기
+source_url: https://ohge.tistory.com/52
+source_blog: tistory
+permalink: /tistory/52/
+---
+{% raw %}
+<h3 data-ke-size="size23">들어가며</h3>
+<p data-ke-size="size16">이 글을 읽기 이전에 Linear Regression에 대한 전반적인 개념 또는 Numpy 구현에 대해 참고하고자 한다면 다음 링크를 먼저 읽고 오는 것을 추천한다.</p>
+<figure contenteditable="false" data-ke-align="alignCenter" data-ke-type="opengraph" data-og-description="Regression회귀 분석: 관찰된 연속형 변수들에 대해 두 변수 사이의 모형을 구한 뒤 적합도를 측정하는 분석 방법변수: 값이 변하는 데이터 요소 또는 속성독립변수(설명변수) : 원인(x, input)종속변" data-og-host="ohge.tistory.com" data-og-image="https://blog.kakaocdn.net/dna/15h0J/hyWOegLskw/AAAAAAAAAAAAAAAAAAAAACWCOT1Dbpa8pJ7JpH8peNCEDHkLc-euPLd-gnfizDlP/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&amp;expires=1796050799&amp;allow_ip=&amp;allow_referer=&amp;signature=YPDcTk7MrbikPU5jWvOyoXAsW3c%3D" data-og-source-url="https://ohge.tistory.com/51" data-og-title="Numpy로 직접 구현하는 Linear Regression" data-og-type="article" data-og-url="https://ohge.tistory.com/51" id="og_1724047814911"><a data-source-url="https://ohge.tistory.com/51" href="https://ohge.tistory.com/51" rel="noopener" target="_blank">
+<div class="og-image" style="background-image: url('https://blog.kakaocdn.net/dna/15h0J/hyWOegLskw/AAAAAAAAAAAAAAAAAAAAACWCOT1Dbpa8pJ7JpH8peNCEDHkLc-euPLd-gnfizDlP/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&amp;expires=1796050799&amp;allow_ip=&amp;allow_referer=&amp;signature=YPDcTk7MrbikPU5jWvOyoXAsW3c%3D');"> </div>
+<div class="og-text">
+<p class="og-title" data-ke-size="size16">Numpy로 직접 구현하는 Linear Regression</p>
+<p class="og-desc" data-ke-size="size16">Regression회귀 분석: 관찰된 연속형 변수들에 대해 두 변수 사이의 모형을 구한 뒤 적합도를 측정하는 분석 방법변수: 값이 변하는 데이터 요소 또는 속성독립변수(설명변수) : 원인(x, input)종속변</p>
+<p class="og-host" data-ke-size="size16">ohge.tistory.com</p>
+</div>
+</a></figure>
+<h3 data-ke-size="size23">Iris 데이터 불러오기</h3>
+<pre class="nix"><code>from sklearn.datasets import load_iris
+from sklearn.model_selection import train_test_split
+
+# iris 데이터 불러오기
+iris = load_iris()
+X = iris.data[:, [0]] # 특성 데이터에서 첫 번째 특성만 사용
+y = iris.data[:, 2] # 타겟 데이터로 세 번째 특성 사용
+
+# 학습-테스트 데이터 분리
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)</code></pre>
+<h3 data-ke-size="size23">데이터 Tensor 형식으로 변경</h3>
+<pre class="routeros"><code>import torch
+device = "cuda" if torch.cuda.is_available() else "cpu"
+
+# 데이터 tensor 형태로 변환하기
+X_train_tensor = torch.tensor(X_train, dtype=torch.float32, device=device)
+y_train_tensor = torch.tensor(y_train, dtype=torch.float32, device=device).view(-1,1)
+X_test_tensor = torch.tensor(X_test, dtype=torch.float32, device=device)
+y_test_tensor = torch.tensor(y_test, dtype=torch.float32, device=device).view(-1,1)
+
+print(X_train_tensor.shape, y_train_tensor.shape)
+print(X_test_tensor.shape, y_test_tensor.shape)
+
+&gt;&gt;&gt; torch.Size([120, 1]) torch.Size([120, 1]) 
+&gt;&gt;&gt; torch.Size([30, 1]) torch.Size([30, 1])</code></pre>
+<h3 data-ke-size="size23">torch DataLoader</h3>
+<pre class="routeros"><code>from torch.utils.data import DataLoader, TensorDataset
+
+# DataLoader 설정하기
+train_dataset = TensorDataset(X_train_tensor, y_train_tensor)
+train_loader = DataLoader(train_dataset, batch_size=32, shuffle=True)</code></pre>
+<h3 data-ke-size="size23">nn.Module(기본 모델 클래스)을 상속받은 Linear Regression 모델 구현</h3>
+<pre class="ruby"><code>import torch.nn as nn
+
+# nn.Module 상속받아 LinearRegression 구현
+class MultipleLinearRegression(nn.Module):
+    def __init__(self, input_dim, output_dim):
+        super(MultipleLinearRegression, self).__init__()
+        self.linear = nn.Linear(input_dim, output_dim)
+
+    def forward(self, x):
+        return self.linear(x)</code></pre>
+<h3 data-ke-size="size23">모델 생성</h3>
+<pre class="reasonml"><code>input_size = X_train_tensor.shape[1]
+model = MultipleLinearRegression(input_size,1)
+model.to(device)</code></pre>
+<h3 data-ke-size="size23">모델 학습</h3>
+<pre class="yaml"><code>import torch.optim as optim
+import numpy as np
+
+criterion = nn.MSELoss()
+optimizer = optim.SGD(model.parameters(), lr=0.001)
+
+model.train() # 학습을 위해 모델이 gradient를 저장하도록 설정
+for epoch in range(10000):
+    for X, y_true in train_loader:    
+        optimizer.zero_grad() # 옵티마이저의 gradient 초기화    
+        y_pred = model(X)    
+        loss = criterion(y_pred, y_true) # 손실 계산 (MSE)        
+        loss.backward() # gradient descent 수행 (기울기 계산)        
+        optimizer.step() # SGD 방식의 최적화 진행 (가중치 업데이트)        
+    if (epoch + 1) % 1000 == 0:        
+        print(f"Epoch {epoch+1}, Loss: {loss.item()}")
+
+&gt;&gt;&gt; Epoch 1000, Loss: 0.7009232640266418 
+&gt;&gt;&gt; Epoch 2000, Loss: 0.8327165246009827 
+&gt;&gt;&gt; Epoch 3000, Loss: 0.8950142860412598 
+&gt;&gt;&gt; Epoch 4000, Loss: 0.7218224406242371 
+&gt;&gt;&gt; Epoch 5000, Loss: 1.0261136293411255 
+&gt;&gt;&gt; Epoch 6000, Loss: 0.5871046185493469
+&gt;&gt;&gt; Epoch 7000, Loss: 0.7505958080291748
+&gt;&gt;&gt; Epoch 8000, Loss: 0.9513499736785889
+&gt;&gt;&gt; Epoch 9000, Loss: 0.7906377911567688
+&gt;&gt;&gt; Epoch 10000, Loss: 0.9563422799110413</code></pre>
+<h3 data-ke-size="size23">모델 평가 및 시각화</h3>
+<pre class="maxima"><code>import matplotlib.pyplot as plt
+
+model.eval()
+with torch.no_grad():
+    y_pred = model(X_test_tensor)
+    test_loss = criterion(y_pred, y_test_tensor)
+    print(f"Test Loss(MSE): {test_loss.item()}")
+
+    # 시각화
+    plt.scatter(X_test_tensor, y_test_tensor, label="Data")
+    plt.plot(X_test_tensor, y_pred, color="r", label="Regression Line")
+    plt.title("Iris Linear Regression")
+    plt.legend()
+    plt.show()
+
+&gt;&gt;&gt; Test Loss(MSE): 0.6069501638412476</code></pre>
+<p><figure class="imageblock alignCenter" data-ke-mobilestyle="widthOrigin" data-origin-height="433" data-origin-width="537"><span data-phocus="https://blog.kakaocdn.net/dna/l6MIv/btsI7nrCh0j/AAAAAAAAAAAAAAAAAAAAAKUj2E-c6tYQLMfNag8OSflwmeoZSs53qkWIOcucPq0V/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&amp;expires=1796050799&amp;allow_ip=&amp;allow_referer=&amp;signature=z2BDGUMjPX61UfG4%2FJU2MYLg1KM%3D" data-url="https://blog.kakaocdn.net/dna/l6MIv/btsI7nrCh0j/AAAAAAAAAAAAAAAAAAAAAKUj2E-c6tYQLMfNag8OSflwmeoZSs53qkWIOcucPq0V/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&amp;expires=1796050799&amp;allow_ip=&amp;allow_referer=&amp;signature=z2BDGUMjPX61UfG4%2FJU2MYLg1KM%3D"><img data-origin-height="433" data-origin-width="537" height="433" loading="lazy" onerror="this.onerror=null; this.src='//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png'; this.srcset='//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png';" src="/assets/images/15218064bd3aa3e4614e4e6f.png" width="537"/></span></figure>
+</p>
+{% endraw %}

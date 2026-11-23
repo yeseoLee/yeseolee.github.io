@@ -1,0 +1,420 @@
+---
+layout: post
+title: Training Large Language Models to Reason in a Continuous Latent Space 논문 리뷰
+date: '2025-05-01T20:57:25+09:00'
+categories:
+- 개발
+- 논문읽기
+source_url: https://ohge.tistory.com/73
+source_blog: tistory
+permalink: /tistory/73/
+---
+{% raw %}
+<h2 data-ke-size="size26">소개</h2>
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>24년 12월 Meta에서 발표한 논문으로, 사람이 생각을 머릿속으로 하는 것처럼, LLM도 Reasoning을 토큰으로 출력하는 대신 Latent Space에서 수행할 수 있도록 하는 방법론인 COCONUT을 제안합니다.</li>
+</ul>
+<h2 data-ke-size="size26">0. Abstract</h2>
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>LLM이 일반적으로 chain-of-thought (CoT)를 사용할 때, “언어 공간"에서만 추론 과정을 표현할 수 있다.</li>
+<li>그러나, 언어 공간이 추론에 항상 최적인 것은 아닐 수 있다. 대부분의 토큰은 텍스트 일관성을 위한 것이며 추론에 필수적이지 않고, 일부 토큰만이 reasoning에 중요한 역할을 한다.</li>
+<li><b>COCONUT</b>: 자연어 대신 잠재 공간에서 LLM이 추론하게하자.
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>가능성이 있는 여러 다음 추론 단계를 인코딩할 수 있도록 하여 BFS(너비 우선 탐색)처럼 추론한다.</li>
+<li>한 가지의 추론 path만을 제공하는 것이 아니기 때문에 백트래킹이 필요한 특정 추론 작업에서 CoT보다 우수한 성능을 보이며, 더 적은 수의 토큰을 사용하여 추론한다.</li>
+</ul>
+</li>
+</ul>
+<h2 data-ke-size="size26">1. Introduction</h2>
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>NTP(Next Token Prediction)은 효과적이지만, LLM의 명시적인 추론 과정은 단어 토큰으로 생성되어야 한다는 근본적인 제약을 부과한다.
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>LLM은 생각을 말로 표현하면서 추론해야 하는데, 실제 사람들은 머릿속으로 무언가를 추론하거나 문제를 풀 때 굳이 언어 기능을 많이 사용하지 않는다.</li>
+<li>뇌를 촬영해서 연구해 보니, 실제 인간이 추론할 때 언어를 이해하고 생성하는 뇌 부위는 적게 움직였다.</li>
+<li>즉, 사람의 언어 능력은 소통을 위해 발달했고, 순수하게 생각하는 과정에서는 언어 없이도 가능하다.<br/>(LLM도 사람처럼 머릿속으로 생각해보자는 직관적인 아이디어에 대한 과학적 근거 제시)</li>
+</ul>
+</li>
+<li>현재 LLM의 추론에서 중요한 문제는 모든 토큰을 생성하는데 동일한 컴퓨팅 파워가 발생하지만, 일부 토큰 만이 추론 과정에 중요한 역할을 한다는 점이다.
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>대부분의 토큰은 유창성(텍스트 일관성)만을 위해 생성되어 실제 추론 과정에 거의 기여하지 못한다.</li>
+<li>이전 연구에서 <a href="https://arxiv.org/abs/2409.12183">LLM이 간결한 추론 체인을 생성하도록 유도</a>하거나, <a href="https://arxiv.org/abs/2403.09629">일부 중요한 토큰을 생성하기 전에 추가 추론을 수행</a>함으로써 이러한 문제를 해결하려고 시도했지만, 이러한 솔루션은 언어 공간 내에서 제약을 받기 때문에 근본적인 문제를 해결하지 않는다.</li>
+</ul>
+</li>
+</ul>
+<p><figure class="imageblock alignCenter" data-ke-mobilestyle="widthOrigin" data-origin-height="0" data-origin-width="0"><span data-phocus="https://blog.kakaocdn.net/dna/b4sfek/btsNGEvTBUu/AAAAAAAAAAAAAAAAAAAAAER5DbHJD5LWQbK7sX49uCErFZr8cWEi2sLaFn0lUaB5/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&amp;expires=1796050799&amp;allow_ip=&amp;allow_referer=&amp;signature=q62EdXFNbl8o60WACh%2FfY%2BCx1nM%3D" data-url="https://blog.kakaocdn.net/dna/b4sfek/btsNGEvTBUu/AAAAAAAAAAAAAAAAAAAAAER5DbHJD5LWQbK7sX49uCErFZr8cWEi2sLaFn0lUaB5/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&amp;expires=1796050799&amp;allow_ip=&amp;allow_referer=&amp;signature=q62EdXFNbl8o60WACh%2FfY%2BCx1nM%3D"><img data-origin-height="0" data-origin-width="0" loading="lazy" onerror="this.onerror=null; this.src='//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png'; this.srcset='//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png';" src="/assets/images/3989e4a761f5c6c85a9bbac9.png"/></span></figure>
+</p>
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>COCONUT(Chain of Continuous Thought): 잠재 공간에서의 LLM 추론
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>전통적인 CoT 프로세스를 간단히 수정하는 과정을 포함: 언어 모델 head와 임베딩 레이어를 사용하여 hidden state와 토큰 간의 매핑 대신, COCONUT은 마지막 hidden state(a continuous thought)를 다음 토큰의 입력 임베딩으로 직접 제공한다.</li>
+<li>추론이 언어 공간 내에 있는 것을 자유롭게 하며, 연속적인 사고는 완전히 미분 가능하기 때문에 시스템은 경사 하강법에 의해 종단 간 최적화될 수 있다.</li>
+<li>잠재적인 추론의 훈련을 강화하기 위해 <a href="https://arxiv.org/abs/2405.14838">iCoT</a> 에서 영감을 받은 multi-stage training 전략을 사용한다.</li>
+</ul>
+</li>
+</ul>
+<h2 data-ke-size="size26">2.Related Work</h2>
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li><b>Chain-of-thought (CoT) reasoning</b></li>
+<li><b>Latent reasoning in LLMs</b></li>
+</ul>
+<p><figure class="imageblock alignCenter" data-ke-mobilestyle="widthOrigin" data-origin-height="0" data-origin-width="0"><span data-phocus="https://blog.kakaocdn.net/dna/OrsWV/btsNGWvWyhu/AAAAAAAAAAAAAAAAAAAAAJoqN9RaLqPrWWdduYWShcye9FXYX_lyLVbcgv9cFwwR/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&amp;expires=1796050799&amp;allow_ip=&amp;allow_referer=&amp;signature=CKG%2FMvWXf7QWA1bjMsjU%2FU27CN4%3D" data-url="https://blog.kakaocdn.net/dna/OrsWV/btsNGWvWyhu/AAAAAAAAAAAAAAAAAAAAAJoqN9RaLqPrWWdduYWShcye9FXYX_lyLVbcgv9cFwwR/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&amp;expires=1796050799&amp;allow_ip=&amp;allow_referer=&amp;signature=CKG%2FMvWXf7QWA1bjMsjU%2FU27CN4%3D"><img data-origin-height="0" data-origin-width="0" loading="lazy" onerror="this.onerror=null; this.src='//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png'; this.srcset='//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png';" src="/assets/images/a2a262541a022106850396bf.png"/></span></figure>
+</p>
+<p data-ke-size="size16">From Explicit CoT to Implicit CoT: Learning to Internalize CoT Step by Step [Figure 1]</p>
+<h2 data-ke-size="size26">3. Coconut: Chain of Continuous Thought</h2>
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>입력 시퀀스 $x=(x_1,...,x_T)$에 대해, 표준 대규모 언어 모델 $M$은 다음과 같이 설명될 수 있다.</li>
+</ul>
+<p data-ke-size="size16">$$
+H_t=Transformer(E_t)
+$$</p>
+<p data-ke-size="size16">$$
+M(x_t+1∣X_let)=softmax(Wh_t)
+$$</p>
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>$E_t=[e(x_1),e(x_2),...,e(x_t)]$는 위치 $t$까지의 토큰 임베딩 시퀀스</li>
+<li>$H_t ∈ R^{t×d}$는 위치 $t$까지의 모든 토큰에 대한 마지막 hidden state의 행렬</li>
+<li>$h_t$는 위치 $t$의 마지막 hidden state, 즉 $h_t=H_t[t,:]$</li>
+<li>$e(\cdot)$는 토큰 임베딩 함수</li>
+<li>$W$는 언어 모델 헤드의 파라미터</li>
+</ul>
+<h3 data-ke-size="size23">3.1 Method Overview</h3>
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>LLM은 “language mode”와 “latent mode” 사이를 전환한다.</li>
+<li>language mode에서 모델은 표준 언어 모델처럼 작동하여 다음 토큰을 autoregressive하게 생성한다.</li>
+<li>latent mode에서는 마지막 hidden state를 다음 input embedding으로 직접 사용한다.
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>이 마지막 hidden state는 "continuous thought"라고 정의한 현재 추론 상태를 나타낸다.</li>
+<li>special 토큰 <code>&lt;bot&gt;</code>과 <code>&lt;eot&gt;</code>는 각각 latent thought mode의 시작과 끝을 표시하는 데 사용된다.</li>
+<li>예를 들어, 위치 $i$와 $j$ 사이( $x_i = $, $x_j = $)에서 latent reasoning이 발생한다고 가정한다.
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>모델이 latent mode에 있는 경우 ($i &lt; t &lt; j$), 이전 토큰의 마지막 hidden state를 사용하여 입력 임베딩을 대체한다.</li>
+<li>즉, $E_t=[e(x_1),e(x_2),...,e(x_i),h_i,h_i+1,...,h_t−1]$이다.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p><figure class="imageblock alignCenter" data-ke-mobilestyle="widthOrigin" data-origin-height="0" data-origin-width="0"><span data-phocus="https://blog.kakaocdn.net/dna/bXYvKw/btsNHyVBmb2/AAAAAAAAAAAAAAAAAAAAAJr0IxcbpzClDIVDX9ngk6umYxH3AV6GxxNfbaTiTqHw/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&amp;expires=1796050799&amp;allow_ip=&amp;allow_referer=&amp;signature=OI5pgA%2FdtwyKpJAcMB1zCZFXjYY%3D" data-url="https://blog.kakaocdn.net/dna/bXYvKw/btsNHyVBmb2/AAAAAAAAAAAAAAAAAAAAAJr0IxcbpzClDIVDX9ngk6umYxH3AV6GxxNfbaTiTqHw/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&amp;expires=1796050799&amp;allow_ip=&amp;allow_referer=&amp;signature=OI5pgA%2FdtwyKpJAcMB1zCZFXjYY%3D"><img data-origin-height="0" data-origin-width="0" loading="lazy" onerror="this.onerror=null; this.src='//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png'; this.srcset='//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png';" src="/assets/images/786aac226841f04698680e22.png"/></span></figure>
+</p>
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>latent mode가 끝나면 ($t \ge j$), 입력은 토큰 임베딩을 사용하는 것으로 되돌아간다.
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>$E_t=[e(x_1),e(x_2),...,e(x_i),h_i,h_i+1,...,h_j−1,e(x_j),...,e(x_t)]$이다.</li>
+<li>마지막 hidden state는 최종 정규화 레이어를 거쳤기 때문에 크기가 그다지 크지 않다.
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>잠재적 사고는 언어 공간으로 다시 매핑될 의도가 없으므로 $i &lt; t &lt; j$일 때 $M(x_t+1∣x_{\le t})$는 정의되지 않는다.</li>
+<li>그러나 탐색 목적으로 $softmax(Wh_t)$는 여전히 계산할 수 있다. (4. 실험 참조)</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h3 data-ke-size="size23">3.2 Training Procedure</h3>
+<p data-ke-size="size16">본 연구에서는 모델이 질문을 입력으로 받아 추론 과정을 통해 답변을 생성할 것으로 예상되는 문제 해결 설정에 중점을 둔다.</p>
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li><a href="https://arxiv.org/abs/2405.14838">iCoT</a> 에서 영감을 받은 다단계 훈련 커리큘럼을 구현하여 CoT 데이터를 활용하여 연속적인 사고를 지도한다.</li>
+<li>그림 2에서 볼 수 있듯이, 초기 단계에서는 모델이 일반적인 CoT 인스턴스에 대해 훈련된다.</li>
+<li>이후 단계에서는 k번째 단계에서 CoT의 첫 번째 <code>k</code>개의 추론 단계를 <code>k × c</code>개의 연속적인 Thought로 대체한다. (<code>c</code>는 단일 추론 단계를 대체하는 잠재적인 사고의 수를 제어하는 하이퍼파라미터이다.)</li>
+<li><a href="https://arxiv.org/abs/2405.14838">iCoT</a> 방법을 따라, 훈련 단계가 전환될 때 옵티마이저를 재설정한다. continuous thought을 캡슐화하기 위해 <code>&lt;bot&gt;</code> 및 <code>&lt;eot&gt;</code> 토큰을 삽입한다.</li>
+<li>훈련 과정에서 일반적인 negative log-likelihood loss을 최적화하지만, question과 latent thoughts 부분에서는 loss을 마스킹한다. (해당 부분의 예측 오류는 손실 계산에 포함시키지 않는다.)
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>모델이 문제를 이해하고 추론하는 과정을 언어적인 표현에만 의존하지 않고, 연속적인 잠재 공간에서의 Thought으로 나타내도록 학습시킨다.</li>
+<li>모델이 초기 question이나 중간 thought을 정확하게 언어로 표현하는 것보다는, thought이 앞으로의 올바른 추론 과정을 이끌어내는 데 더 집중하도록 훈련하는 것이다.</li>
+<li>따라서 LLM은 자연어에 비해 더 효과적인 추론 단계 표현을 학습할 수 있다.</li>
+</ul>
+</li>
+</ul>
+<h3 data-ke-size="size23">3.3 Training Details</h3>
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>continuous thoughts는 완전히 미분 가능하며 역전파가 가능하다.</li>
+<li>현재 훈련 단계에서 n개의 latent thoughts가 예약될 때, n + 1개의 forward pass를 수행하여 각 pass마다 새로운 latent thoughts을 계산하고 마지막으로 추가적인 forward pass를 수행하여 남은 텍스트 시퀀스에 대한 loss를 얻는다.</li>
+<li>KV 캐시를 사용하여 반복적인 컴퓨팅을 저장할 수는 있지만, 여러 forward pass의 sequential 특성은 병렬 처리를 어렵게 한다. → 훈련 효율성 최적화는 향후 연구에서 중요한 방향이다...</li>
+</ul>
+<h3 data-ke-size="size23">3.4 Inference Process</h3>
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>COCONUT의 inference 과정은 표준 언어 모델 디코딩과 유사하지만, latent mode에서는 마지막 hidden state를 다음 input 임베딩으로 직접 입력한다.</li>
+<li>문제는 latent mode와 language mode 간의 전환 시기를 결정하는 것.
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>질문 토큰 바로 뒤에 <code>&lt;bot&gt;</code> 토큰을 삽입한다.</li>
+<li><code>&lt;eot&gt;</code>의 경우, 우리는 두 가지 잠재적 전략을 고려한다.
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>a: latent thoughts에 대한 이진 분류기를 훈련시켜 모델이 latent reasoning을 언제 종료할지 자율적으로 결정할 수 있도록 한다.</li>
+<li>b: 항상 latent thoughts를 일정한 길이로 패딩할 수 있도록 한다.</li>
+<li>(두 접근 방식 모두 비교적 잘 작동하기 때문에 별도로 명시되지 않는 한 실험에서 두 번째 옵션을 사용하여 단순화했다.)</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h2 data-ke-size="size26">4. Experiments</h2>
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>세 가지 데이터셋에 대한 실험을 통해 continuous latent space에서 LLM reasoning의 타당성을 검증한다.</li>
+<li>주로 모델 생성 답변을 실제 진실과 비교하여 정확성을 평가한다.</li>
+<li>reasoning 효율성을 측정하기 위해 질문당 새로 생성된 토큰의 수를 분석한다.</li>
+</ul>
+<h3 data-ke-size="size23">4.1 Reasoning Tasks</h3>
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li><b>Math Reasoning</b>: GSM8k dataset
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>초등학교 수준의 수학 문제들로 구성된 데이터셋.</li>
+<li>다른 데이터셋에 비해 문제들이 더 다양하고 개방적이며, 실제 사용 사례와 유사</li>
+<li>latent reasoning이 실제 응용 분야에서 잠재력을 갖는지 확인</li>
+<li>모델 훈련을 위해 <a href="https://arxiv.org/abs/2311.01460">Implicit Chain of Thought Reasoning via Knowledge Distillation</a>에서 생성한 합성 데이터셋을 사용</li>
+</ul>
+</li>
+<li><b>Logical Reasoning</b>: 5-hop ProntoQA 사용 &amp; ProQA 제안
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>목표: 주어진 조건들을 활용하여 결론이 참인지 거짓인지 논리적으로 판단</li>
+<li>특징: 여러 추론 경로 중 올바른 경로를 탐색하고 계획하는 능력 필요</li>
+<li>ProntoQA
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>5단계 추론 필요</li>
+<li>가상의 개념 사용</li>
+<li>조건 구조: 트리 형태 (하나의 부모 노드)</li>
+<li>제한점: 곁가지(오답 유도)의 크기가 작아 복잡한 계획 불필요</li>
+</ul>
+</li>
+<li>ProsQA(Proof with Search Question-Answering)
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>조건 구조: DAG (방향성 비순환 그래프) 형태 (여러 부모 노드 가능)</li>
+<li>요구 능력: 그래프 전체를 탐색하고 올바른 추론 경로를 찾는 고도의 계획 및 탐색 능력 필요</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h3 data-ke-size="size23">4.2 Experimental Setup</h3>
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>실험 설정
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>base model: pre-trained GPT-2</li>
+<li>learning rate: 1 × 10-4</li>
+<li>batch size: 128</li>
+<li><a href="https://arxiv.org/abs/2405.14838">iCoT</a>에 따라, 학습 단계가 전환될 때 optimizer 재설정</li>
+</ul>
+</li>
+<li><b>Math Reasoning</b>
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>기본적으로 각 추론 단계에 대해 2개의 latent thoughts(c = 2)를 사용한다.</li>
+<li>모델은 초기 학습 단계를 거친 후, 3번의 추가 학습 단계를 더 진행한다.</li>
+<li>이후 최종 단계에서는 이전 단계와 동일하게 3 × c 개의 continuous thoughts를 사용하되, 자연어 reasoning chain은 모두 제거한다.</li>
+<li>이는 3단계 이상의 긴 reasoning chain에서 LTD(Long-Tail Distribution)를 다루기 위함이다.</li>
+<li>초기 단계에서는 6 epochs 동안 학습하고, 나머지 각 단계에서는 3 epochs 동안 학습한다.</li>
+</ul>
+</li>
+<li><b>Logical Reasoning</b>
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>모든 추론 단계에 대해 하나의 continuous thought (c = 1)을 사용한다.</li>
+<li>모델은 초기 단계 외에도 6단계의 훈련 단계를 더 거친다. 두 데이터셋에서 최대 추론 단계 수가 6개이기 때문이다.</li>
+<li>그런 다음 모델은 마지막 단계에서 문제를 해결하기 위해 continuous thoughts을 완전히 추론한다.</li>
+<li>모델은 각 단계당 5 epochs 동안 훈련한다.</li>
+<li>모든 데이터셋에 대해 표준 일정 이후 모델은 50번째 epoch까지 최종 훈련 단계에 머무른다.</li>
+<li>검증 세트의 정확도를 기준으로 checkpoint를 선택한다.</li>
+<li>추론을 위해 continuous thought의 수를 최종 훈련 단계와 동일하게 수동으로 설정한다.</li>
+<li>모든 실험에 greedy decoding을 사용한다.</li>
+</ul>
+</li>
+</ul>
+<h3 data-ke-size="size23">4.3 Baselines and Variants of Coconut</h3>
+<p><figure class="imageblock alignCenter" data-ke-mobilestyle="widthOrigin" data-origin-height="0" data-origin-width="0"><span data-phocus="https://blog.kakaocdn.net/dna/s1716/btsNHx3urpo/AAAAAAAAAAAAAAAAAAAAAMIg8M8QH-kdPy_Tvua_-hVHT2uINUY0tnaidN5US6pt/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&amp;expires=1796050799&amp;allow_ip=&amp;allow_referer=&amp;signature=WnOsiBmmrncY7e71P04iBR8tsBA%3D" data-url="https://blog.kakaocdn.net/dna/s1716/btsNHx3urpo/AAAAAAAAAAAAAAAAAAAAAMIg8M8QH-kdPy_Tvua_-hVHT2uINUY0tnaidN5US6pt/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&amp;expires=1796050799&amp;allow_ip=&amp;allow_referer=&amp;signature=WnOsiBmmrncY7e71P04iBR8tsBA%3D"><img data-origin-height="0" data-origin-width="0" loading="lazy" onerror="this.onerror=null; this.src='//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png'; this.srcset='//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png';" src="/assets/images/949a297e44922f7c129f9359.png"/></span></figure>
+</p>
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li><b>CoT (Chain-of-Thought)</b>:
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>완전한 reasoning chain을 사용하여 지도 미세 조정으로 언어 모델 훈련</li>
+<li>inference: 답변 출력 전 reasoning chain 생성</li>
+</ul>
+</li>
+<li><b>No-CoT</b>:
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>reasoning chain없이 LLM이 직접 답변 생성하도록 훈련</li>
+</ul>
+</li>
+<li><a href="https://arxiv.org/abs/2405.14838"><b>iCoT (Deng et al., 2024)</b></a>:
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>language reasoning chains으로 모델 훈련, CoT를 내재화</li>
+<li>훈련 진행에 따라 reasoning chain 시작 부분 토큰 점진적으로 제거 (답변만 남을 때까지)</li>
+<li>inference: 답변 직접 예측</li>
+</ul>
+</li>
+<li><a href="https://arxiv.org/abs/2310.02226"><b>Pause Token (Goyal et al., 2023)</b></a>:
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>reasoning chain없이 질문과 답변만으로 모델 훈련</li>
+<li>질문과 답변 사이에 special token <code>&lt;pause&gt;</code> 삽입 (추가 계산 능력 제공)</li>
+<li><code>&lt;pause&gt;</code> 토큰 수 = COCONUT의 continuous thought 수</li>
+</ul>
+</li>
+<li>COCONUT 변형:
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li><b>without curriculum</b>:
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>multi-stage training 대신 질문과 답변만 있는 마지막 단계 데이터로 직접 COCONUT 훈련</li>
+<li>모델은 문제 해결을 위해 continuous thought 사용</li>
+</ul>
+</li>
+<li><b>without thought</b>:
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>language reasoning steps을 점진적으로 제거하는 multi-stage training 유지</li>
+<li>continuous latent thoughts은 사용 안 함 (iCoT와 유사하지만 training schedule은 iCoT 대신 COCONUT과 동일하게)</li>
+</ul>
+</li>
+<li><b>pause as thought</b>:
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>continuous thoughts 대신 special token <code>&lt;pause&gt;</code> 사용</li>
+<li>COCONUT과 동일한 multi-stage training 커리큘럼 적용</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h3 data-ke-size="size23">4.4 Results and Discussion</h3>
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li><b>“Chaining” continuous thoughts enhances reasoning</b>
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>잠재 공간 추론이 기존 CoT처럼 reasoning 성능에 도움을 준다.</li>
+<li>COCONUT은 GSM8k 실험에서 iCoT와 Pause Token 대비 높은 성능을 보였다. CoT와 비교했을 때는 비교적 성능을 유지하면서 토큰 수를 줄일 수 있었다.</li>
+<li>저자의 말에 따르면 CoT는 text space에서 pretraining되고 text space에서 reasoning이 이뤄졌기 때문에 pretraining의 효과를 최대로 활용했지만 COCONUT 방식은 latent space에서 reasoning이 이루어지기 때문에 pretraining의 효과를 최대로 활용하지 못했고, 성능 비교에 있어 불리한 점이 있고, 후속 연구에서 latent space에서 pretraining 하는 것을 시도할 것이라고 합니다.</li>
+<li>하이퍼파라미터 c(하나의 reasoning step에 대한 latent thoughts의 수)를 조정했을 때, 0에서 1로 증가시킴에 따라 모델의 성능이 꾸준히 향상되었다. 잠재 공간에서 CoT와 유사한 연쇄 효과를 관찰할 수 있음을 보여준다.</li>
+<li><img src="/assets/images/7c2533204d646f72f2870ac1.png" width="100%"/></li>
+</ul>
+</li>
+<li><b>Latent reasoning outperforms language reasoning in planning-intensive tasks</b>
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>복잡한 추론은 모델이 "앞을 내다보며"(계획) 각 단계의 적절성을 평가해야 한다.</li>
+<li>GSM8k와 ProntoQA는 직관적인 문제 구조와 제한된 분기로 인해 다음 단계 예측이 비교적 간단하다.</li>
+<li>그러나 ProsQA의 무작위로 생성된 복잡한 구조는 높은 모델의 계획 능력을 필요로 한다.</li>
+<li>해당 Task에서 CoT는 No-CoT와 큰 차이를 보이지 않는데, COCONUT과 iCoT는 높은 성능을 기록하는 것으로 보아 잠재 공간 추론이 광범위한 계획을 요구하는 작업에서 명확한 이점이 있다.</li>
+</ul>
+</li>
+<li><b>The LLM still needs guidance to learn latent reasoning</b>
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>실험 결과에 따르면 curriculum learning 없이 학습한 모델은 No-CoT보다 성능이 좋지 못했다.</li>
+<li>curriculum learning을 적용했을 때 Pause Token 방식에서도 잘 통합된다.</li>
+<li>curriculum learning은 효과적이지만 reasoning chaining의 지도 학습이 반드시 필요하다는 점에서 잠재 공간에서 reasoning을 학습하기 위한 일반화된 방식의 추가 연구가 필요하다.</li>
+</ul>
+</li>
+<li><b>Continuous thoughts are efficient representations of reasoning</b>
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>continuous thoughts의 원래 목적은 잠재 공간에서 생성되어 reasoning에 사용되는 것이지만, Language Token으로 해석하는 데 사용할 수 있다. 즉, reasoning step을 추적할 수 있다.</li>
+<li>그림 4에서 예시로 등장하는 수학 문제 3 × 3 × 60에 대한 reasoning은 9 × 60 또는 3 × 180 이어야 한다.</li>
+<li>첫 번째 continuous thought의 embedding이 "180", "180", "9" 중 하나인 것을 확인할 수 있는데, 이는 다양한 궤적의 분포를 인코딩하여 복잡한 계획이 필요한 추론 문제에서 더 발전된 추론 패턴을 가능하게 만든다.</li>
+<li><img src="/assets/images/be69b7c5dd65295490ed0173.png" width="100%"/></li>
+</ul>
+</li>
+<li>Figure 5
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>ProsQA에서 다양한 추론 방법을 비교 분석한 결과를 보여줍니다.</li>
+<li>왼쪽은 추론 과정에 관계없이 최종 답변의 정확성을 기반으로, 오른쪽은 추론 과정 및 정답에 따라 가장 최단 경로 / 긴 경로 / 환각 / 잘못된 목표 / 정답 / 오답 으로 나눈다.</li>
+<li>no-CoT나 k가 충분히 큰 COCONUT에서는 reasoning을 출력하지 않기 때문에 정답/오답만이 존재.</li>
+<li>왼쪽은 continuous thoughts을 늘려가며 성능을 측정했을 때 그림이다. 3개까지 늘렸을 때 성능이 증가했고, 4개 이후부터는 학습이 불안정해져서 성능이 떨어지는 경향을 보인다.</li>
+<li>오른쪽은 continuous thoughts을 늘려가며 reasoning 및 정답 성능을 함께 측정했을 때 그림이다. k=3일 때 부터는 language mode에서 정답만 추출하는데, 이는 continuous reasoning이 늘어날 수록 language mode에서 reasoning이 줄어들고, latent mode에서 reasoning이 발생한다고 볼 수 있다.</li>
+<li>CoT의 훈련 목표는 항상 다음 단계의 생성에 집중하여 모델을 근시안적으로 만드는데, COCONUT 훈련의 후반 단계에서는 첫 몇 단계가 숨겨져 있어 모델이 향후 단계를 계획하는 것에 더 집중할 수 있도록 한다.</li>
+</ul>
+</li>
+<li><img src="/assets/images/98d14ac0a27853c7dff24b94.png" width="100%"/></li>
+</ul>
+<h2 data-ke-size="size26">5. Understanding the Latent Reasoning in Coconut</h2>
+<h3 data-ke-size="size23">5.1 Experimental Setup</h3>
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>Methods
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>reasoning 중에 <code>&lt;eot&gt;</code> 토큰의 위치를 수동으로 설정하여 잠재적인 생각의 수를 조절할 수 있게 한다.</li>
+<li>COCONUT이 k개의 continuous thoughts 을 사용하도록 강제하여 모델이 k + 1단계부터 나머지 추론 체인을 언어로 출력하도록 한다.</li>
+</ul>
+</li>
+</ul>
+<h3 data-ke-size="size23">5.2 Interpolating between Latent and Language Reasoning</h3>
+<p><figure class="imageblock alignCenter" data-ke-mobilestyle="widthOrigin" data-origin-height="0" data-origin-width="0"><span data-phocus="https://blog.kakaocdn.net/dna/rl2c2/btsNGT0yODN/AAAAAAAAAAAAAAAAAAAAALLTeUqSVRsaIex4_IfY2Stwr9ymkHQrR2mzKNrxa3Yl/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&amp;expires=1796050799&amp;allow_ip=&amp;allow_referer=&amp;signature=UheXXKHYpIE3Yuu1%2FM3L3BVIqEY%3D" data-url="https://blog.kakaocdn.net/dna/rl2c2/btsNGT0yODN/AAAAAAAAAAAAAAAAAAAAALLTeUqSVRsaIex4_IfY2Stwr9ymkHQrR2mzKNrxa3Yl/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&amp;expires=1796050799&amp;allow_ip=&amp;allow_referer=&amp;signature=UheXXKHYpIE3Yuu1%2FM3L3BVIqEY%3D"><img data-origin-height="0" data-origin-width="0" loading="lazy" onerror="this.onerror=null; this.src='//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png'; this.srcset='//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png';" src="/assets/images/96fa37182a41f75d0b8fb98d.png"/></span></figure>
+</p>
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>그림 6을 보면 CoT가 존재하지 않는 경로를 출력하는 할루시네이션을 보인다. COCONUT(k = 1)은 잘못된 목표를 출력하지만, COCONUT(k = 2)이 문제를 성공적으로 해결한다.</li>
+<li>이 실험을 통해 모델은 초기 단계에서 어떤 경로를 선택할지 정확하게 결정할 수 없다는 것을 보여준다. 그러나 latent reasoning은 사전에 가능성이 낮은 선택을 피할 수 있기 때문에, 후속 단계에서 잘못된 옵션을 점진적으로 제거하고 추론이 끝날 때 더 높은 정확도를 달성할 수 있었다.</li>
+</ul>
+<h3 data-ke-size="size23">5.3 Interpreting the Latent Search Tree</h3>
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>continuous thoughts은 여러 다음 단계 후보군을 인코딩할 수 있다는 점에서 latent reasoning은 단순한 reasoning chain이 아니라 Search Tree로 해석할 수 있다.</li>
+</ul>
+<p><figure class="imageblock alignCenter" data-ke-mobilestyle="widthOrigin" data-origin-height="0" data-origin-width="0"><span data-phocus="https://blog.kakaocdn.net/dna/BjMla/btsNHM68r7a/AAAAAAAAAAAAAAAAAAAAAOD7Qf0hdURHQn7m51ENOhARBT7Acaykgq4-SBVMdByh/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&amp;expires=1796050799&amp;allow_ip=&amp;allow_referer=&amp;signature=cbIjVNCsegdLf2O8%2FxYN2kntNaM%3D" data-url="https://blog.kakaocdn.net/dna/BjMla/btsNHM68r7a/AAAAAAAAAAAAAAAAAAAAAOD7Qf0hdURHQn7m51ENOhARBT7Acaykgq4-SBVMdByh/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&amp;expires=1796050799&amp;allow_ip=&amp;allow_referer=&amp;signature=cbIjVNCsegdLf2O8%2FxYN2kntNaM%3D"><img data-origin-height="0" data-origin-width="0" loading="lazy" onerror="this.onerror=null; this.src='//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png'; this.srcset='//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png';" src="/assets/images/a8572129c7b41befec4accec.png"/></span></figure>
+</p>
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>그림 7은 그림 6에 대한 첫번째와 두번째 단계의 가능한 브랜치들을 보여준다.</li>
+<li>모든 프론티어 노드를 균일하게 탐색하는 BFS과 달리, 모델은 가능성이 높은 노드를 우선순위에 두고 덜 관련성 있는 노드를 가지치기할 수 있는 능력을 보인다.
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>모델을 단일 latent thought(k = 1) 후 언어 공간으로 다시 전환하도록 강제하면, "모든 &lt;개념 A&gt;는 &lt;개념 B&gt;입니다"와 같은 구조화된 형식으로 다음 단계를 예측한다. &lt;개념 A&gt;의 잠재적 확률 분포를 조사함으로써, 우리는 루트 노드 알렉스의 자식 노드에 대한 수치 값을 도출할 수 있다.</li>
+<li>k = 2일 때, 모든 프론티어 노드(알렉스의 손자)에 대한 예측 확률을 얻을 수 있다. {"렘푸스", "조르푸스", "그림푸스", "스테르푸스"}는 각각 0.33, 0.16, 0.32, 0.01의 값을 갖는다.</li>
+<li>첫 번째 continuous thought에서 모델이 "스테푸스"를 옵션에서 거의 배제했지만, 다른 세 가지 옵션 중에서는 아직 불확실하다는 것을 나타낸다. 그러나 두 번째 사고에서는 모델이 대부분 다른 옵션을 배제하고 "로푸스"에 높은 확률을 부여한 것을 볼 수 있다.</li>
+<li>"스테푸스"는 리프노드이며, 목표 노드 "범푸스"로 이어질 수 없기 때문에 쉽게 잘못된 선택으로 식별할 수 있다. 반면 다른 노드들은 탐색해야 할 자식이 더 많아 쉽게 평가하기 어렵다.</li>
+</ul>
+</li>
+</ul>
+<p><figure class="imageblock alignCenter" data-ke-mobilestyle="widthOrigin" data-origin-height="0" data-origin-width="0"><span data-phocus="https://blog.kakaocdn.net/dna/zjhpo/btsNGMf1jZK/AAAAAAAAAAAAAAAAAAAAAP5V7NKP0uIEjvCYgbhRjyMes8FCFM5_lETspckmj6OK/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&amp;expires=1796050799&amp;allow_ip=&amp;allow_referer=&amp;signature=%2BVyfMrjsHUMeGvcLML9MSfejRnE%3D" data-url="https://blog.kakaocdn.net/dna/zjhpo/btsNGMf1jZK/AAAAAAAAAAAAAAAAAAAAAP5V7NKP0uIEjvCYgbhRjyMes8FCFM5_lETspckmj6OK/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&amp;expires=1796050799&amp;allow_ip=&amp;allow_referer=&amp;signature=%2BVyfMrjsHUMeGvcLML9MSfejRnE%3D"><img data-origin-height="0" data-origin-width="0" loading="lazy" onerror="this.onerror=null; this.src='//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png'; this.srcset='//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png';" src="/assets/images/74151153065896e615edc35a.png"/></span></figure>
+</p>
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>그림 8은 병렬 탐색에 대한 첫 번째와 두 번째 thought간의 비교이다. (X축은 확률, Y축은 비중)</li>
+<li>첫 번째 thought(k=1)에서 Top 1 ~ 3 후보 노드 선 사이의 간격이 큰 것을 볼 수 있는데, 정답 path에 낮은 확률을 부여할 가능성이 크다는 것은 모델이 확실하지 않은 상황에서 상당한 다양성(후보)을 유지하고 있음을 나타낸다.</li>
+<li>반면, 두 번째 thought(k=2)은 이러한 간격이 좁아지는 것을 보인다. 이러한 경향은 모델이 두 번째 잠재 추론 단계에서 더 집중된 추론으로 전환된 것을 시사하며, 이는 정답 path에 대한 더 큰 확신이 생겼기 때문이다.</li>
+</ul>
+<h3 data-ke-size="size23">5.4 Why is a Latent Space Better for Planning?</h3>
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>앞서 정의한 검색 트리 관점과 Value 함수를 바탕으로 latent reasoning이 planning에 유리한 이유를 설명한다.</li>
+<li>노드의 탐색 잠재력을 정량화하기 위해 트리 내에서 노드의 높이를 측정하고 리프 노드와의 최단 거리로 정의한다.</li>
+<li>가설: 낮은 높이를 가진 노드들이 탐색 잠재력이 제한적이기 때문에 정확한 평가가 더 쉽다.
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>모델은 다른 후보들보다 높은 높이 2를 가진 "grimpus"와 "lempus" 사이에서 더 큰 불확실성을 보인다.</li>
+</ul>
+</li>
+</ul>
+<p><figure class="imageblock alignCenter" data-ke-mobilestyle="widthOrigin" data-origin-height="0" data-origin-width="0"><span data-phocus="https://blog.kakaocdn.net/dna/paG1v/btsNGKP5CXj/AAAAAAAAAAAAAAAAAAAAAMue0yMULnFddANQpmBGX_fes_26IGpBASA0nbbHokUn/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&amp;expires=1796050799&amp;allow_ip=&amp;allow_referer=&amp;signature=Fy7zGNKE%2BeCTZnnhWThV1TWIbyg%3D" data-url="https://blog.kakaocdn.net/dna/paG1v/btsNGKP5CXj/AAAAAAAAAAAAAAAAAAAAAMue0yMULnFddANQpmBGX_fes_26IGpBASA0nbbHokUn/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&amp;expires=1796050799&amp;allow_ip=&amp;allow_referer=&amp;signature=Fy7zGNKE%2BeCTZnnhWThV1TWIbyg%3D"><img data-origin-height="0" data-origin-width="0" loading="lazy" onerror="this.onerror=null; this.src='//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png'; this.srcset='//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png';" src="/assets/images/649bae1b8be75d04f0e3e510.png"/></span></figure>
+</p>
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>그림 9 : 테스트 세트 전반에 걸쳐 첫 번째와 두 번째 잠재 추론 단계 동안 모델의 예측 확률과 노드 "높이" 사이의 상관관계를 분석
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>높이가 낮을 때(정답 노드에 가까울 때) 오답에 더 낮은 확률을 부여하고, 정답에 더 높은 확률을 부여한다.</li>
+<li>높이가 높을 때(정답 노드와 멀 때) 오답과 정답 간의 확률이 유사해져 평가에 어려움이 생긴다.</li>
+<li>latent space에서 reasoning하는 것은 명확한 결정을 미루고 reasoning step을 확장함으로써, 모델은 검색 트리의 최종 상태에 더 가깝게 탐색하여 올바른 노드와 잘못된 노드를 더 쉽게 구별할 수 있다.</li>
+<li>또한 사람의 직관과 유사하게 동작한다는 점이 reasoning을 잘 수행하고 있다고 해석할 수 있을 것이다.</li>
+</ul>
+</li>
+</ul>
+<h2 data-ke-size="size26">6. Conclusion</h2>
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>COCONUT: 연속적인 잠재 공간에서의 추론을 위한 새로운 패러다임을 제시하여 추론 능력을 크게 향상시켰다.</li>
+<li>특히, 제약 없는 잠재 공간은 모델이 BFS와 유사한 추론 패턴을 개발할 수 있게 했다.</li>
+<li>잠재 추론 방법을 더욱 정교화하고 확장하기 위해서는 향후 연구가 필요하다. 유망한 방향 중 하나는 연속적인 사고를 가진 LLM을 사전 훈련하는 것. 이를 통해 더 넓은 범위의 추론 시나리오에서 더 효과적으로 일반화할 수 있을 것이다.</li>
+</ul>
+<hr data-ke-style="style1"/>
+<h2 data-ke-size="size26">요약</h2>
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>Idea
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>언어 공간이 LLM reasoning의 최적의 공간이 아니다. Latent Space에서의 reasoning 제안.</li>
+<li>iCoT에서 확장한 CoT 과정의 내재화 연구</li>
+</ul>
+</li>
+<li>Limit
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>수학 문제에서는 여전히 CoT 보다 낮은 성능</li>
+<li>CoT의 가장 큰 장점 중 하나인 해석 가능성을 저해함</li>
+</ul>
+</li>
+<li>Contribution
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>공간에 대한 제약을 해소하여 토큰 효율성 증가</li>
+<li>기존 implicit reasoning 대비 성능 개선</li>
+<li>복잡한 계획이 필요한 추론 테스크에서 성능 향상</li>
+</ul>
+</li>
+<li>Future works
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>잠재 공간에서 reasoning을 학습하기 위한 일반화된 방식의 추가 연구</li>
+<li>학습 안정성 문제를 해결하여 scaling 가능한 방법론 연구</li>
+<li>다른 데이터 혹은 더 큰 모델에서의 가능성에 대한 실험 (해당 연구는 GPT-2 small)</li>
+</ul>
+</li>
+<li>Code
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li><a href="https://github.com/facebookresearch/coconut">https://github.com/facebookresearch/coconut</a></li>
+</ul>
+</li>
+</ul>
+{% endraw %}

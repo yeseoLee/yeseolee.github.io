@@ -1,0 +1,155 @@
+---
+layout: post
+title: '[강의노트] 06-2 Dimensionality Reduction Part 2 (LSA & t-SNE)'
+date: '2024-08-26T16:40:37+09:00'
+categories:
+- 강의노트
+- Text Analytics (강필성 교수님)
+source_url: https://ohge.tistory.com/55
+source_blog: tistory
+permalink: /tistory/55/
+---
+{% raw %}
+<blockquote data-ke-style="style1">
+<p data-ke-size="size16">위 강의노트는 고려대학교 산업경영공학부 대학원 강필성 교수님의 <a href="https://www.youtube.com/playlist?list=PLetSlH8YjIfVzHuSXtG4jAC2zbEAErXWm">비정형데이터분석 (Text Analytics)</a>을 듣고 정리한 강의노트입니다.</p>
+</blockquote>
+<h1>Feature Extraction: LSA &amp; t-SNE</h1>
+<h2 data-ke-size="size26">Singular Value Decomposition: SVD</h2>
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>실수 행렬 또는 복소 행렬의 분해 (A factorization of a real or complex matrix)</li>
+<li>m by n (m &gt; n) 크기의 직사각 TDM 행렬 A<br/>$$ A = U \Sigma V^T $$</li>
+</ul>
+<h3 data-ke-size="size23">Properties of SVD (SVD의 특성)</h3>
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>행렬 U와 V는 직교행렬 (Singular vectors of the matrix U and V are orthogonal)<br/>$$ U^TU = V^TV = I$$</li>
+<li>$\Sigma$ 의 특이값 (positive singular value) 개수 = Rank(A)</li>
+<li>Running time: O(mnc)
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>c: the average number of words per document</li>
+</ul>
+</li>
+</ul>
+<h3 data-ke-size="size23">Reduces SVDs (SVD 축소)</h3>
+<p><figure class="imageblock alignCenter" data-ke-mobilestyle="widthOrigin" data-origin-height="1668" data-origin-width="1456"><span data-phocus="https://blog.kakaocdn.net/dna/bvy3or/btsJfAxjXrd/AAAAAAAAAAAAAAAAAAAAAADE9XY1vADErxDafr4lp5CMWLIjXFglqnJMy825fmhD/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&amp;expires=1796050799&amp;allow_ip=&amp;allow_referer=&amp;signature=tFduVlRNSTfelKot6ZdK4vjqnFg%3D" data-url="https://blog.kakaocdn.net/dna/bvy3or/btsJfAxjXrd/AAAAAAAAAAAAAAAAAAAAAADE9XY1vADErxDafr4lp5CMWLIjXFglqnJMy825fmhD/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&amp;expires=1796050799&amp;allow_ip=&amp;allow_referer=&amp;signature=tFduVlRNSTfelKot6ZdK4vjqnFg%3D"><img data-origin-height="1668" data-origin-width="1456" height="1668" loading="lazy" onerror="this.onerror=null; this.src='//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png'; this.srcset='//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png';" src="/assets/images/28593f1a528f6ae793fd1067.png" width="1456"/></span></figure>
+</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16"><span style="color: gray;">이미지 및 내용 출처: <a href="https://darkpgmr.tistory.com/106">https://darkpgmr.tistory.com/106</a></span></p>
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>Thin SVD: Transform $\Sigma$ to a square matrix &amp; remove the corresponding columns of U ($\Sigma$에서 대각파트가 아닌 0으로 구성된 부분을 없애고 U에서는 이에 대응되는 열벡터들를 제거)</li>
+<li>Compact SVD: Reduce $\Sigma$ by removing zero-singular values and corresponding vectors in U and V (비대각 원소들뿐만 아니라 0인 singular values까지 모두 제거)</li>
+<li><b>Truncated(Approximated) SVD</b>: Preserve top t largest singular values in $\Sigma$ and their corresponding vectors in U and V (Top k개의 가장 큰 singular values만 보존, 0이 아닌 singular value까지 제거한 형태로서 원래의 A가 보존되지 않고 A에 대한 근사행렬 A'이 나옴)</li>
+</ul>
+<hr data-ke-style="style1"/>
+<h2 data-ke-size="size26">Latent Semantic Analysis (LSA)</h2>
+<h3 data-ke-size="size23">Latent Semantic Indexing</h3>
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>고차원 공간을 저차원 공간으로 변환하여 TDM의 통계적 구조를 드러내는 과정 (A process of term-document matrix to expose statistical structure by converting a high dimensional space to lower dimensional space)
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>feature 수 뿐만 아닌 문서 수를 줄이는 데에도 사용할 수 있다 (Can be used to not only reduce the number of features, but also to reduce the number of documents)</li>
+</ul>
+</li>
+<li>Latent: 명시적이지 않은 연관 관계를 포착(Captures associations which are not explicit)</li>
+<li>Semantic: 다른 엔티티 간의 유사성 자체가 저차원으로 변환된 이후에도 보존이 될 수 있도록 하겠다 (represent meaning as a function of similarity to other entities)</li>
+</ul>
+<h3 data-ke-size="size23">SVD를 통한 차원 축소</h3>
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>상위 k개만을 사용한 Truncated SVD를 이용하여 원본 TDM 행렬 $A$를 $A_k$로 근사<br/>$$ A \approx A_k = U_k\Sigma_kV_k^T$$</li>
+<li>양변에 $U_k^T$를 곱해준다. m * n 행렬에서 -&gt; k * n으로 축소된 TDM 행렬을 얻는다.<br/>$$ U_k^TA_k = U_k^TU_K\Sigma_kV_k^T = I\Sigma_kV_k^T = \Sigma_kV_k^T$$</li>
+<li>양변에 $V_k$를 곱해주면 m * k 행렬인 $U_k \Sigma_k$ 가 남게된다. 즉 <b>n개의 Term이 k개의 차원으로도 축소가 될 수 있다. 따라서 SVD는 반드시 문서가 기준이 아니라 Term이 기준이 될 수도 있다.</b> 보존되는 정보량은 특이값(positive singular value)의 개수에 따라 정해진다.</li>
+</ul>
+<hr data-ke-style="style1"/>
+<h2 data-ke-size="size26">Stochastic Neighbor Embedding (SNE)</h2>
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li><b>local distance를 보존하는 것이 non-local distance를 보존하는 것보다 중요하다.</b>
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>가까이 있는 점들 사이의 거리를 보존하는 것이 먼 점들 사이의 거리를 보존하는 것보다 중요하다는 뜻이다.</li>
+<li>고차원 공간에서 가까운 점들은 유사한 특성을 가지는 경우가 많아서 이를 잘 보존하면 저차원 공간에서도 데이터의 본래 구조를 잘 유지할 수 있다.</li>
+<li>시각화적인 측면에서도 저차원 공간에서도 클러스터나 패턴이 더 명확하게 드러난다.</li>
+</ul>
+</li>
+<li><b>SNE는 distance가 local인지는 probabilistic하게 결정하겠다.</b>
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>확률 분포로써 처리하는 것에 대한 이점은 비선형적 관계를 더 잘 반영할 수 있다.</li>
+<li>노이즈나 이상치에 대한 영향을 줄여준다. 어떤 노이즈에 의해 두 점 사이의 거리가 커져도 확률적으로 큰 의미를 갖지 않아 이상치에 대해 민감도가 낮다.</li>
+<li>거리에 따라 가중치를 부여하여 가까운 거리 정보에 집중할 수 있어 성능이 향상된다.</li>
+</ul>
+</li>
+<li><b>각각의 고차원 유사도를 하나의 데이터가 다른 데이터를 이웃으로 선택할 확률로 변환</b>
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>Probability of picking j given in <span style="color: blue;">high D</span><br/>$p_{j|i}$: 원 공간에서 j번째 객체가 i번째 객체의 이웃으로 선택될 확률</li>
+<li>Probability of picking j given in <span style="color: red;">low D</span><br/>$q_{j|i}$: 축소된 공간에서 객체 j가 객체i의 이웃으로 선택될 확률</li>
+</ul>
+</li>
+</ul>
+<p data-ke-size="size16">$$p_{j|i} = \frac{e^{- |x_i - x_j|_2^2 / 2\sigma_i^2}}{\sum_k e^{- |x_i - x_k|_2^2 / 2\sigma_i^2}}$$</p>
+<p data-ke-size="size16">$$q_{j|i} = \frac{e^{- |y_i - y_j|_2^2}}{\sum_k e^{- |y_i - y_k|_2^2}}$$</p>
+<h3 data-ke-size="size23">Picking the Radius of the Gaussian in P</h3>
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>big radius leads to high entropy, 시그마가 크면 distribution이 넒게 퍼지므로 좀 더 멀리있는 j들도 $p_{j|i}$ 값이 커짐</li>
+<li>small radius leads to a low entropy, 봉우리가 뾰족하게 올라간 형태이므로 $p_{j|i}$ 가 0에 가까워짐</li>
+<li>SNE의 성능은 perplexity에 차이에 대해서 민감하지 않다(fairly robust하다).</li>
+</ul>
+<h3 data-ke-size="size23">Cost Function for a Low-dimensional Representation</h3>
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>Kullback-Leibler divergence
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>non-symmetric하다. ( distance(a,b)=distance(b,a)여야 하는데 KL divergence는 보존되지 않는다.)<br/>$$ Cost = \sum_i KL (P_i||Q_i) = \sum_i\sum_j p_{j|i}log\frac{p_{j|i}}{q_{j|i}}$$</li>
+</ul>
+</li>
+<li>Gradient<br/>$$ \frac{\partial C}{\partial y_i} = 2 \sum_j (y_j - y_i) (p_{ij} - q_{ij} + p_{ji} - q_{ji}) $$</li>
+<li>Update the coordinate in the lower dimension to minimize the Cost function (비용 함수 최소화를 위한 저차원 좌표 업데이트)
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>Gradient update with momentum term<br/>$$ y(t+1) = y(t) + \eta \frac{\partial C}{\partial y} - \alpha(t) y(t) - y(t-1)$$</li>
+</ul>
+</li>
+</ul>
+<h3 data-ke-size="size23">Symmetric SNE</h3>
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>$p_{i|j}$와 $p_{j|i}$ 가 다르니(각각 i가 j의 이웃이 될 확률과 j가 i의 이웃이 될 확률임) 이를 symmentic 하게 바꿔보겠다<br/>$$ p_{ij} = \frac{p_{i|j} + p_{j|i}}{2n} $$</li>
+<li>이렇게 되면 gradient가 훨씬 단순하게 만들어진다.<br/>$$ \frac{\partial C}{\partial y_i} = 4\sum_j(y_j-y_i)(p_{ij} - q_{ij})$$</li>
+</ul>
+<h3 data-ke-size="size23">Crowding problem</h3>
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>가우시안 분포를 쓰기 때문에 봉우리가 비교적 높아서 거리가 길어지면 확률이 급격하게 감소한다.</li>
+<li>조금 더 꼬리가 두껍고 긴 분포를 가져 거리가 길어졌을 때에도 확률이 급격하게 떨어지는 것을 방지하고 싶다.</li>
+<li><b>정규분포 대신 t-분포 사용</b></li>
+</ul>
+<h3 data-ke-size="size23">t-SNE</h3>
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>정규분포보다 꼬리는 높고 봉우리는 낮은 분포 사용하여 <b>Crowding Problem</b> 해소</li>
+<li>Optimization of t-SNE
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>Gradient<br/>(SNE에 대한 연산을 할 수 있다면 t-SNE는 어렵지 않으므로 생략)<br/><figure class="imageblock alignCenter" data-ke-mobilestyle="widthOrigin" data-origin-height="640" data-origin-width="640"><span data-phocus="https://blog.kakaocdn.net/dna/boCGse/btsJfzSJHJi/AAAAAAAAAAAAAAAAAAAAAGlw6lgjuVD1SsmLoUam8UsACMvxchf9uLYZjke6Je10/img.gif?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&amp;expires=1796050799&amp;allow_ip=&amp;allow_referer=&amp;signature=28X7mA2SzK7t%2FtjcuYKuOtF5DHA%3D" data-url="https://blog.kakaocdn.net/dna/boCGse/btsJfzSJHJi/AAAAAAAAAAAAAAAAAAAAAGlw6lgjuVD1SsmLoUam8UsACMvxchf9uLYZjke6Je10/img.gif?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&amp;expires=1796050799&amp;allow_ip=&amp;allow_referer=&amp;signature=28X7mA2SzK7t%2FtjcuYKuOtF5DHA%3D"><img data-origin-height="640" data-origin-width="640" height="640" loading="lazy" onerror="this.onerror=null; this.src='//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png'; this.srcset='//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png';" src="/assets/images/65bb4f062fdc663d860ea915.gif" width="640"/></span></figure>
+<br/><span style="color: gray;">이미지 출처: <a href="https://github.com/oreillymedia/t-SNE-tutorial">https://github.com/oreillymedia/t-SNE-tutorial</a></span></li>
+</ul>
+</li>
+</ul>
+<h3 data-ke-size="size23">t-SNE Examples</h3>
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>Olivetti faces datasets</li>
+<li>CalTech-101</li>
+<li>Wiki t-SNE</li>
+<li>Embedding Projector by Google</li>
+</ul>
+<hr data-ke-style="style1"/>
+<h2 data-ke-size="size26">요약</h2>
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>특성 추출(Feature Extraction)
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>LSA
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>Reduced SVD 중 <b>Truncated(Approximated) SVD</b>를 이용하여 Top k 개의 singular values를 선택하여 차원 축소</li>
+<li><b>Truncated(Approximated) SVD</b>: 원래의 A가 보존되지 않고 A에 대한 근사행렬 A'를 구하며, 보존되는 정보량은 positive singular vaue의 개수에 따라 정해진다</li>
+</ul>
+</li>
+<li>t-SNE
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>local distance를 보존하는 것이 non-local distance를 보존하는 것보다 중요하다.</li>
+<li>각각의 고차원 유사도를 <b>하나의 데이터가 다른 데이터를 이웃으로 선택할 확률</b>로 변환</li>
+<li>정규분포보다 꼬리는 높고 봉우리는 낮은 분포 사용하여 SNE에서 발생하는 <b>Crowding Problem</b> 해소</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+{% endraw %}

@@ -1,0 +1,82 @@
+---
+layout: post
+title: '[Python 알고리즘] Binary Search(이진탐색/이분탐색)'
+date: '2021-01-31T22:52:48.152000+09:00'
+categories:
+- python
+- 알고리즘
+source_url: https://velog.io/@yeseolee/파이썬-알고리즘-Binary-Search이분탐색
+source_blog: velog
+permalink: /velog/cae8d9a6/
+---
+{% raw %}
+<h2>💡Python Binary Search (파이썬 이진 탐색)</h2>
+<p>이진탐색이란 **'정렬된 자료'**를 반으로 쪼개가며 원하는 값을 찾아가는 탐색 알고리즘이다.
+반드시 정렬되어있는 배열에서만 탐색 가능하다. 시간복잡도는 <code>O(logN)</code>이다.</p>
+<p>주로 <code>left와 right</code> 또는 <code>low와 high</code> 또는 <code>start,end</code>로 변수 이름을 쓴다.
+가운데 지점<code>(mid)</code>을 찾고, 계속 <code>left, right</code> 값을 <code>mid</code>를 이용해 갱신하면서 범위를 좁혀나가는 알고리즘이다.</p>
+<h3>📌 알고리즘 전개과정</h3>
+<p>n개의 원소를 가지는 정렬된 배열 A가 있을 때, 찾으려는 값 K와 가운데 값을 비교했을 때,
+K가 더 작다면 반드시 K는 <strong>A[0] ~ A[mid-1]</strong> 에 존재할 것이다.
+K가 더 크다면 반드시 K는 <strong>A[mid+1] ~ A[n-1]</strong> 에 존재할 것이다.
+K를 구할 때 까지 반복하면 구간이 점점 줄어들면서 마침내 <strong>A[mid]==K</strong> 일때, 탐색이 종료된다.
+이 반복을 반복문을 통해 구현할 수 있고, 재귀를 통해 구현할 수도 있다.</p>
+<h3>📌 1. 비재귀적 알고리즘 (정방향)</h3>
+<pre><code class="language-python">#이분탐색 알고리즘 (정방향)
+def BinarySearch(arr,target):
+    #L: left, R: Right, M: Mid
+    L,R = 0, len(arr)-1
+    while(L &lt;= R): # L&gt;R 되면 탈출 (배열에 target이 없다)
+        M = (L + R) // 2
+        if(arr[M] == target): # target값에 해당하는 idx 찾음
+            return M
+        elif(arr[M] &gt; target): # target 값보다 더 클 때
+            R = M - 1 # R을 중간-1 의 idx로 갱신 
+        else: #target 값보다 더 작을 때
+            L = M + 1 # L을 중간+1 의 idx로 갱신
+    return -1 #배열 내에 값이 없음
+</code></pre>
+<h3>📌 2. 재귀적 알고리즘</h3>
+<pre><code class="language-python">#이분탐색 알고리즘 (재귀)
+def BinarySearch(arr, target, left, right):
+    if left &gt; right: #배열 내에 값이 없음
+        return -1
+    mid = (left + right) // 2
+    if arr[mid] &gt; target: # target 값보다 더 클 때
+    	#right 값을 mid-1로 대체하여 함수 호출
+        return BinarySearch(arr, target, left, mid-1)
+    if arr[mid] == target: # target 값에 해당하는 idx 찾음
+        return mid
+    if arr[mid] &lt; target: # target 값보다 더 작을 때
+    	#left 값을 mid+1로 대체하여 함수 호출
+        return BinarySearch(arr, target, mid + 1, right)
+</code></pre>
+<h3>📌 예시 문제: 백준 1920 파이썬</h3>
+<p><img alt="BOJ1920" src="/assets/images/0a36dc94b44cbcf6e47b9bec.png"/></p>
+<pre><code class="language-python">import sys
+
+def BinarySearch(arr,target):
+    #L: left, R: Right, M: Mid
+    L,R = 0, len(arr)-1
+    while(L &lt;= R): # L&gt;R 되면 탈출 (배열에 target이 없다)
+        M = (L + R) // 2
+        if(arr[M] == target): # target값에 해당하는 idx 찾음
+            return M
+        elif(arr[M] &gt; target): # target 값보다 더 클 때
+            R = M - 1 # R을 중간-1 의 idx로 갱신 
+        else: #target 값보다 더 작을 때
+            L = M + 1 # L을 중간+1 의 idx로 갱신
+    return -1 #배열 내에 값이 없음
+
+n=int(sys.stdin.readline())
+a=list(map(int,sys.stdin.readline().rstrip().split()))
+m=int(sys.stdin.readline())
+b=list(map(int,sys.stdin.readline().rstrip().split()))
+#사실 n,m값은 필요 없기 때문에 입력을 조금 더 간단하게 해결할 수 있다.
+
+a=sorted(a)
+for i in b:
+    print(BinarySearch(a,i))
+</code></pre>
+
+{% endraw %}

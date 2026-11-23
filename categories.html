@@ -1,0 +1,14 @@
+---
+layout: page
+title: 카테고리
+permalink: /categories/
+---
+{% assign categories = site.categories | sort %}
+{% for category in categories %}
+<h2>{{ category[0] | escape }}</h2>
+<ul>
+  {% for post in category[1] %}
+  <li><time datetime="{{ post.date | date_to_xmlschema }}">{{ post.date | date: "%Y.%m.%d" }}</time> <a href="{{ post.url | relative_url }}">{{ post.title | escape }}</a></li>
+  {% endfor %}
+</ul>
+{% endfor %}

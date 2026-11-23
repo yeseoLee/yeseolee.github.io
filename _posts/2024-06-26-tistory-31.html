@@ -1,0 +1,176 @@
+---
+layout: post
+title: '[강의노트] 01-2 Introduction to Text Analytics - Part 2'
+date: '2024-06-26T12:42:14+09:00'
+categories:
+- 강의노트
+- Text Analytics (강필성 교수님)
+source_url: https://ohge.tistory.com/31
+source_blog: tistory
+permalink: /tistory/31/
+---
+{% raw %}
+<blockquote data-ke-style="style1"><p data-ke-size="size16"><span style="font-family: 'Noto Serif KR';"><p>위 강의노트는 고려대학교 산업경영공학부 대학원 강필성 교수님의<br/><a href="https://www.youtube.com/playlist?list=PLetSlH8YjIfVzHuSXtG4jAC2zbEAErXWm">비정형데이터분석 (Text Analytics)</a> 을 듣고 정리한 강의노트입니다.</p>
+</span></p></blockquote><h1>TA Process 1: Collection &amp; Preprocessing</h1>
+<h2>Decide What to Mine</h2>
+<ul>
+<li>데이터셋 수집 혹은 수집된 데이터셋 선택</li>
+</ul>
+<h2>Text Preprocessing Level 0: Text</h2>
+<ul>
+<li>Remove unnecessary information from the collected data</li>
+<li>Do not remove <strong>meta-data</strong> (Newspapaer article: author, date, category, language, etc), which contains significant information on the text</li>
+<li>Meta-data can be used for further analysis<ul>
+<li>Target class of a document</li>
+<li>Time series analysis</li>
+</ul>
+</li>
+</ul>
+<h2>Text Preprocessing Level 1: Sentence</h2>
+<ul>
+<li>가장 상위 개념 문서의 바로 하위 개념은 문단(여러 문장의 집합체)이나 문단 자체를 분석하는 일은 많지 않음. 즉 문장 단위의 분석은 텍스트 분석에서 (거의) 가장 상위 개념임</li>
+<li>For many downstream analysis tasks<ul>
+<li>POS-Tagger(형태소 분석): 문장 내 각 태그들의 발생 확률 최대화</li>
+<li>Summarization(요약): 어떤 문장이 가장 중요한 문장인지 선택</li>
+</ul>
+</li>
+<li>Sentence Splitting<ul>
+<li>문장 부호 없이 문장 분리는 꽤나 어려운 task</li>
+</ul>
+</li>
+</ul>
+<h2>Text Preprocessing Level 2: Token</h2>
+<ul>
+<li>Extracting meaningful tokens 가장 작은 의미있는 단위<ul>
+<li>ex) word,number,space, etc</li>
+</ul>
+</li>
+<li>쉽지 않은 task임<ul>
+<li>ex) John's sick, C++, A/C 같은 단어들을 어떻게 구분할 것인가</li>
+<li>ex) 띄어쓰기가 없는 중국어</li>
+</ul>
+</li>
+</ul>
+<h3>Power distribution in word frequencies</h3>
+<ul>
+<li>빈번하게 사용되는 단어일 수록 중요한 것은 아니다 (ex 관사 등은 큰 의미가 없고 많이 쓰임)</li>
+</ul>
+<h3>Stop-words(불용어)</h3>
+<ul>
+<li>문법적 기능을 수행하나 의미를 갖고 있지는 않음 -&gt; 자연어처리 관점에서는 제거함</li>
+</ul>
+<h3>Stemming(어간 추출)</h3>
+<ul>
+<li><strong>base form(normalized form)</strong></li>
+<li>ex) Innovations, Innovate , Innovative -&gt; Innovat</li>
+<li>사전에 존재하지 않을 수 있으나 결과물 갯수가 훨씬 적다 (차원의 숙소 관점에서 더 효율적)</li>
+</ul>
+<h3>Lemmatization(표제어 추출)</h3>
+<ul>
+<li><strong>root of a word</strong></li>
+<li>ex) Innovation, Innovate , Innovative -&gt; Inovation, Innovate, Innovative</li>
+<li>결과물 갯수가 더 많으나 품사를 보존한다.</li>
+</ul>
+<h1>TM Process 2: Transformation</h1>
+<h2>Text Transformation</h2>
+<h3>Document representation</h3>
+<p>문서를 어떻게 하면 연속형의 숫자로 표현할 것인가 (text를 D 차원의 실수 공간으로 표현)</p>
+<ul>
+<li>Bag-of-words: 각 문장에서 단어의 등장 횟수를 세어 벡터로 표현 (단어 모음)</li>
+<li>Word Weighting: 특정 단어가 어떤 문서에서 얼마나 중요한지 가중치로 표현<ul>
+<li>TF-IDF (Term frequency and inverse document frequency)<br/>단어 W가 문서 D에서는 자주 등장하지만 Corpus에서는 적게 등장해야 TF-IDF가 커지고, 즉 단어 W가 문서 D를 얼마나 특징지어줄 수 있냐이다.<br/><figure class="imageblock alignCenter" data-ke-mobilestyle="widthOrigin" data-origin-height="714" data-origin-width="1806"><span data-phocus="https://blog.kakaocdn.net/dna/bwk7ty/btsIdw2vmQI/AAAAAAAAAAAAAAAAAAAAAEMD68YK_JNXbTk0K6KzhVoidpNY8orbWUajBBbgZCn4/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&amp;expires=1796050799&amp;allow_ip=&amp;allow_referer=&amp;signature=BzVdDskUMSSNpGAp4qiey5qUJGo%3D" data-url="https://blog.kakaocdn.net/dna/bwk7ty/btsIdw2vmQI/AAAAAAAAAAAAAAAAAAAAAEMD68YK_JNXbTk0K6KzhVoidpNY8orbWUajBBbgZCn4/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&amp;expires=1796050799&amp;allow_ip=&amp;allow_referer=&amp;signature=BzVdDskUMSSNpGAp4qiey5qUJGo%3D"><img data-origin-height="714" data-origin-width="1806" height="714" loading="lazy" onerror="this.onerror=null; this.src='//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png'; this.srcset='//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png';" src="/assets/images/8e821aa80e065537203bef6e.png" width="1806"/></span></figure>
+</li>
+</ul>
+</li>
+</ul>
+<h3>One-hot-vector representation</h3>
+<ul>
+<li>전체 단어의 갯수만큼의 차원을 가짐</li>
+<li>ex) Wcat = [1,0,0, ... ,0] , Wzebra = [0,1,0, ... ,0]</li>
+<li>두 단어의 유사성이 보존될 수 없다. (모든 벡터들 사이의 내적이 0이기 때문)</li>
+</ul>
+<h3>Word vectors: distributed representation (분산 표상)</h3>
+<ul>
+<li>n 차원의 실수 공간에 매핑해주는 방법론을 개발해보자 (n &lt; v, v: vocab size)</li>
+<li>ex) Wcat = (0.2, -0.4 ,0.7, ... ) , Wzebra = (0.0, 0.6, -0.1, ... )</li>
+<li>Semantic relationship between words can be preserved (단어 간 의미적 관계를 보존)</li>
+</ul>
+<h3>Pre-trained Models</h3>
+<ul>
+<li>Word Models: Word2vec, GloVe, fastText</li>
+<li>Language Models: ELMo, GPT, BERT</li>
+</ul>
+<h1>TM Process 3: Dimensionality Reduction</h1>
+<h2>Feature Selection/Extraction</h2>
+<h3>Feature subset selection</h3>
+<ul>
+<li>중요도를 판단하여 최적의 변수 집합 선택 (선택적 사용)</li>
+<li>Scoring methods for individual feature (for supervised learning tasks)<ul>
+<li>Information gain, Cross- entropy, ...</li>
+</ul>
+</li>
+</ul>
+<h3>Feature subset extraction</h3>
+<p>d &gt; d` (특성 추출로 차원이 축소되어야 함)</p>
+<ul>
+<li>원본 데이터가 가진 정보를 최대한 보존하면서 훨씬 더 적은 데이터셋을 생성</li>
+<li>LSA (Latent Semantic Analysis, 잠재 의미 분석)<ul>
+<li>ex) 연구 초록에서 긍정/부정 키워드 분석</li>
+</ul>
+</li>
+</ul>
+<h3>SVD in Text Mining</h3>
+<ul>
+<li>전체 r차원을 사용하지 않고 r보다 작은 k개의 차원을 가지고 데이터를 재구축(reconstruction)할 수 있다.</li>
+<li>문서 또는 단어를 축약하는데 사용</li>
+</ul>
+<h3>Topic Modeling as a Feature Extractor</h3>
+<ul>
+<li>토픽 모델링: unsupervised 관점에서 corpus를 관통하는 주요 주제를 판별하여 문서별로 주제의 비중(<strong>Per-document topic proportion</strong>)과 각 주제별로 각 단어들이 얼마의 발생빈도를 가지는가(<strong>Per-topic word distribution</strong>) 두가지 Output</li>
+<li>feature extractor 관점에서는 전자의 output(문서별 주제의 비중) 사용 -&gt; document는 k 차원(k개의 topic)을 갖는 연속형 벡터로서 표현할 수 있다.</li>
+</ul>
+<h3>Document to vector (Doc2Vec)</h3>
+<ul>
+<li>A natural extension of word2vec</li>
+<li>Use a distributed representation for each document</li>
+<li>문서와 단어가 동일한 차원의 공간 상에 표현될 수 있는 학습 기법</li>
+</ul>
+<h1>TM Process 4: Learning &amp; Evaluation</h1>
+<h2>Similarity Between Documents</h2>
+<ul>
+<li>Document similarity<ul>
+<li>Use <strong>cosine similarity</strong> rather than Euclidean distance</li>
+<li>단어의 사용 빈도나 분포 관점에서 볼때 코사인 유사도가 더 유사도를 잘 나타냄</li>
+</ul>
+</li>
+</ul>
+<h2>Learning Task 1: Classification</h2>
+<ul>
+<li>Document categoraization (classification)</li>
+<li>Spam filtering</li>
+<li>Sentiment Analysis</li>
+</ul>
+<h2>Learning Task 2: Clustering</h2>
+<ul>
+<li>Document Clustering<ul>
+<li>주요 topic 판단</li>
+<li>topic간 관계</li>
+<li>문서 이해</li>
+</ul>
+</li>
+<li>Visualization<ul>
+<li>keyword간 관계 시각화</li>
+<li>저널/토픽 카테고리간 유사성 시각화</li>
+</ul>
+</li>
+</ul>
+<h2>Learning Task3: Information Extraction/Retrieval</h2>
+<ul>
+<li>Information extraction/retrieval<ul>
+<li>ex) Question Answering (SQuAD 2.0)</li>
+</ul>
+</li>
+<li>Topic Modeling</li>
+<li>Latent Dirichlet Allocation (LDA)</li>
+</ul>
+{% endraw %}

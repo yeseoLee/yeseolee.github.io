@@ -1,0 +1,438 @@
+---
+layout: post
+title: HTTP Method
+date: '2023-10-17T18:17:23.826000+09:00'
+categories:
+- CS
+source_url: https://velog.io/@yeseolee/HTTP-Method
+source_blog: velog
+permalink: /velog/8514e436/
+---
+{% raw %}
+<h2>HTTP Method 종류</h2>
+<h3>GET</h3>
+<ul>
+<li><strong>리소스 조회</strong></li>
+<li>서버에 전달하고 싶은 데이터는 query(쿼리 파라미터, 쿼리 스트링)를 통해서 전달</li>
+<li>메시지 바디를 사용해서 데이터를 전달할 수 있지만, 지원하지 않는 곳이 많아서 권장하지
+않음</li>
+</ul>
+<pre><code>GET /search?q=hello&amp;hl=ko HTTP/1.1
+Host: www.google.com
+</code></pre>
+<h3>POST</h3>
+<ul>
+<li>요청 데이터 처리 (주로 등록에 사용)</li>
+<li>메시지 바디를 통해 서버로 요청 데이터 전달</li>
+<li>서버는 요청 데이터(메시지 바디를 통해 들어온)를 처리하는 모든 기능을 수행</li>
+<li>주로 전달된 데이터로 <strong>신규 리소스 등록</strong>, <strong>프로세스 처리</strong>에 사용
+<ul>
+<li>
+<p><strong>새 리소스 생성(등록)</strong></p>
+<p>예) 신규 유저 회원 가입</p>
+</li>
+<li>
+<p><strong>요청 데이터 처리</strong></p>
+<p>예) 주문에서 결제완료 -&gt; 배달시작 -&gt; 배달완료 처럼 단순히 값 변경을 넘어 프로세스의 상태가 변경되는 경우</p>
+</li>
+<li>
+<p><strong>다른 메서드로 처리하기 애매한 경우</strong></p>
+<p>예) JSON으로 조회 데이터를 넘겨야 하는데, GET 메서드를 사용하기 어려운 경우</p>
+</li>
+</ul>
+</li>
+</ul>
+<pre><code>POST /members HTTP/1.1
+Content-Type: application/json
+{
+ "username": "hello",
+ "age": 20
+}
+</code></pre>
+<h3>PUT</h3>
+<ul>
+<li>리소스를 대체, 해당 리소스가 없으면 생성 (일종의 덮어쓰기)</li>
+<li>클라이언트가 리소스를 식별
+<ul>
+<li>클라이언트가 리소스 위치를 알고 URI 지정함</li>
+<li>POST와 차이점</li>
+</ul>
+</li>
+</ul>
+<pre><code>PUT /members/100 HTTP/1.1
+Content-Type: application/json
+{
+ "username": "hello",
+ "age": 20
+}
+</code></pre>
+<h3>PATCH</h3>
+<ul>
+<li>리소스 부분 변경</li>
+</ul>
+<pre><code>PATCH /members/100 HTTP/1.1
+Content-Type: application/json
+{
+ "age": 50
+}
+</code></pre>
+<h3>PUT vs PATCH</h3>
+<ul>
+<li>
+<p>서버에 저장된<code>/members/100</code> 에 해당하는 데이터</p>
+<pre><code class="language-json">{
+ "username": "young",
+ "age": 20
+}
+</code></pre>
+</li>
+<li>
+<p>PATCH</p>
+<pre><code>// 요청
+PATCH /members/100 HTTP/1.1
+Content-Type: application/json
+{
+ "age": 50
+}
+// 결과
+{
+ "username": "young",
+ "age": 50
+}
+</code></pre>
+</li>
+<li>
+<p>PUT</p>
+<pre><code>// 요청
+PUT /members/100 HTTP/1.1
+Content-Type: application/json
+{
+ "age": 50
+}
+// 결과
+{
+ "age": 50
+}
+</code></pre>
+</li>
+</ul>
+<h3>DELETE</h3>
+<ul>
+<li>리소스 삭제</li>
+</ul>
+<pre><code>DELETE /members/100 HTTP/1.1
+Host: localhost:8080
+</code></pre>
+<hr/>
+<h3>기타 메서드</h3>
+<ul>
+<li>HEAD: GET과 동일하지만 메시지 부분을 제외하고, 상태 줄과 헤더만 반환</li>
+<li>OPTIONS: 대상 리소스에 대한 통신 가능 옵션(메서드)을 설명(주로 CORS에서 사용)</li>
+<li>CONNECT: 대상 리소스로 식별되는 서버에 대한 터널을 설정</li>
+<li>TRACE: 대상 리소스에 대한 경로를 따라 메시지 루프백 테스트를 수행</li>
+</ul>
+<h2>HTTP 메서드의 속성</h2>
+<table>
+<thead>
+<tr>
+<th>HTTP 메소드</th>
+<th>RFC</th>
+<th>요청에 Body가 있음</th>
+<th>응답에 Body가 있음</th>
+<th>안전</th>
+<th>멱등(Idempotent)</th>
+<th>캐시 가능</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GET</td>
+<td><a href="https://datatracker.ietf.org/doc/html/rfc7231">rfc7231</a></td>
+<td>아니요</td>
+<td>예</td>
+<td>예</td>
+<td>예</td>
+<td>예</td>
+</tr>
+<tr>
+<td>HEAD</td>
+<td><a href="https://datatracker.ietf.org/doc/html/rfc7231">rfc7231</a></td>
+<td>아니요</td>
+<td>아니요</td>
+<td>예</td>
+<td>예</td>
+<td>예</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><a href="https://datatracker.ietf.org/doc/html/rfc7231">rfc7231</a></td>
+<td>예</td>
+<td>예</td>
+<td>아니요</td>
+<td>아니요</td>
+<td>예</td>
+</tr>
+<tr>
+<td>PUT</td>
+<td><a href="https://datatracker.ietf.org/doc/html/rfc7231">rfc7231</a></td>
+<td>예</td>
+<td>예</td>
+<td>아니요</td>
+<td>예</td>
+<td>아니요</td>
+</tr>
+<tr>
+<td>DELETE</td>
+<td><a href="https://datatracker.ietf.org/doc/html/rfc7231">rfc7231</a></td>
+<td>아니요</td>
+<td>예</td>
+<td>아니요</td>
+<td>예</td>
+<td>아니요</td>
+</tr>
+<tr>
+<td>CONNECT</td>
+<td><a href="https://datatracker.ietf.org/doc/html/rfc7231">rfc7231</a></td>
+<td>예</td>
+<td>예</td>
+<td>아니요</td>
+<td>아니요</td>
+<td>아니요</td>
+</tr>
+<tr>
+<td>OPTIONS</td>
+<td><a href="https://datatracker.ietf.org/doc/html/rfc7231">rfc7231</a></td>
+<td>선택 사항</td>
+<td>예</td>
+<td>예</td>
+<td>예</td>
+<td>아니요</td>
+</tr>
+<tr>
+<td>TRACE</td>
+<td><a href="https://datatracker.ietf.org/doc/html/rfc7231">rfc7231</a></td>
+<td>아니요</td>
+<td>예</td>
+<td>예</td>
+<td>예</td>
+<td>아니요</td>
+</tr>
+<tr>
+<td>PATCH</td>
+<td><a href="https://datatracker.ietf.org/doc/html/rfc5789">rfc5789</a></td>
+<td>예</td>
+<td>예</td>
+<td>아니요</td>
+<td>아니요</td>
+<td>예</td>
+</tr>
+</tbody>
+</table>
+<p>https://ko.wikipedia.org/wiki/HTTP</p>
+<h3>안전(Safe Methods)</h3>
+<p>호출해도 리소스를 변경하지 않는다.</p>
+<h3>멱등(Idempotent Methods)</h3>
+<p>한 번 호출하든 두 번 호출하든 100번 호출하든 결과가 똑같다.</p>
+<ul>
+<li>멱등 메서드
+<ul>
+<li>GET: 한 번 조회하든, 두 번 조회하든 같은 결과가 조회된다.</li>
+<li>PUT: 결과를 대체한다. 따라서 같은 요청을 여러번 해도 최종 결과는 같다.</li>
+<li>DELETE: 결과를 삭제한다. 같은 요청을 여러번 해도 삭제된 결과는 똑같다.</li>
+</ul>
+</li>
+<li>자동 복구 메커니즘(서버가 TIMEOUT 등으로 정상 응답을 못주었을 때, 클라이언트가 같은 요청을 다시 해도 되는가? 에 대한 판단 근거) 등으로 활용한다.</li>
+<li>멱등은 외부 요인으로 중간에 리소스가 변경되는 것 까지는 고려하지는 않는다.</li>
+</ul>
+<h3>캐시가능(Cacheable Methods)</h3>
+<ul>
+<li>응답 결과 리소스를 캐시해서 사용해도 되는가?</li>
+<li>GET, HEAD, POST, PATCH 캐시가능</li>
+<li>실제로는 GET, HEAD 정도만 캐시로 사용 (POST, PATCH는 본문 내용까지 캐시 키로 고려해야 하는데, 구현이 쉽지 않음)</li>
+</ul>
+<h2>URI 설계</h2>
+<h3>URI 설계 개념</h3>
+<ul>
+<li>문서(document)
+<ul>
+<li>단일 개념(파일 하나, 객체 인스턴스, 데이터베이스 row)</li>
+<li>예) /members/100, /files/star.jpg</li>
+</ul>
+</li>
+<li>컬렉션(collection)
+<ul>
+<li>서버가 관리하는 리소스 디렉터리</li>
+<li>서버가 리소스의 URI를 생성하고 관리</li>
+<li>예) /members</li>
+</ul>
+</li>
+<li>스토어(store)
+<ul>
+<li>클라이언트가 관리하는 자원 저장소</li>
+<li>클라이언트가 리소스의 URI를 알고 관리</li>
+<li>예) /files</li>
+</ul>
+</li>
+<li>컨트롤러(controller), 컨트롤 URI
+<ul>
+<li>문서, 컬렉션, 스토어로 해결하기 어려운 추가 프로세스 실행</li>
+<li>동사를 직접 사용</li>
+<li>예) /members/{id}/delete</li>
+</ul>
+</li>
+</ul>
+<h3>URI 설계 예시</h3>
+<ul>
+<li><strong>HTTP API - 컬렉션</strong>
+<ul>
+<li>POST 기반 등록</li>
+<li>서버가 리소스 URI 결정</li>
+</ul>
+</li>
+<li><strong>HTTP API - 스토어</strong>
+<ul>
+<li>PUT 기반 등록</li>
+<li>클라이언트가 리소스 URI 결정</li>
+</ul>
+</li>
+<li><strong>HTML FORM 사용</strong>
+<ul>
+<li>순수 HTML + HTML form 사용</li>
+<li>GET, POST만 지원</li>
+</ul>
+</li>
+</ul>
+<h2>API 설계 예시</h2>
+<h3>HTTP API 데이터 전송</h3>
+<ul>
+<li>서버 to 서버
+<ul>
+<li>백엔드 시스템 통신</li>
+</ul>
+</li>
+<li>앱 클라이언트
+<ul>
+<li>아이폰, 안드로이드</li>
+</ul>
+</li>
+<li>웹 클라이언트
+<ul>
+<li>HTML에서 Form 전송 대신 자바 스크립트를 통한 통신에 사용(AJAX)</li>
+<li>예) React, VueJs 같은 웹 클라이언트와 API 통신</li>
+</ul>
+</li>
+<li>POST, PUT, PATCH: 메시지 바디를 통해 데이터 전송</li>
+<li>GET: 조회, 쿼리 파라미터로 데이터 전달</li>
+<li>Content-Type: application/json을 주로 사용 (사실상 표준)
+<ul>
+<li>TEXT, XML, JSON 등등</li>
+</ul>
+</li>
+</ul>
+<h3>HTTP API 설계</h3>
+<ul>
+<li>HTTP API - 컬렉션
+<ul>
+<li>POST 기반 등록</li>
+<li>예) 회원 관리 API 제공</li>
+</ul>
+</li>
+<li>HTTP API - 스토어
+<ul>
+<li>PUT 기반 등록</li>
+<li>예) 정적 컨텐츠 관리, 원격 파일 관리</li>
+</ul>
+</li>
+<li>HTML FORM 사용
+<ul>
+<li>웹 페이지 회원 관리</li>
+<li>GET, POST만 지원</li>
+</ul>
+</li>
+</ul>
+<h3><strong>POST 기반 등록 API 설계</strong></h3>
+<p><strong>회원 관리 시스템</strong></p>
+<ul>
+<li>회원 목록 /members -&gt; GET</li>
+<li>회원 등록 /members -&gt; POST</li>
+<li>회원 조회 /members/{id} -&gt; GET</li>
+<li>회원 수정 /members/{id} -&gt; PATCH, PUT, POST</li>
+<li>회원 삭제 /members/{id} -&gt; DELETE</li>
+</ul>
+<p><strong>POST - 신규 자원 등록 특징</strong></p>
+<ul>
+<li>클라이언트는 등록될 리소스의 URI를 모른다.
+<ul>
+<li>회원 등록 /members -&gt; POST</li>
+<li>POST /members</li>
+</ul>
+</li>
+<li>서버가 새로 등록된 리소스 URI를 생성해준다.
+<ul>
+<li>HTTP/1.1 201 Created
+Location: /members/100</li>
+</ul>
+</li>
+<li>컬렉션(Collection)
+<ul>
+<li>서버가 관리하는 리소스 디렉토리</li>
+<li>서버가 리소스의 URI를 생성하고 관리</li>
+<li>여기서 컬렉션은 /members</li>
+</ul>
+</li>
+</ul>
+<h3>PUT <strong>기반 등록 API 설계</strong></h3>
+<p><strong>파일 관리 시스템</strong></p>
+<ul>
+<li>파일 목록 /files -&gt; GET</li>
+<li>파일 조회 /files/{filename} -&gt; GET</li>
+<li>파일 등록 /files/{filename} -&gt; PUT</li>
+<li>파일 삭제 /files/{filename} -&gt; DELETE</li>
+<li>파일 대량 등록 /files -&gt; POST</li>
+</ul>
+<p><strong>PUT - 신규 자원 등록 특징</strong></p>
+<ul>
+<li>클라이언트가 리소스 URI를 알고 있어야 한다.
+<ul>
+<li>파일 등록 /files/{filename} -&gt; PUT</li>
+<li>PUT /files/star.jpg</li>
+</ul>
+</li>
+<li>클라이언트가 직접 리소스의 URI를 지정한다.</li>
+<li>스토어(Store)
+<ul>
+<li>클라이언트가 관리하는 리소스 저장소</li>
+<li>클라이언트가 리소스의 URI를 알고 관리</li>
+<li>여기서 스토어는 /files</li>
+</ul>
+</li>
+</ul>
+<h3>HTML FORM 사용</h3>
+<ul>
+<li>HTML FORM은 GET, POST만 지원</li>
+<li>AJAX 같은 기술을 사용해서 해결 가능</li>
+<li>컨트롤 URI
+<ul>
+<li>GET, POST만 지원하므로 제약이 있음</li>
+<li>이런 제약을 해결하기 위해 동사로 된 리소스 경로 사용</li>
+<li>POST의 /new, /edit, /delete가 컨트롤 URI</li>
+<li>HTTP 메서드로 해결하기 애매한 경우 사용(HTTP API 포함)</li>
+</ul>
+</li>
+</ul>
+<p><strong>회원 API 예시</strong></p>
+<ul>
+<li>회원 목록 /members -&gt; GET</li>
+<li>회원 등록 폼 /members/new -&gt; GET</li>
+<li>회원 등록 /members/new, /members -&gt; POST</li>
+<li>회원 조회 /members/{id} -&gt; GET</li>
+<li>회원 수정 폼 /members/{id}/edit -&gt; GET</li>
+<li>회원 수정 /members/{id}/edit, /members/{id} -&gt; POST</li>
+<li>회원 삭제 /members/{id}/delete -&gt; POST</li>
+</ul>
+<p>출처</p>
+<ul>
+<li><a href="https://www.inflearn.com/course/http-%EC%9B%B9-%EB%84%A4%ED%8A%B8%EC%9B%8C%ED%81%AC">모든 개발자를 위한 HTTP 웹 기본 지식</a></li>
+</ul>
+
+{% endraw %}

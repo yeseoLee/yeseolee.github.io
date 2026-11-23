@@ -1,0 +1,793 @@
+---
+layout: post
+title: '[네이버 부스트캠프 AI Tech 7기] Level3 수능 문제 풀이 모델 생성 프로젝트 최종 리포트'
+date: '2024-12-03T22:17:10+09:00'
+categories:
+- 강의노트
+- 네이버 부스트캠프 AI Tech 7기
+source_url: https://ohge.tistory.com/68
+source_blog: tistory
+permalink: /tistory/68/
+---
+{% raw %}
+<p><figure class="imageblock alignCenter" data-filename="gqzkv6mwfmavwnxgccml.png" data-ke-mobilestyle="widthOrigin" data-origin-height="1024" data-origin-width="1024"><span data-phocus="https://blog.kakaocdn.net/dna/bKGqX2/btsK4NPDCki/AAAAAAAAAAAAAAAAAAAAAGrt-lkq7K9mAnbv_VawPzCm3kq69q1L-Cdj85_Y4Kkm/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&amp;expires=1796050799&amp;allow_ip=&amp;allow_referer=&amp;signature=9BbYIyezQMG2WTXt2QA81SKv57Q%3D" data-url="https://blog.kakaocdn.net/dna/bKGqX2/btsK4NPDCki/AAAAAAAAAAAAAAAAAAAAAGrt-lkq7K9mAnbv_VawPzCm3kq69q1L-Cdj85_Y4Kkm/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&amp;expires=1796050799&amp;allow_ip=&amp;allow_referer=&amp;signature=9BbYIyezQMG2WTXt2QA81SKv57Q%3D"><img data-filename="gqzkv6mwfmavwnxgccml.png" data-origin-height="1024" data-origin-width="1024" height="1024" loading="lazy" onerror="this.onerror=null; this.src='//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png'; this.srcset='//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png';" src="/assets/images/9fc66062b01439b1d746f640.png" width="1024"/></span></figure>
+</p>
+<p data-ke-size="size16"><span style="color: #000000;"><a href="https://github.com/boostcampaitech7/level2-nlp-generationfornlp-nlp-02-lv3" rel="noopener noreferrer" target="_blank">https://github.com/boostcampaitech7/level2-nlp-generationfornlp-nlp-02-lv3</a></span></p>
+<figure contenteditable="false" data-ke-align="alignCenter" data-ke-type="opengraph" data-og-description="level2-nlp-generationfornlp-nlp-02-lv3 created by GitHub Classroom - boostcampaitech7/level2-nlp-generationfornlp-nlp-02-lv3" data-og-host="github.com" data-og-image="https://blog.kakaocdn.net/dna/ceIYrE/hyXGGJ1Itm/AAAAAAAAAAAAAAAAAAAAAPV4jPXllB4qP4jcfPnVPh0izT243_lrxZyNHtiLV7o4/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&amp;expires=1796050799&amp;allow_ip=&amp;allow_referer=&amp;signature=RrMratzJGRIjGAWQtRAe22xkAUE%3D" data-og-source-url="https://github.com/boostcampaitech7/level2-nlp-generationfornlp-nlp-02-lv3" data-og-title="GitHub - boostcampaitech7/level2-nlp-generationfornlp-nlp-02-lv3: level2-nlp-generationfornlp-nlp-02-lv3 created by GitHub Class" data-og-type="object" data-og-url="https://github.com/boostcampaitech7/level2-nlp-generationfornlp-nlp-02-lv3" id="og_1733469619801"><a data-source-url="https://github.com/boostcampaitech7/level2-nlp-generationfornlp-nlp-02-lv3" href="https://github.com/boostcampaitech7/level2-nlp-generationfornlp-nlp-02-lv3" rel="noopener" target="_blank">
+<div class="og-image" style="background-image: url('https://blog.kakaocdn.net/dna/ceIYrE/hyXGGJ1Itm/AAAAAAAAAAAAAAAAAAAAAPV4jPXllB4qP4jcfPnVPh0izT243_lrxZyNHtiLV7o4/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&amp;expires=1796050799&amp;allow_ip=&amp;allow_referer=&amp;signature=RrMratzJGRIjGAWQtRAe22xkAUE%3D');"> </div>
+<div class="og-text">
+<p class="og-title" data-ke-size="size16">GitHub - boostcampaitech7/level2-nlp-generationfornlp-nlp-02-lv3: level2-nlp-generationfornlp-nlp-02-lv3 created by GitHub Class</p>
+<p class="og-desc" data-ke-size="size16">level2-nlp-generationfornlp-nlp-02-lv3 created by GitHub Classroom - boostcampaitech7/level2-nlp-generationfornlp-nlp-02-lv3</p>
+<p class="og-host" data-ke-size="size16">github.com</p>
+</div>
+</a></figure>
+<h2 data-ke-size="size26"><b><span style="color: #000000;">목차</span></b></h2>
+<p data-ke-size="size16"><span style="color: #000000;">0. 프로젝트 개요</span></p>
+<p data-ke-size="size16"><span style="color: #000000;">1. 모델</span><span style="color: #000000;"> </span></p>
+<p data-ke-size="size16"><span style="color: #000000;">2.데이터</span></p>
+<p data-ke-size="size16"><span style="color: #000000;">3. 추론</span></p>
+<p data-ke-size="size16"><span style="color: #000000;">4. 앙상블</span></p>
+<p data-ke-size="size16"><span style="color: #000000;">5. 최종 제출 데이터</span></p>
+<p data-ke-size="size16"><span style="color: #000000;">6. 개인회고</span><span style="color: #000000;"></span></p>
+<h2 data-ke-size="size26"><b><span style="color: #000000;">0. 프로젝트 개요</span></b></h2>
+<p data-ke-size="size16"><span style="color: #000000;">한국어의 특성과 수능 시험의 특징을 바탕으로 수능에 특화된 AI 모델을 만드는 프로젝트이다.</span><b></b></p>
+<p data-ke-size="size16"><span style="color: #000000;">평가지표는 정확도 Accuracy이다.</span></p>
+<p data-ke-size="size16"><b> </b></p>
+<p data-ke-size="size16"><span style="color: #000000;">데이터의 구성은 다음과 같다.</span></p>
+<p data-ke-size="size16"><span style="color: #000000;">수능형문제, KMMLU(Korean History), MMMLU(HighSchool 데이터 중 역사, 경제, 정치, 지리, 심리), KLUE MRC(경제, 교육산업, 국제, 부동산, 사회, 생활, 책마을)</span></p>
+<p data-ke-size="size16"><b> </b></p>
+<p data-ke-size="size16"><span style="color: #000000;">데이터셋 세부 정보는 다음과 같다.</span></p>
+<p data-ke-size="size16"><span style="color: #000000;">paragraph(지문), question(질문), choices(선지), answer(정답), question_plus(보기)</span></p>
+<p data-ke-size="size16"><b> </b></p>
+<p data-ke-size="size16"><span style="color: #000000;">학습데이터는 KMMLU, MMMLU(Ko), KLUE MRC 데이터중 2031개, 평가 데이터는 수능형문제, KMMLU, MMMLU(Ko), KLUE MRC 데이터 총 869개이며 정답은 빈 문자열로 구성되어있다.</span><b></b></p>
+<h2 data-ke-size="size26"><b><span style="color: #000000;">1. 모델</span></b></h2>
+<h3 data-ke-size="size23"><span style="color: #000000;">1.1. 모델 선정</span></h3>
+<h4 data-ke-size="size20"><span style="color: #000000;">1.1.1. 모델 선정을 위한 실험 </span></h4>
+<p data-ke-size="size16"><span style="background-color: #ffffff; color: #0d0d0d;">모델 선정을 위한 과정에서 베이스라인 코드와 대회 제공 데이터를 활용하여 LLM의 성능을 평가하였다. 평가에 사용된 모델은 한국어 언어 모델 다분야 사고력 벤치마크인 LogicKor</span><span style="background-color: #ffffff; color: #0d0d0d;">의 7~9B 공개 모델이다.</span><b></b></p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16"><span style="background-color: #ffffff; color: #0d0d0d;">실험은 모델을 제외한 모든 환경을 동일하게 설정하여 진행하였다.</span><span style="color: #000000;"> (trained, epoch 1)</span></p>
+<div>
+<table border="1" data-ke-align="alignLeft" style="border-collapse: collapse; width: 100%;">
+<tbody>
+<tr>
+<td style="background-color: #efefef;"><span><span style="color: #000000;">모델 명</span></span></td>
+<td style="background-color: #efefef;"><span><span style="color: #000000;">accuracy</span></span></td>
+</tr>
+<tr>
+<td style="background-color: #dee8f1;"><span><span style="color: #000000;">Qwen/Qwen2.5-7B-Instruct</span></span></td>
+<td style="background-color: #dee8f1;"><span><span style="color: #1f2328;">0.6590</span></span></td>
+</tr>
+<tr>
+<td style="background-color: #dee8f1;"><span><span style="color: #1f2328;">LGAI-EXAONE/EXAONE-3.0-7.8B-Instruct</span></span></td>
+<td style="background-color: #dee8f1;"><span><span style="color: #000000;">0.6498</span></span></td>
+</tr>
+<tr>
+<td><span><span style="color: #000000;">NCSOFT/Llama-VARCO-8B-Instruct</span></span></td>
+<td><span><span style="color: #000000;">0.5876</span></span></td>
+</tr>
+<tr>
+<td><span><span style="color: #000000;">rtzr/ko-gemma-2-9b-it</span></span></td>
+<td><span><span style="background-color: #ffffff; color: #1f2328;">0.5760</span></span></td>
+</tr>
+<tr>
+<td><span><span style="color: #000000;">KISTI-KONI/KONI-Llama3-8B-Instruct-20240729</span></span></td>
+<td><span><span style="color: #000000;">0.5668</span></span></td>
+</tr>
+<tr>
+<td><span><span style="color: #000000;">CohereForAI/aya-expanse-8b</span></span></td>
+<td><span><span style="background-color: #ffffff; color: #1f2328;">0.5253</span></span></td>
+</tr>
+<tr>
+<td><span><span style="color: #000000;">beomi/Llama-3-Open-Ko-8B</span></span></td>
+<td><span><span style="color: #000000;">0.5069</span></span></td>
+</tr>
+<tr>
+<td><span><span style="color: #000000;">MLP-KTLim/llama-3-Korean-Bllossom-8B</span></span></td>
+<td><span><span style="color: #000000;">0.4931</span></span></td>
+</tr>
+</tbody>
+</table>
+<b></b></div>
+<p data-ke-size="size16"><span style="background-color: #ffffff; color: #0d0d0d;">실험 결과, Accuracy가 가장 높은 두 모델인 </span><span style="background-color: #efefef; color: #0d0d0d;">Qwen/Qwen2.5-7B-Instruct</span><span style="background-color: #ffffff; color: #0d0d0d;">(0.6590)와 </span><span style="background-color: #efefef; color: #0d0d0d;">LGAI-EXAONE/EXAONE-3.0-7.8B-Instruct</span><span style="background-color: #ffffff; color: #0d0d0d;">(0.6498)을 기반으로, 모델 크기를 조정하며 이번 프로젝트의 주요 모델로 선정하여 활용하였다.</span><b></b><span style="background-color: #ffffff; color: #0d0d0d;"></span></p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16"><span style="color: #0d0d0d;">별도의 표기가 없다면 </span><span style="color: #0d0d0d;">Qwen/Qwen2.5-7B-Instruct</span><span style="color: #0d0d0d;">, </span><span style="color: #0d0d0d;">Qwen2.5-7B-Instruct는 모두 같은 모델을 의미하며, LGAI-EXAONE/EXAONE-3.0-7.8B-Instruct, EXAONE-3.0-7.8B-Instruct도 동일한 모델을 지칭한다.</span><b></b></p>
+<h4 data-ke-size="size20"><span style="background-color: #ffffff; color: #1f2328;">1.1.2. EXAONE-3.0-7.8B vs Qwen_Qwen2.5-7B-Instruct </span></h4>
+<p data-ke-size="size16"><span style="color: #000000;">두 모델에 대한 성능 비교 실험 결과는 다음과 같다. </span><b></b></p>
+<p data-ke-size="size16"><span style="background-color: #ffffff; color: #0d0d0d;">실험은 모델과 description에 표시된 파라미터를 제외한 모든 환경을 동일하게 설정하여 진행하였다.</span></p>
+<div>
+<table border="1" data-ke-align="alignLeft" style="border-collapse: collapse; width: 100%;">
+<tbody>
+<tr>
+<td style="background-color: #efefef;"><span><span style="color: #000000;">모델 명</span></span></td>
+<td style="background-color: #efefef;"><span><span style="color: #000000;">description</span></span></td>
+<td style="background-color: #efefef;"><span><span style="color: #000000;">accuracy</span></span></td>
+</tr>
+<tr>
+<td><span><span style="color: #000000;">Qwen/Qwen2.5-7B-Instruct</span></span></td>
+<td><span><span style="color: #000000;">trained, epoch 1</span></span></td>
+<td><span><span style="background-color: #ffffff; color: #1f2328;">0.6613</span></span></td>
+</tr>
+<tr>
+<td><span><span style="color: #000000;">Qwen/Qwen2.5-7B-Instruct</span></span></td>
+<td><span><span style="color: #000000;">trained, epoch 3</span></span></td>
+<td><span><span style="color: #000000;">0.6590</span></span></td>
+</tr>
+<tr>
+<td><span><span style="color: #1f2328;">LGAI-EXAONE/EXAONE-3.0-7.8B-Instruct</span></span></td>
+<td><span><span style="color: #000000;">trained, epoch 3</span></span></td>
+<td><span><span style="color: #000000;">0.6475</span></span></td>
+</tr>
+<tr>
+<td><span><span style="color: #1f2328;">LGAI-EXAONE/EXAONE-3.0-7.8B-Instruct</span></span></td>
+<td><span><span style="color: #000000;">trained, epoch 1</span></span></td>
+<td><span><span style="color: #000000;">0.6221</span></span></td>
+</tr>
+<tr>
+<td><span><span style="color: #000000;">Qwen/Qwen2.5-7B-Instruct</span></span></td>
+<td><span><span style="color: #000000;">not trained, inference only</span></span></td>
+<td><span><span style="color: #000000;">0.6129</span></span></td>
+</tr>
+<tr>
+<td><span><span style="color: #1f2328;">LGAI-EXAONE/EXAONE-3.0-7.8B-Instruct</span></span></td>
+<td><span><span style="color: #000000;">not trained, inference only</span></span></td>
+<td><span><span style="color: #000000;">0.5023</span></span></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p data-ke-size="size16"><b> </b></p>
+<p data-ke-size="size16"><span style="color: #000000;">1) 학습 없이 inference만 진행한 경우 (not trained, inference only)</span></p>
+<p data-ke-size="size16"><span style="background-color: #efefef; color: #000000;">Qwen2.5-7B-Instruct</span><span style="color: #000000;">는 accuracy가 0.6129로, </span><span style="background-color: #efefef; color: #000000;">EXAONE-3.0-7.8B-Instruct</span><span style="color: #000000;">의 0.5023보다 약 0.11 높은 성능을 보였다.</span></p>
+<p data-ke-size="size16"><span style="color: #000000;">2) 학습(epoch)별 성능 변화</span></p>
+<p data-ke-size="size16"><span style="color: #000000;">EXAONE 모델은 학습을 진행하며 Epoch를 늘릴수록 성능이 점진적으로 증가했다. Epoch 1에서 0.6221, Epoch 3에서는 0.6475로 성능 증가폭이 뚜렷했다. Qwen 모델은 Epoch 1에서 0.6613의 Accuracy로 가장 높은 성능을 기록했으나, Epoch3에서는 0.6590으로 소폭 감소했다.</span></p>
+<p data-ke-size="size16"><span style="color: #000000;">3) 학습 효과</span></p>
+<p data-ke-size="size16"><span style="color: #000000;">학습을 진행한 경우, EXAONE 모델은 성능 증가폭이 커 학습의 효과가 두드러졌다. 반면, Qwen 모델은 학습 전 inference 상태에서 이미 높은 성능을 보였으며, 학습 이후 성능 변화는 상대적으로 적었다.</span></p>
+<p data-ke-size="size16"><b> </b></p>
+<p data-ke-size="size16"><span style="color: #000000;">결론적으로, Qwen은 기본 상태에서 높은 성능을 보이며 Epoch 1에서 가장 우수한 결과를 나타냈지만, EXAONE은 학습에 따른 성능 향상이 더 뚜렷하여 지속적인 학습에서 강점을 보였다. </span><span style="background-color: #ffffff; color: #0d0d0d;">이러한 결과를 바탕으로 이후 실험에서는 Qwen은 Epoch 1, EXAONE은 Epoch 3 이상의 설정으로 학습을 진행하였다.</span><b></b></p>
+<h3 data-ke-size="size23"><span style="color: #000000;">1.2. 메모리/속도 최적화</span></h3>
+<p data-ke-size="size16"><span style="color: #000000;">모델 관점에서 성능 향상을 위해서는 더 큰 모델과 더 많은 입력 토큰 길이를 사용하는 것이다. 메모리 최적화는 성능에 가장 직접적으로 영향을 주는 부분이기 때문에 여러 관점에서 시도한 다양한 방법론을 담았다.</span><b></b></p>
+<h4 data-ke-size="size20"><span style="color: #000000;">1.2.1. Gradient</span></h4>
+<p data-ke-size="size16"><span style="color: #000000;">1.2.1.1. gradient checkpointing</span></p>
+<p data-ke-size="size16"><span style="color: #000000;">backward pass중에 gradient를 계산하려면 일반적으로 forward pass의 모든 activation이 저장된다. gradient checkpointing은 계산 그래프 전체에서 전략적으로 선택된 activation을 저장하고 일부만 다시 계산하여 메모리 사용량을 줄인다. TESLA V100 32G에서 gradient checkpointing만 사용해도 파라미터 사이즈 8B이내의 모델은 fp16으로 충분히 학습 및 추론 가능했다.</span></p>
+<p data-ke-size="size16"><b> </b></p>
+<p data-ke-size="size16"><span style="color: #000000;">1.2.1.2. gradient accumulation</span></p>
+<p data-ke-size="size16"><span style="color: #000000;">gradient accumulation은 작은 미니 배치로 나누어 gradient를 계산하고, 지정된 accumulation step동안 gradient를 누적하고, 누적된 gradient로 모델 가중치 업데이트를 한번에 수행한다. 학습 과정에서 메모리 사용량이 감소하고 학습 안정성이 향상된다. 또한 제한된 메모리로도 큰 배치 사이즈의 효과를 달성하는 방법이나 이번 task는 batch size에 민감한 task가 아니며 학습 중에 메모리 이슈가 발생한 상황은 거의 없었고 주로 모델을 로드하는 과정에서 메모리 이슈가 발생했기 때문에 적극적으로 사용하지는 않았고 일부 상황에서만 활용했다.</span><b></b></p>
+<h4 data-ke-size="size20"><span style="color: #000000;">1.2.2. 양자화</span></h4>
+<p data-ke-size="size16"><span style="color: #000000;">1.2.2.1. BitsAndBytes</span></p>
+<p data-ke-size="size16"><span style="color: #000000;">대표적인 양자화 방식 중 하나인 BitsAndBytes는 quantization_config 인자를 넣어주는 간단한 설정만으로 8-bit 혹은 4-bit 양자화가 가능하다. 파라미터 크기가 8B를 초과하는 모델은 모델 로드 과정에서 OOM이 발생했으나,  8-bit 양자화를 적용하여 14B 모델을 훈련 및 추론에 이용할 수 있었다. 4-bit 양자화를 적용했을 때는 32B 모델도 구동할 수 있었다. 4-bit 양자화 32B,  8-bit 양자화 14B, 8B 모델의 성능 실험 결과는 각각 다음과 같았다. 그리고 양자화 비트별 성능을 보기 위한 실험 결과는 다음과 같았다.</span><b></b></p>
+<div>
+<table border="1" data-ke-align="alignLeft" style="border-collapse: collapse; width: 100%;">
+<tbody>
+<tr>
+<td style="background-color: #efefef;"><span><span style="color: #000000;">Parameter size</span></span></td>
+<td style="background-color: #efefef;"><span><span style="color: #000000;">Quantization</span></span></td>
+<td style="background-color: #efefef;"><span><span style="color: #000000;">train runtime</span></span></td>
+<td style="background-color: #efefef;"><span><span style="color: #000000;">inference runtime</span></span></td>
+<td style="background-color: #efefef;"><span><span style="color: #000000;">accuracy</span></span></td>
+</tr>
+<tr>
+<td style="background-color: #cfe2f3;"><span><span style="color: #000000;">32B</span></span></td>
+<td style="background-color: #cfe2f3;"><span><span style="color: #000000;">4bit(nf4)</span></span></td>
+<td style="background-color: #cfe2f3;"><span><span style="color: #000000;">4h 23m 21s</span></span></td>
+<td style="background-color: #cfe2f3;"><span><span style="color: #000000;">1h 13m 38s</span></span></td>
+<td style="background-color: #cfe2f3;"><span><span style="color: #000000;">0.7696</span></span></td>
+</tr>
+<tr>
+<td><span><span style="color: #000000;">14B</span></span></td>
+<td><span><span style="color: #000000;">8bit</span></span></td>
+<td><span><span style="color: #000000;">2h 14m 38s</span></span></td>
+<td><span><span style="color: #000000;">0h 40m 41s</span></span></td>
+<td><span><span style="color: #000000;">0.7235</span></span></td>
+</tr>
+<tr>
+<td><span><span style="color: #000000;">14B</span></span></td>
+<td><span><span style="color: #000000;">4bit(nf4)</span></span></td>
+<td><span><span style="color: #000000;">1h 56m 28s</span></span></td>
+<td><span><span style="color: #000000;">0h 35m 58s</span></span></td>
+<td><span><span style="color: #000000;">0.7120</span></span></td>
+</tr>
+<tr>
+<td><span><span style="color: #000000;">7B</span></span></td>
+<td><span><span style="color: #000000;">float16</span></span></td>
+<td><span><span style="color: #000000;">0h 9m 59s</span></span></td>
+<td><span><span style="color: #000000;">0h 9m 06s</span></span></td>
+<td><span><span style="color: #000000;">0.6613</span></span></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p data-ke-size="size16"><span style="color: #000000;">- 파라미터 사이즈별 성능</span><b></b></p>
+<div>
+<table border="1" data-ke-align="alignLeft" style="border-collapse: collapse; width: 100%;">
+<tbody>
+<tr>
+<td style="background-color: #efefef;"><span><span style="color: #000000;">model</span></span></td>
+<td style="background-color: #efefef;"><span><span style="color: #000000;">max_token_length</span></span></td>
+<td style="background-color: #efefef;"><span><span style="color: #000000;">accuracy</span></span></td>
+</tr>
+<tr>
+<td style="background-color: #cfe2f3;"><span><span style="color: #000000;">Qwen2.5-32B-Instruct-GPTQ-Int4</span></span></td>
+<td style="background-color: #cfe2f3;"><span><span style="color: #000000;">4096</span></span></td>
+<td style="background-color: #cfe2f3;"><span><span style="color: #000000;">0.7465</span></span></td>
+</tr>
+<tr>
+<td><span><span style="color: #000000;">Qwen2.5-32B-Instruct + 4 bit 양자화</span></span></td>
+<td><span><span style="color: #000000;">2048</span></span></td>
+<td><span><span style="color: #000000;">0.7696</span></span></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p data-ke-size="size16"><span style="color: #000000;">- 32B 모델의 양자화 방식에 따른 성능</span></p>
+<p data-ke-size="size16"><b> </b></p>
+<p data-ke-size="size16"><span style="color: #000000;">1.2.2.2. GPTQ</span></p>
+<p data-ke-size="size16"><span style="color: #000000;">Qwen2.5 모델은 미리 양자화된 모델을 함께 공개했는데, GPTQ 방식과 AWQ 방식으로 양자화된 모델이 있었다. AWQ 방식으로 양자화된 모델은 추론만 가능하고 학습에는 사용할 수 없었기 때문에 GPTQ 방식으로 양자화된 모델을 가져와 사용했다. </span><span style="background-color: #efefef; color: #000000;">Qwen2.5-32B-Instruct-QPTQ-Int4</span><span style="color: #000000;"> 모델은 </span><span style="background-color: #efefef; color: #000000;">Qwen2.5-32B-Instruct</span><span style="color: #000000;">를 BitsAndBytes로 4bit 양자화한 모델에 비해 약간의 성능 하락이 있었지만 속도가 훨씬 빠르고 더 메모리 효율적이기 때문에 입력 토큰의 최대 길이를 늘릴 수 있었다. 늘어난 입력 토큰만큼 더 길이가 긴 훈련 데이터를 손실없이 사용할 수 있으며, RAG와 Prompt 등 성능 개선 방법을 더 많이 적용할 수 있기 때문에 개선의 여지가 더 큰 GPTQ 모델을 이용하여 성능을 최대한 끌어올려보기로 결정했다. </span><b></b></p>
+<div>
+<table border="1" data-ke-align="alignLeft" style="border-collapse: collapse; width: 100%;">
+<tbody>
+<tr>
+<td style="background-color: #efefef;"><span><span style="color: #000000;">model</span></span></td>
+<td style="background-color: #efefef;"><span><span style="color: #000000;">max_token_length</span></span></td>
+<td style="background-color: #efefef;"><span><span style="color: #000000;">accuracy</span></span></td>
+</tr>
+<tr>
+<td style="background-color: #cfe2f3;"><span><span style="color: #000000;">Qwen2.5-32B-Instruct-GPTQ-Int4</span></span></td>
+<td style="background-color: #cfe2f3;"><span><span style="color: #000000;">4096</span></span></td>
+<td style="background-color: #cfe2f3;"><span><span style="color: #000000;">0.7465</span></span></td>
+</tr>
+<tr>
+<td><span><span style="color: #000000;">Qwen2.5-32B-Instruct + 4 bit 양자화</span></span></td>
+<td><span><span style="color: #000000;">2048</span></span></td>
+<td><span><span style="color: #000000;">0.7696</span></span></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p data-ke-size="size16"><b> </b></p>
+<p data-ke-size="size16"><span style="color: #000000;">1.2.2.3. Optimizer Quantization</span></p>
+<p data-ke-size="size16"><span style="color: #000000;">Optimizer Quantization은 모델 훈련 중 옵티마이저의 메모리 사용량을 줄여 더 큰 모델과 더 빠른 처리를 가능하게 하면서도 성능을 유지하기 위한 접근 방식이다. 그중에서 사용한 기술은 기술 중 하나는 8-bit Adam 옵티마이저이다. Adafactor가 옵티마이저 상태를 축약하여 저장하는 것과 달리, 8-bit Adam은 전체 상태를 유지하지만 더 낮은 정밀도로 저장하고 최적화를 위해 필요할 때만 역양자화한다. 이 접근 방식은 혼합 정밀도 훈련과 유사하며, 메모리 사용량을 크게 줄인다.</span></p>
+<p data-ke-size="size16"><span style="color: #000000;">8-bit Adam을 구현하기 위해 우리는 bitsandbytes 라이브러리를 사용했다. 이 라이브러리는 모델과 옵티마이저의 편리한 구현을 제공하며, TrainingArguments에서 optim="adamw_bnb_8bit"를 지정하여 훈련 파이프라인에 원활하게 통합할 수 있었다.</span><b><br/></b></p>
+<h4 data-ke-size="size20"><span style="color: #000000;">1.2.3. 최적화 솔루션 </span></h4>
+<p data-ke-size="size16"><span style="color: #000000;">1.2.3.1. Unsloth </span></p>
+<p data-ke-size="size16"><span style="color: #000000;">Unsloth는 LLM fine-tuning 최적화 솔루션이다. 시작한지 얼마 되지 않은 신생 프로젝트임에도 GitHub 18.7k의 star 수를 달성하였으며 Google Colab 환경에서 2배 이상의 속도 개선과 40~70%의 메모리 사용량 감소를 보일 정도로 퍼포먼스가 우수하여 우리 프로젝트에 적용한다면 좋은 성과를 낼 수 있을 것을 기대했다. 그러나 대회 제공 GPU 서버 환경에서 kernel 버전과 V100에 맞는 개발 환경 세팅에 어려움을 겪었고, 많은 시행착오 끝에 적용하지 못했다. 하드웨어적인 지식과 개발 환경에 대한 배경 지식에 부족함을 느꼈고, 이는 프로젝트 종료 이후 더 공부해보고 싶은 부분으로 남았다. </span></p>
+<p data-ke-size="size16"><b> </b></p>
+<p data-ke-size="size16"><span style="color: #000000;">1.2.3.2. DeepSpeed </span></p>
+<p data-ke-size="size16"><span style="color: #000000;">DeepSpeed는 Transformers와 Accelerate와 통합된 오픈 소스 딥러닝 최적화 라이브러리로, 대규모 딥 러닝 훈련의 효율성과 확장성을 개선하기 위해 다양한 기능과 최적화를 제공한다. DeepSpeed ZeRO + CPU Offload 또는 NVMe Offload를 활용하여 훨씬 더 큰 모델을 사용할 수 있기 때문에 사용되는 라이브러리이다. 우리 환경에서 메모리를 절약하는 방법으로 deepspeed의 메모리 offloading을 제안하였다. 기존에는 vram 24GB 환경에서 8B모델을 학습시킬때 vram이 부족하여 병목이 일어나는 현상을 보였는데, cpu offloading 적용 후 14B 모델이 메모리를 90% 정도만 먹으며 부족함 없이 돌아가는 모습을 볼 수 있었다. 프로젝트 막바지에 진행했던 실험이어서, 로컬환경에서만 테스트해보고 서버환경에서는 전역적으로 테스트 및 적용해보지 못하였다.</span><b></b></p>
+<h3 data-ke-size="size23"><span style="color: #000000;">1.3. 하이퍼파라미터 튜닝</span></h3>
+<p data-ke-size="size16"><span style="color: #000000;">1.3.1. LoRA </span></p>
+<p data-ke-size="size16"><span style="color: #000000;">LoRA는 사전 학습된 가중치를 고정된 상태로 유지하면서 대신 adaptation 중에 레이어의 변화에 대한 rank decomposition matrix들을 최적화하여 신경망의 일부 레이어를 간접적으로 학습하는 방식이다. SFTTrainer 인자인 peft_config에 LoraConfig를 주입하여 사용할 수 있다. 베이스라인으로 설정된 다양한 하이퍼파라미터 중에  LoRA 값이 메모리 및 속도의 한계로 작은 값으로 설정되어있는 것을 확인했다. 이를 개선하기 위해 앞선 작업들에서 메모리 최적화를 진행했고, </span><span style="color: #000000;">r(rank)를 6→16, alpha(스케일링 파라미터)는 8→32, target_modules(LoRA가 적용될 모듈)은 ["q_proj", "v_proj"] → ["q_proj", "k_proj", "v_proj", "o_proj", "gate_proj", "up_proj", "down_proj"]</span><span style="color: #000000;">로 늘릴 수 있었다. 시간 관계상 많은 하이퍼파라미터 탐색을 진행할 수 없었던 점 때문에 일반적인 범위(rank 8-16, alpha는 rank의 2배) 수준에서 탐색했다. 새로운 개념을 학습할 때 높은 rank를 사용하는 방식이나 alpha를 rank과 동일한 값으로 설정하여 학습 중 결정된 가중치를 그대로 적용하는 방식 등을 사용해보지 못한 점이 아쉬움으로 남았다.</span><b></b></p>
+<h2 data-ke-size="size26"><b><span style="color: #000000;">2.데이터</span></b></h2>
+<h3 data-ke-size="size23"><span style="color: #000000;">2.1. EDA</span></h3>
+<h4 data-ke-size="size20"><span style="color: #000000;">2.1.1. 국어영역과 사회영역 차이 분석하기</span></h4>
+<p data-ke-size="size16"><span style="color: #000000;">토론 3에서 언급된 다음의 내용을 바탕으로, 국어영역과 사회탐구영역을 분리하기 위한 방법론에 대해 실험을 진행하였다. 토론에서는 국어영역은 문해력 혹은 언어적인 사고력을 요구하며, 사회탐구영역은 흔히 암기 과목으로 인식되며 지문에 주어진 정보만으로는 해결할 수 없는 경우가 있다고 언급되었다. 또한 사회탐구영역에 대해서는 RAG 접근 방식을 제안했으나, 현재 평가 데이터셋에는 어떤 문제가 국어영역에 속하고, 어떤 문제가 사회탐구영역에 속하는지에 대한 명확한 표시가 없는 상황이다. </span></p>
+<p data-ke-size="size16"><b> </b></p>
+<p data-ke-size="size16"><span style="color: #000000;">이에 따라, 본 실험에서는 국어영역과 사회탐구영역을 다음과 같은 기준으로 정의하여 실험을 진행하였다:</span></p>
+<p data-ke-size="size16"><span style="color: #000000;">- 국어영역: Paragraph 안에서 정답의 근거를 찾을 수 있는 문제</span></p>
+<p data-ke-size="size16"><span style="color: #000000;">- 사회탐구영역: Paragraph 안에서 정답의 근거를 찾을 수 없는 문제.</span></p>
+<p data-ke-size="size16"><b> </b></p>
+<p data-ke-size="size16"><span style="color: #000000;">이와 같은 정의를 기반으로, 국어영역과 사회탐구영역을 효과적으로 구분하고, 이를 활용한 후속 실험과 분석을 수행하였다. </span></p>
+<p data-ke-size="size16"><b> </b></p>
+<p data-ke-size="size16"><span style="color: #000000;">2.1.1.1. K-means, HDBSCAN Clusturing을 통한 문제 유형 분류</span></p>
+<p data-ke-size="size16" style="background-color: #ffffff;"><span style="color: #0d0d0d;">Clustering을 통해 문제 유형을 분류하는 실험을 진행하였다. 이 과정에서 데이터의 Paragraph를 Sentence Embedding으로 변환한 값을 사용하였다. 초기 실험의 목적은 문제 유형이 어느 정도 분류되는지 관찰하는 데 있었기 때문에, 어떤 SentenceTransformer 모델을 활용하여 임베딩을 생성할지는 깊게 고민하지 않았다.</span></p>
+<p data-ke-size="size16" style="background-color: #ffffff;"><span style="color: #0d0d0d;">Clustering 기법으로는 K-Means와 HDBSCAN을 사용하였으며, 두 기법 모두 데이터의 차원을 t-SNE로 축소하여 처리하였다. 이를 통해 문제 유형 간의 분류 가능성을 실험적으로 확인하고자 하였다.</span></p>
+<p data-ke-size="size16"><b> </b></p>
+<p data-ke-size="size16"><span style="color: #000000;">1) K-Means Clustering</span></p>
+<p data-ke-size="size16"><span style="color: #000000;">적절한 클러스터의 수는 엘보우 포인트를 찾았고, 실루엣 계수의 평균값을 통해 적절한 클러스터 수인지 검증하였다.</span></p>
+<p><figure class="imageblock alignCenter" data-ke-mobilestyle="widthOrigin" data-origin-height="885" data-origin-width="1280"><span data-phocus="https://blog.kakaocdn.net/dna/I0CVf/btsK5NH92Wk/AAAAAAAAAAAAAAAAAAAAAEekChEX8mDXlzBX0dFdRPEY7B-JSMyTIOX-_nm1lMcF/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&amp;expires=1796050799&amp;allow_ip=&amp;allow_referer=&amp;signature=lpILFqtX7zgHew9iEOTQhwsGMYo%3D" data-url="https://blog.kakaocdn.net/dna/I0CVf/btsK5NH92Wk/AAAAAAAAAAAAAAAAAAAAAEekChEX8mDXlzBX0dFdRPEY7B-JSMyTIOX-_nm1lMcF/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&amp;expires=1796050799&amp;allow_ip=&amp;allow_referer=&amp;signature=lpILFqtX7zgHew9iEOTQhwsGMYo%3D"><img data-origin-height="885" data-origin-width="1280" height="289" loading="lazy" onerror="this.onerror=null; this.src='//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png'; this.srcset='//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png';" src="/assets/images/6a37a30037a8563cac4d2af3.png" width="420"/></span></figure>
+</p>
+<p data-ke-size="size16"><b> </b></p>
+<p data-ke-size="size16"><span style="color: #000000;">적절한 클러스터값이 2로 나왔다는 것과, 분류된 데이터 수를 고려했을 때, 원하는대로 적절히 잘 분류된것처럼 보였지만, 분류된 데이터를 직접 살펴본 결과, 우리가 원하는대로 분류되진 않았다.</span></p>
+<p data-ke-size="size16"><b> </b></p>
+<p data-ke-size="size16"><span style="color: #000000;">2) HDBSCAN</span></p>
+<p data-ke-size="size16"><span style="color: #000000;">K-Means를 통한 클러스터링에서, 뚜렷한 엘보우 포인트를 찾지 못했고, 그나마 가장 가까워보이는값인 2로 실험해보았지만, 그마저도 적절히 분류하지 못했다.</span></p>
+<p data-ke-size="size16"><b> </b></p>
+<p data-ke-size="size16"><span style="color: #000000;">그렇다면 클러스터 수를 명시하지 않고, HDBSCAN을 통해 클러스터를 형성해보기로 했다. 적절한 min_cluster_size와 min_samples를 찾기 위해, 마찬가지로 실루엣 계수값을 통해 탐색하였다.</span></p>
+<p data-ke-size="size16"><b> </b></p>
+<p><figure class="imageblock alignCenter" data-ke-mobilestyle="widthOrigin" data-origin-height="932" data-origin-width="1280"><span data-phocus="https://blog.kakaocdn.net/dna/Ms3E4/btsK3QFTkZe/AAAAAAAAAAAAAAAAAAAAALTqC8w0dH_hqoIk7zMb0X2W_Sp2M-ZAevUbVbmODhyr/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&amp;expires=1796050799&amp;allow_ip=&amp;allow_referer=&amp;signature=1KDCv7wMM17%2FBnEKLdE1Kl1Lr7o%3D" data-url="https://blog.kakaocdn.net/dna/Ms3E4/btsK3QFTkZe/AAAAAAAAAAAAAAAAAAAAALTqC8w0dH_hqoIk7zMb0X2W_Sp2M-ZAevUbVbmODhyr/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&amp;expires=1796050799&amp;allow_ip=&amp;allow_referer=&amp;signature=1KDCv7wMM17%2FBnEKLdE1Kl1Lr7o%3D"><img data-origin-height="932" data-origin-width="1280" height="300" loading="lazy" onerror="this.onerror=null; this.src='//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png'; this.srcset='//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png';" src="/assets/images/2fdab1bcd5473b55c118418e.png" width="415"/></span></figure>
+</p>
+<p data-ke-size="size16"><span style="color: #000000;">(x로 표기된 데이터 : 노이즈 데이터(밀도 기반의 조건이나, 최소 클러스터의 크기를 만족하지 못하는 데이터 등))</span></p>
+<p data-ke-size="size16"><b> </b></p>
+<p data-ke-size="size16"><span style="color: #000000;">마찬가지로 클러스터링 후 분류된 데이터를 직접 확인해본 결과, 우리가 원하는 결과를 얻어내진 못했다.</span></p>
+<p data-ke-size="size16"><b> </b></p>
+<p data-ke-size="size16"><span style="color: #000000;">결과적으로 두 알고리즘 모두 우리가 원하는 적절한 Cluster를 형성하지 못했는데, 임베딩값을 통해 Cluster를 만들어주는 과정은 주제분류에는 적합할 수 있겠으나, 우리가 원하는 문제 유형 분류를 하기에는 부적합하다고 판단하였다.</span></p>
+<p data-ke-size="size16"><b> </b></p>
+<p data-ke-size="size16"><span style="color: #000000;">2.1.1.2. TF-IDF와 k-means clustering</span></p>
+<p data-ke-size="size16"><span style="color: #000000;">국어 문제와 사회 문제를 분류하기 위해 TF-IDF와 K-means 클러스터링을 사용했다. TF-IDF는 문서 내에서 자주 등장하지만 다른 문서에서는 드물게 나타나는 단어에 높은 가중치를 부여하여, 각 문제의 특징적인 단어를 식별하였다. 이후에, 벡터화된 데이터를 기반으로  K-means clustering을 통해  유사한 특성을 가진 데이터 포인트들을 자동으로 그룹화하도록 하였다.</span></p>
+<p><figure class="imageblock alignCenter" data-ke-mobilestyle="widthOrigin" data-origin-height="547" data-origin-width="816"><span data-phocus="https://blog.kakaocdn.net/dna/lgRu9/btsK5MCrL3n/AAAAAAAAAAAAAAAAAAAAANkPYx4BR-0q1-bYiI9g7enA1G_fvWhnBTjhNNh09kv3/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&amp;expires=1796050799&amp;allow_ip=&amp;allow_referer=&amp;signature=GVe%2Fzxk1UM%2FjO4Kb0sxjXAoqRMI%3D" data-url="https://blog.kakaocdn.net/dna/lgRu9/btsK5MCrL3n/AAAAAAAAAAAAAAAAAAAAANkPYx4BR-0q1-bYiI9g7enA1G_fvWhnBTjhNNh09kv3/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&amp;expires=1796050799&amp;allow_ip=&amp;allow_referer=&amp;signature=GVe%2Fzxk1UM%2FjO4Kb0sxjXAoqRMI%3D"><img data-origin-height="547" data-origin-width="816" height="233" loading="lazy" onerror="this.onerror=null; this.src='//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png'; this.srcset='//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png';" src="/assets/images/5aa4352d93e6785182be62e0.png" width="348"/></span></figure>
+</p>
+<p data-ke-size="size16"><span style="background-color: #ffffff; color: #0d0d0d;">“generation-for-nlp-1380부터는 국어문제이다.”라는 가설을 세우고 is_kor 칼럼을 추가하여 clustering 결과와 비교하였다. 실험 결과, cluster와 is_kor 칼럼의 값이 불일치한 경우가 총 58건 발생하였다. 따라서, 이 방법은 국어영역과 사회영역을 효과적으로 분리하기에 적합하지 않다고 판단하였으며, 이후 실험에서는 적용하지 않았다.</span></p>
+<p data-ke-size="size16"><b> </b></p>
+<p data-ke-size="size16"><span style="background-color: #ffffff; color: #1f2328;">2.1.1.3. TF-IDF+XGBClassifier+CleanLab</span></p>
+<p data-ke-size="size16"><span style="background-color: #ffffff; color: #1f2328;">먼저 TF-IDF를 사용하여 각 문제의 텍스트 데이터를 벡터화한 후, 이 벡터를 XGBoost 모델에 입력으로 제공하였다. XGBoost는 각 문제의 특징을 학습하고, 이를 바탕으로 국어 문제와 사회 문제를 구별할 수 있도록 훈련되었다. 후에,  Cleanlab 라이브러리를 활용하여 라벨링 오류로 판단된 문제들에 대해 라벨링을 수정하였다.</span></p>
+<p data-ke-size="size16"><b> </b></p>
+<p data-ke-size="size16"><span style="color: #000000;">2.1.1.4. length를 기준으로 분석</span></p>
+<p><figure class="imageblock alignCenter" data-ke-mobilestyle="widthOrigin" data-origin-height="545" data-origin-width="859"><span data-phocus="https://blog.kakaocdn.net/dna/noVHt/btsK6NUGtvd/AAAAAAAAAAAAAAAAAAAAAKLtMaR9oDhKaTOB8LJmWPTMaUZEsxBxvf5xJgXBWrBB/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&amp;expires=1796050799&amp;allow_ip=&amp;allow_referer=&amp;signature=lars4xboRncX5S6l8TBKtRcJNFk%3D" data-url="https://blog.kakaocdn.net/dna/noVHt/btsK6NUGtvd/AAAAAAAAAAAAAAAAAAAAAKLtMaR9oDhKaTOB8LJmWPTMaUZEsxBxvf5xJgXBWrBB/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&amp;expires=1796050799&amp;allow_ip=&amp;allow_referer=&amp;signature=lars4xboRncX5S6l8TBKtRcJNFk%3D"><img data-origin-height="545" data-origin-width="859" height="290" loading="lazy" onerror="this.onerror=null; this.src='//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png'; this.srcset='//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png';" src="/assets/images/8f3232855e2796f991e807a1.png" width="459"/></span></figure>
+</p>
+<p data-ke-size="size16" style="background-color: #ffffff;"><span style="color: #0d0d0d;">“Token의 길이가 어느 정도 길다면, 정답의 근거를 paragraph 내에서 찾을 수 있을 것”이라는 가설을 세웠다. Token의 길이는 id, paragraph, question, choices, answer, question_plus, prompt를 모두 합친 값으로 정의하였다.</span></p>
+<p data-ke-size="size16" style="background-color: #ffffff;"><span style="color: #0d0d0d;">그래프를 분석한 결과, Input Length가 약 500을 경계로 분포가 명확히 나뉘는 것을 확인할 수 있었다. 또한, 길이가 500 이하인 데이터는 모델의 처리 효율성을 유지하는 데 중요한 기준점으로 작용한다. 지나치게 긴 입력 데이터는 모델이 더 많은 계산 리소스를 필요로 하기 때문에, 길이 500을 기준으로 데이터를 짧은 데이터와 긴 데이터로 나누는 것이 실용적이라고 판단하였다. </span></p>
+<p data-ke-size="size16" style="background-color: #ffffff;"><span style="background-color: #ffffff; color: #0d0d0d;">이 결과를 바탕으로, 이후 실험에서는 국어영역과 사회영역 데이터를 Input Length를 기준으로 분리하여 실험을 진행하였다.</span></p>
+<p data-ke-size="size16"><b> </b></p>
+<p data-ke-size="size16"><span style="color: #000000;">2.1.1.5. 특정 영역에서만 나타나는 단어를 기준으로 분석 </span></p>
+<p data-ke-size="size16"><span style="color: #000000;">1) 질문의 특정 단어 포함 여부</span><span style="color: #000000;"><br/></span><span style="color: #000000;">사회 영역의 문제들은 일반적으로 "위의", "단락", "본문", "밑줄 친", "(가)", "다음~", "시기"와 같은 특정 단어를 포함하는 경향이 있다. 반면, 국어 영역의 문제들은 이러한 특정 단어를 포함하지 않는 경우가 많았다. 따라서 질문에서 특정 단어가 포함되어 있는지를 확인하는 것은 사회와 국어 문제를 구분하는 기준이 될 수 있을 것이라 생각했다.</span><span style="color: #000000;"><br/></span><span style="color: #000000;">2) 본문 내 정답 일치 여부</span></p>
+<p data-ke-size="size16"><span style="color: #000000;">두 번째 기준은 본문 내에서 정답과 일치하는 문장이나 단어를 찾을 수 있는지 여부이다. 사회 탐구 영역에서는 배경 지식을 바탕으로 문제를 해결해야 하므로, 본문에서 정답과 정확하게 일치하는 단어나 문장을 찾기 어려운 경우가 많다. 이는 사회 과목이 지식을 확인하고 적용하는 데 중점을 두기 때문이라고 생각했다.</span></p>
+<p data-ke-size="size16"><span style="color: #000000;">반면, 국어 영역에서는 본문에서 정답과 일치하는 문장이나 단어를 쉽게 찾을 수 있다. 국어 문제는 주로 글의 이해와 해석에 초점을 맞추고 있으며, 학생들이 주어진 텍스트에서 직접적인 정보를 추출하는 것을 요구하기 때문이라고 생각했다. </span><span style="color: #000000;"><br/><br/></span></p>
+<p data-ke-size="size16"><span style="color: #000000;">2.1.1.6 prompt를 활용하여 분리하기</span></p>
+<p data-ke-size="size16" style="background-color: #ffffff;"><span style="background-color: #ffffff; color: #1f2328;">정답의 근거를 paragraph에서 찾을 수 있는지 여부를 4o-mini와 prompt를 통해 확인하고, 이를 기반으로 train없이 inference 결과와의 관계를 분석하였다. </span></p>
+<p data-ke-size="size16" style="background-color: #ffffff;"><span style="background-color: #ffffff; color: #1f2328;">실험과정은 다음과 같다.</span></p>
+<p data-ke-size="size16" style="background-color: #ffffff;"><span style="background-color: #ffffff; color: #1f2328;">가장 먼저, prompt를 통해 모델에 질문한다. 정답의 근거를 paragraph에서 찾을 수 있는지 여부를 묻고, 그 답변을 기록하였다. 다음으로 Inference 결과를 분석한다. train 데이터셋에 대해서 학습없이 inference를 수행하여 오답 여부를 기록하였다. 마지막으로 관계를 분석한다. 오답과 근거를 찾을 수 없음의 관계를 비교하였다.</span></p>
+<p data-ke-size="size16"><span style="background-color: #ffffff; color: #1f2328;">실험 전 예상 결과를 다음과 같다.</span></p>
+<p data-ke-size="size16"><span style="background-color: #ffffff; color: #1f2328;">근거를 찾을 수 없음으로 대답한 문제는 모두 오답이며 근거를 찾을 수 있음으로 대답한 문제는 모두 정답일 것으로 예상하였다.</span></p>
+<p data-ke-size="size16"><span style="background-color: #ffffff; color: #1f2328;">실제 결과는 다음과 같다.</span></p>
+<p><figure class="imageblock alignCenter" data-ke-mobilestyle="widthOrigin" data-origin-height="856" data-origin-width="1108"><span data-phocus="https://blog.kakaocdn.net/dna/tAxO9/btsK6A88j1h/AAAAAAAAAAAAAAAAAAAAAI59PniokkF65daaQKIHY9e3w0faKknrAW9LU6qyTGvr/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&amp;expires=1796050799&amp;allow_ip=&amp;allow_referer=&amp;signature=kbee7fSocB%2FY%2FLp2iDNW7hJ5XCU%3D" data-url="https://blog.kakaocdn.net/dna/tAxO9/btsK6A88j1h/AAAAAAAAAAAAAAAAAAAAAI59PniokkF65daaQKIHY9e3w0faKknrAW9LU6qyTGvr/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&amp;expires=1796050799&amp;allow_ip=&amp;allow_referer=&amp;signature=kbee7fSocB%2FY%2FLp2iDNW7hJ5XCU%3D"><img data-origin-height="856" data-origin-width="1108" height="233" loading="lazy" onerror="this.onerror=null; this.src='//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png'; this.srcset='//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png';" src="/assets/images/a991f0c43a59e9bd2a63b0b2.png" width="302"/></span></figure>
+</p>
+<p data-ke-size="size16"><span style="background-color: #ffffff; color: #1f2328;">GroupA: inference 결과에서 오답인 문제 (355개)</span></p>
+<p data-ke-size="size16"><span style="background-color: #ffffff; color: #1f2328;">GroupB: Prompt를 통해 근거를 찾을 수 없음으로 대답한 문제(314개)</span></p>
+<p data-ke-size="size16"><b> </b></p>
+<p data-ke-size="size16"><span style="background-color: #ffffff; color: #1f2328;">겹치는 부분(150개): 오답 중에서 근거를 찾을 수 없음으로 대답한 경우</span></p>
+<p data-ke-size="size16"><span style="background-color: #ffffff; color: #1f2328;">빨간 부분(205개): 근거를 찾을 수 있음으로 대답했으나, 오답을 출력한 경우</span></p>
+<p data-ke-size="size16"><span style="background-color: #ffffff; color: #1f2328;">초록 부분(164개): 근거를 찾을 수 없음으로 대답했으나, 정답을 출력한 경우</span></p>
+<p data-ke-size="size16"><b> </b></p>
+<p data-ke-size="size16"><span style="background-color: #ffffff; color: #1f2328;">근거를 찾을 수 있음으로 대답했지만, 오답을 출력한 경우가 존재했고 근거를 찾을 수 없음으로 대답했지만 정답을 출력한 경우도 존재했다. </span><span style="background-color: #ffffff; color: #0d0d0d;">따라서, 해당 방법을 활용하여 국어영역과 사회탐구영역을 구분하는 것은 적합하지 않다고 판단하였으며, 이후 실험에서는 이 방법을 적용하지 않았다.</span></p>
+<p data-ke-size="size16"><b> </b></p>
+<h4 data-ke-size="size20"><span style="color: #000000;">2.1.2. 데이터 출처 기반 분석</span></h4>
+<p data-ke-size="size16"><span style="color: #000000;">2.1.2.1. 출처 데이터 분석</span></p>
+<p data-ke-size="size16"><span style="color: #000000;"> 이번 데이터는 수능과 MMMLU, KMMLU, KLUE-MRC 데이터를 기반으로 제작되었다. 그렇기에 기존 MMLU의 데이터와 KLUE-MRC 데이터를 확인해보고, 각각 데이터의 출처를 기반으로 분류할 수 있다면 정답에 다가가기 용이하지 않을까 하는 생각에 시작하였다.</span></p>
+<p data-ke-size="size16"><span style="color: #000000;"> 먼저 KLUE-MRC는 title, context, news_category, source, guid, is_impossible, question_type, question, answer까지 총 9개의 row로 구성되어 있다. 한국 Wiki, 한국 경제 신문, ACROFAN에 출처를 두고 있다고 한다. 이 데이터는 context가 주어지고, 그 안에서 질문에 대한 정답을 찾을 수 있다. 그렇기에 지문이 길며, 정답이 context 내에 포함되어 있기에 문제의 난이도가 어렵지 않다고 보았다.</span></p>
+<p data-ke-size="size16"><span style="color: #000000;"> 반면 MMLU는 question, answer, A, B, C, D, Category, Human Accuracy의 row를 가지고 있으며, 4지선다 객관식 문제로 구성되어있다. MMLU는 주제에 따라 다양한 문제를 제작되었다. 그렇기에 원하는 주제를 가져오는 것이 가능하며, MMMLU에서는 korean task가 따로 존재한다.</span></p>
+<p data-ke-size="size16"><span style="color: #000000;"> 다만 객관식이라 문제 난이도가 쉬울 것이라 생각할 수 있으나, MRC에 비하여 지문의 설명이 부족하여 사전지식이 없으면 풀지 못하는 문제들이 많은 편이다.</span></p>
+<p data-ke-size="size16"><b> </b></p>
+<p data-ke-size="size16"><span style="color: #000000;">2.1.2.2. 출처 기반 분리</span></p>
+<p data-ke-size="size16"><span style="color: #000000;"> MRC는 사실상 정답과 이유가 context 내에 포함되어 있어 길이가 길다. MMLU는 오히려 필요한 정답의 이유조차 없는 경우가 많아 context가 짧다. 그렇다면 길이로 분리하는 것이 가능하지 않을까? 라는 의문이 들었다. 2.1.1.4. 에서 실제로 길이 기반 분리를 시도하였는데, 상당히 좋은 시도였다. id 1380번에서 데이터가 괜찮게 분리되는 것을 확인할 수 있다. 이에 대한 확신을 굳히기 위하여 id 1380 부근의 데이터를 살펴보았다.</span></p>
+<p data-ke-size="size16"><span style="color: #000000;"> 여기서 id 1380 이전은 4지선다, 이후는 5지선다가 주를 이루는 것으로 보였다. 푸른색을 4지선다, 붉은색을 5지선다로 하여 다시 한 번 그래프를 그려보았다.</span></p>
+<p><figure class="imageblock alignCenter" data-ke-mobilestyle="widthOrigin" data-origin-height="543" data-origin-width="869"><span data-phocus="https://blog.kakaocdn.net/dna/qWF1H/btsK52LOG4C/AAAAAAAAAAAAAAAAAAAAAHOSTu8pukz2DGlFotUhIUrLWMpPKCvavInLAkWtTdgG/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&amp;expires=1796050799&amp;allow_ip=&amp;allow_referer=&amp;signature=227r1E2RFmKU1oc3u8rw%2F2Io2r4%3D" data-url="https://blog.kakaocdn.net/dna/qWF1H/btsK52LOG4C/AAAAAAAAAAAAAAAAAAAAAHOSTu8pukz2DGlFotUhIUrLWMpPKCvavInLAkWtTdgG/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&amp;expires=1796050799&amp;allow_ip=&amp;allow_referer=&amp;signature=227r1E2RFmKU1oc3u8rw%2F2Io2r4%3D"><img data-origin-height="543" data-origin-width="869" height="301" loading="lazy" onerror="this.onerror=null; this.src='//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png'; this.srcset='//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png';" src="/assets/images/8862fbcccd1988924278fe6a.png" width="482.928"/></span></figure>
+</p>
+<p data-ke-size="size16"><b> </b></p>
+<p data-ke-size="size16"><span style="color: #000000;">데이터가 확실하게 나누어 졌다는 것을 볼 수 있다. 우리는 4지선다가 MMLU, 5지선다가 MRC가 출처임을 확신하며 그럼 AI는 어떤 문제를 더 잘 맞출까 테스트해보았다.</span></p>
+<p data-ke-size="size16"><b> </b></p>
+<div>
+<table border="1" data-ke-align="alignLeft" style="border-collapse: collapse; width: 100%;">
+<tbody>
+<tr>
+<td style="background-color: #efefef;"><span><span style="color: #000000;">id</span></span></td>
+<td style="background-color: #efefef;"><span><span style="color: #000000;">correct</span></span></td>
+<td style="background-color: #efefef;"><span><span style="color: #000000;">incorrect</span></span></td>
+<td style="background-color: #efefef;"><span><span style="color: #000000;">total</span></span></td>
+</tr>
+<tr>
+<td><span><span style="color: #000000;">MMLU ( ~ 1379)</span></span></td>
+<td><span><span style="color: #000000;">387</span></span></td>
+<td><span><span style="color: #000000;">403</span></span></td>
+<td><span><span style="color: #000000;">790</span></span></td>
+</tr>
+<tr>
+<td><span><span style="color: #000000;">MRC (1380 ~ )</span></span></td>
+<td><span><span style="color: #000000;">844</span></span></td>
+<td><span><span style="color: #000000;">395</span></span></td>
+<td><span><span style="color: #000000;">1239</span></span></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p data-ke-size="size16"><span style="color: #000000;"> </span></p>
+<p data-ke-size="size16"><span style="color: #000000;">확실히 어려울 것이라 생각한 MMLU 출처의 데이터를 훨씬 많이 틀린 것을 확인할 수 있다. 그러면 각각의 데이터를 학습해 보았을 때, 어느 모델의 점수가 더 높을까? </span></p>
+<p data-ke-size="size16"><b> </b></p>
+<p data-ke-size="size16"><span style="background-color: #ffffff; color: #0d0d0d;">실험은 모델 </span><span style="background-color: #efefef; color: #000000;">EXAONE-3.0-7.8B-Instruct</span><span style="color: #000000;">을 사용하였으며 </span><span style="background-color: #ffffff; color: #0d0d0d;">사용된 데이터를 제외한 모든 환경을 동일하게 설정하여 진행하였다.</span></p>
+<div>
+<table border="1" data-ke-align="alignLeft" style="border-collapse: collapse; width: 100%;">
+<tbody>
+<tr>
+<td style="background-color: #efefef;"><span><span style="color: #000000;">Used Data</span></span></td>
+<td style="background-color: #efefef;"><span><span style="color: #000000;">Accuracy</span></span></td>
+</tr>
+<tr>
+<td><span><span style="color: #000000;">Train Data</span></span></td>
+<td><span><span style="color: #000000;">0.6475</span></span></td>
+</tr>
+<tr>
+<td><span><span style="color: #000000;">MMLU ( ~ 1379)</span></span></td>
+<td><span><span style="color: #000000;">0.6175</span></span></td>
+</tr>
+<tr>
+<td><span><span style="color: #000000;">MRC (1380 ~ )</span></span></td>
+<td><span><span style="color: #000000;">0.6129</span></span></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p data-ke-size="size16"><span style="color: #000000;"> 의외로 MRC 데이터를 학습했을 때 점수가 더 좋다는 것을 확인할 수 있었다. 여기서 우리는 MMLU 출처의 데이터가 난이도에 비해 수가 적어 발생한 문제라 예상하였다.</span></p>
+<p data-ke-size="size16"><b> </b></p>
+<h4 data-ke-size="size20"><span style="color: #000000;">2.1.3. 시각화</span></h4>
+<p data-ke-size="size16"><span style="color: #000000;">2.1.3.1. streamlit </span></p>
+<p data-ke-size="size16" style="background-color: #ffffff;"><span style="color: #0d0d0d;">저번 프로젝트에서 데이터를 직접 살펴볼 때 Streamlit을 사용하여 데이터를 시각화하는 페이지를 구현한 경험이 많은 편리함을 제공하였기에, 이번에도 Streamlit을 활용하여 간단하게 데이터를 나타내는 페이지를 구현하였다.</span></p>
+<p data-ke-size="size16" style="background-color: #ffffff;"><span style="color: #0d0d0d;">특히, RAG를 구현한 이후에는, Documents에서 해당 데이터와 관련된 Document를 Retrieve한 결과까지 함께 표시되도록 페이지를 구성하여 데이터를 보다 직관적으로 확인할 수 있도록 하였다.</span></p>
+<p><figure class="imageblock alignCenter" data-ke-mobilestyle="widthOrigin" data-origin-height="636" data-origin-width="1280"><span data-phocus="https://blog.kakaocdn.net/dna/by0uLw/btsK63CYAYH/AAAAAAAAAAAAAAAAAAAAAMQu00Nfqd9mfHzAnYObl7cjPoG1_CdXOm3sDJwZ9aeY/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&amp;expires=1796050799&amp;allow_ip=&amp;allow_referer=&amp;signature=%2BXIJPJXab0K3OPN4Qyb6wSGRh2s%3D" data-url="https://blog.kakaocdn.net/dna/by0uLw/btsK63CYAYH/AAAAAAAAAAAAAAAAAAAAAMQu00Nfqd9mfHzAnYObl7cjPoG1_CdXOm3sDJwZ9aeY/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&amp;expires=1796050799&amp;allow_ip=&amp;allow_referer=&amp;signature=%2BXIJPJXab0K3OPN4Qyb6wSGRh2s%3D"><img data-origin-height="636" data-origin-width="1280" height="260" loading="lazy" onerror="this.onerror=null; this.src='//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png'; this.srcset='//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png';" src="/assets/images/fb9da5dc8f0fd22d7ac61cb7.png" width="523"/></span></figure>
+</p>
+<p data-ke-size="size16"><b> </b></p>
+<p data-ke-size="size16"><span style="color: #000000;">2.1.3.2. CSVtoPDF </span></p>
+<p data-ke-size="size16"><span style="color: #000000;">CSV 파일에 저장된 데이터를 PDF 형식으로 변환하여 시각화하는 도구를 구현하였다. 데이터의 가독성을 높이고, 데이터를 직관적으로 확인할 수 있는 형태로 제공하는 데 초점을 맞추었다.</span></p>
+<p data-ke-size="size16"><span style="color: #000000;">CSV 데이터를 PDF로 변환하는 과정에서 reportlab 라이브러리를 사용하였으며, CSV의 각 행을 문제 ID, 본문, 문제, 선택지, 정답으로 나누어 시각적으로 보기 좋게 구성하였다. 이를 통해 데이터를 분석하거나 검토할 때 더 직관적이고 쉽게하였다. 본문과 문제, 선택지의 길이가 길어질 경우 페이지 너비에 맞게 자동으로 줄바꿈되도록 구현하였으며, textwrap 라이브러리를 활용하여 텍스트를 지정된 너비에 맞게 줄바꿈하고, 페이지 높이를 초과할 경우 자동으로 페이지를 넘겨 출력하였다. 결과적으로 실제 문제 스타일의 pdf파일을 만들 수 있었다.</span></p>
+<p><figure class="imageblock alignCenter" data-ke-mobilestyle="widthOrigin" data-origin-height="914" data-origin-width="1280"><span data-phocus="https://blog.kakaocdn.net/dna/cT7nuL/btsK4Kr8ebv/AAAAAAAAAAAAAAAAAAAAAGFoXjANxbAz2qeIYrYafish4N-iyJiAIdqZkEL_MMiO/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&amp;expires=1796050799&amp;allow_ip=&amp;allow_referer=&amp;signature=luCU6XITGNQHzkP0gk8zmm3MT5Y%3D" data-url="https://blog.kakaocdn.net/dna/cT7nuL/btsK4Kr8ebv/AAAAAAAAAAAAAAAAAAAAAGFoXjANxbAz2qeIYrYafish4N-iyJiAIdqZkEL_MMiO/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&amp;expires=1796050799&amp;allow_ip=&amp;allow_referer=&amp;signature=luCU6XITGNQHzkP0gk8zmm3MT5Y%3D"><img data-origin-height="914" data-origin-width="1280" height="244" loading="lazy" onerror="this.onerror=null; this.src='//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png'; this.srcset='//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png';" src="/assets/images/180c524b13a136cd4ccd309d.png" width="342"/></span></figure>
+</p>
+<p data-ke-size="size16"><b> </b></p>
+<h3 data-ke-size="size23"><span style="color: #000000;">2.2. 데이터 수집</span></h3>
+<h4 data-ke-size="size20"><span style="color: #000000;">2.2.1.Huggingface</span></h4>
+<p data-ke-size="size16"><span style="color: #000000;">2.2.1.1. SAT / gaokao </span></p>
+<p data-ke-size="size16"><span style="color: #000000;">Huggingface에 올라온 데이터셋 중 </span><span style="color: #0d0d0d;">미국과 중국의 대학 입학 시험 데이터셋을 발견하였다. 해당 데이터셋은 AGIEval</span><span style="color: #0d0d0d;"> 벤치마크를 위해 수집 가공된 데이터셋이다. 이를 한국어로 번역하기 위해 Google Translate API를 사용하여 번역하였다. API 호출량이 꽤 많았기 때문에 예상 번역 시간이 오래 걸리는 점과 데이터셋에서 동일 지문에 대해 여러 질문을 가지고 있는 점을 파악하고 이를 개선하고자 딕셔너리 형태의 캐시를 구현했다. API 호출 전 캐시에서 먼저 번역된 결과가 있는지 파악하고, 있다면 캐시에서 가져오도록 했다. 중복 호출을 방지하여 실제 수행 시간을 2배 이상 줄일 수 있었고, 번역 특성상 같은 요청에 대해 다른 응답이 생기는 경우가 있는데 이를 방지할 수 있었다. 또한 원하지 않은 결과에 대해서는 캐시 파일에서 직접 수정하여 일괄적으로 갱신할 수 있었다.</span></p>
+<p data-ke-size="size16"><b> </b></p>
+<p data-ke-size="size16"><span style="color: #000000;"> 2.2.1.2. MuSR </span></p>
+<p data-ke-size="size16"><span style="color: #000000;">MuSR</span><span style="color: #000000;"> 벤치마크 데이터셋은 Multistep Soft Reasoning을 위해 ChatGPT를 이용해 제작된 데이터셋이다. 수능 국어 문제는 사고력 시험이기 때문에 모델의 추론 능력을 길러줄 수 있는 데이터셋을 포함하는 것이 성능 향상에 도움이 될 것이라고 생각했다. 또한 모델에 CoT를 적용하기 위해서 추론 과정을 학습할 수 있는 데이터 수집이 필요하다고 생각했다. 데이터셋을 단독으로 사용했을 때는 기존 train 데이터셋에 비해 성능이 아쉬웠으나 SAT/gaokao 데이터셋과 혼합하여 사용했을 때는 성능이 올랐다. 그러나 증강 데이터셋을 단독으로 사용한 것에 비해서는 성능이 아쉬웠기 때문에 최종 제출에는 사용하지 않았다.</span></p>
+<p data-ke-size="size16"><b> </b></p>
+<p data-ke-size="size16"><span style="background-color: #ffffff; color: #0d0d0d;">실험은 모델 </span><span style="background-color: #efefef; color: #000000;">Qwen/Qwen2.5-3B-Instruct</span><span style="color: #000000;">을 사용하였으며 </span><span style="background-color: #ffffff; color: #0d0d0d;">사용된 데이터를 제외한 모든 환경을 동일하게 설정하여 진행하였다. augment 데이터는 2.2.4.1.LLM 합성 데이터1을 통해 생성된 데이터이다.</span></p>
+<div>
+<table border="1" data-ke-align="alignLeft" style="border-collapse: collapse; width: 100%;">
+<tbody>
+<tr>
+<td style="background-color: #efefef;"><span><span style="color: #000000;">데이터</span></span></td>
+<td style="background-color: #efefef;"><span><span style="color: #000000;">data length</span></span></td>
+<td style="background-color: #efefef;"><span><span style="color: #000000;">accuracy</span></span></td>
+</tr>
+<tr>
+<td style="background-color: #cfe2f3;"><span><span style="color: #000000;">augment</span></span></td>
+<td style="background-color: #cfe2f3;"><span><span style="color: #000000;">3224</span></span></td>
+<td style="background-color: #cfe2f3;"><span><span style="color: #000000;">0.5899</span></span></td>
+</tr>
+<tr>
+<td><span><span style="color: #000000;">augment_MuSR_sat</span></span></td>
+<td><span><span style="color: #000000;">6152</span></span></td>
+<td><span><span style="color: #000000;">0.5806</span></span></td>
+</tr>
+<tr>
+<td><span><span style="color: #000000;">augment_sat</span></span></td>
+<td><span><span style="color: #000000;">5396</span></span></td>
+<td><span><span style="color: #000000;">0.5691</span></span></td>
+</tr>
+<tr>
+<td><span><span style="color: #000000;">sat</span></span></td>
+<td><span><span style="color: #000000;">2172</span></span></td>
+<td><span><span style="color: #000000;">0.5691</span></span></td>
+</tr>
+<tr>
+<td><span><span style="color: #000000;">train</span></span></td>
+<td><span><span style="color: #000000;">2023</span></span></td>
+<td><span><span style="color: #000000;">0.5530</span></span></td>
+</tr>
+<tr>
+<td><span><span style="color: #000000;">MuSR</span></span></td>
+<td><span><span style="color: #000000;">759</span></span></td>
+<td><span><span style="color: #000000;">0.4677</span></span></td>
+</tr>
+<tr>
+<td><span><span style="color: #000000;">raw (only inference)</span></span></td>
+<td><span><span style="color: #000000;">0</span></span></td>
+<td><span><span style="color: #000000;">0.4194</span></span></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p data-ke-size="size16"><span style="color: #000000;">2.2.1.3. race</span></p>
+<p data-ke-size="size16"><span style="color: #000000;">RACE 데이터셋은 다양한 지문을 기반으로 한 객관식 질문을 통해 독해 능력을 평가하는 데 목적이 있다. 이 데이터셋은 질문 응답 시스템을 훈련하는데 유용할 것이라고 생각되어 학습에 이용하게 되었다. </span></p>
+<p data-ke-size="size16"><b> </b></p>
+<p data-ke-size="size16"><span style="background-color: #ffffff; color: #0d0d0d;">실험은 모델 </span><span style="background-color: #efefef; color: #000000;">Qwen/Qwen2.5-3B-Instruct</span><span style="color: #000000;">을 사용하였으며 </span><span style="background-color: #ffffff; color: #0d0d0d;">사용된 데이터를 제외한 모든 환경을 동일하게 설정하여 진행하였다. </span></p>
+<div>
+<table border="1" data-ke-align="alignLeft" style="border-collapse: collapse; width: 100%;">
+<tbody>
+<tr>
+<td style="background-color: #efefef;"><span><span style="color: #000000;">데이터</span></span></td>
+<td style="background-color: #efefef;"><span><span style="color: #000000;">data length</span></span></td>
+<td style="background-color: #efefef;"><span><span style="color: #000000;">accuracy</span></span></td>
+</tr>
+<tr>
+<td><span><span style="color: #000000;">race</span></span></td>
+<td><span><span style="color: #000000;">5023</span></span></td>
+<td><span><span style="color: #000000;">0.4028</span></span></td>
+</tr>
+<tr>
+<td style="background-color: #cfe2f3;"><span><span style="color: #000000;">train</span></span></td>
+<td style="background-color: #cfe2f3;"><span><span style="color: #000000;">2023</span></span></td>
+<td style="background-color: #cfe2f3;"><span><span style="color: #000000;">0.5530</span></span></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p data-ke-size="size16"><span style="color: #000000;">오히려 성능이 떨어져 최종학습 데이터에는 추가하지 않게 되었다.</span></p>
+<h4 data-ke-size="size20"><span style="color: #000000;"></span><span style="color: #000000;">2.2.2. 크롤링 </span></h4>
+<p data-ke-size="size16"><span style="color: #000000;">2.2.2.1. 공무원 시험 </span></p>
+<p data-ke-size="size16"><span style="color: #000000;">모델이 국어/사회 중 사회 영역에 약점을 가지고 있었기 때문에 사회 영역의 성능을 늘리기 위해 사회 데이터를 확보하는 것이 가장 중요했다. 또한 수능 관련 데이터를 사용할 수 없기 때문에 수능과 유사한 시험을 탐색하였고, 그 중 저작권 문제가 없으며 크롤링 권고(robots.txt) 상 문제가 없는 공무원 시험 기출문제은행 사이트를 발견하였다. 공무원 시험 중 회계, 헌법, 한국사, 사회 영역의 데이터를 수집하였고, 표나 그림이 포함된 데이터를 필터링하여 사용하였다. 그러나 대회 규정상  KMMLU 데이터를 직접적으로 사용할 수 없었는데, KMMLU 데이터 출처 일부가 공무원 시험이라는 점을 파악하였다. 따라서 문제의 질문 또는 지문이 KMMLU 데이터에 포함된다면 이를 필터링 하는 단계를 추가하여 대회 규정상 문제없는 데이터셋을 구축하여 사용했다.</span><b></b></p>
+<h4 data-ke-size="size20"><span style="color: #000000;">2.2.3. pdf 파싱 </span></h4>
+<p data-ke-size="size16"><span style="color: #000000;">2.2.3.1. 사관학교 기출문제</span></p>
+<p data-ke-size="size16"><span style="background-color: #ffffff; color: #0d0d0d;">수능 국어영역과 유사하다고 판단한 사관학교 국어 기출 문제를 증강에 사용하였다. 이 데이터는 PDF 파일 형식으로 제공되었기 때문에, pdfminer 라이브러리를 사용하여 전처리를 진행하였다. 또한, max_length_token을 고려하여 paragraph 길이가 3000 이하인 문제만 증강에 사용하였으며, 총 56개의 문제를 추가로 증강하였다.</span></p>
+<p data-ke-size="size16"><b> </b></p>
+<p data-ke-size="size16"><span style="background-color: #ffffff; color: #0d0d0d;">실험은 모델 </span><span style="background-color: #efefef; color: #000000;">Qwen/Qwen2.5-3B-Instruct</span><span style="color: #000000;">을 사용하였으며 </span><span style="background-color: #ffffff; color: #0d0d0d;">사용된 데이터를 제외한 모든 환경을 동일하게 설정하여 진행하였다.aug3224/aug3222 데이터는 2.2.4.1.LLM 합성 데이터1을 통해 생성된 데이터이다.</span></p>
+<div>
+<table border="1" data-ke-align="alignLeft" style="border-collapse: collapse; width: 100%;">
+<tbody>
+<tr>
+<td style="background-color: #efefef;"><span><span style="color: #000000;">데이터</span></span></td>
+<td style="background-color: #efefef;"><span><span style="color: #000000;">data length</span></span></td>
+<td style="background-color: #efefef;"><span><span style="color: #000000;">accuracy</span></span></td>
+</tr>
+<tr>
+<td style="background-color: #cfe2f3;"><span><span style="color: #000000;">aug3224 +rag</span></span></td>
+<td style="background-color: #cfe2f3;"><span><span style="color: #000000;">3224</span></span></td>
+<td style="background-color: #cfe2f3;"><span><span style="color: #000000;">0.5899</span></span></td>
+</tr>
+<tr>
+<td><span><span style="color: #000000;">aug3222 + army56 + rag</span></span></td>
+<td><span><span style="color: #000000;">3278</span></span></td>
+<td><span><span style="color: #000000;">0.5737</span></span></td>
+</tr>
+<tr>
+<td><span><span style="color: #000000;">aug3222 + army56</span></span></td>
+<td><span><span style="color: #000000;">3278</span></span></td>
+<td><span><span style="color: #000000;">0.5806</span></span></td>
+</tr>
+<tr>
+<td><span><span style="color: #000000;">train 2029 + army56</span></span></td>
+<td><span><span style="color: #000000;">2085</span></span></td>
+<td><span><span style="color: #000000;">0.5576</span></span></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p data-ke-size="size16"><b> </b></p>
+<p data-ke-size="size16"><span style="background-color: #ffffff; color: #0d0d0d;">실험결과 사관학교 문제를 추가하지 않았을 때 성능이 더 우수한 것으로 나타났다. 구체적으로, 국어영역의 문제를 추가하지 않았을 때 성능이 더 좋았는데, 그 이유를 다음과 같이 분석할 수 있다.</span></p>
+<p data-ke-size="size16"><span style="background-color: #ffffff; color: #0d0d0d;">사관학교 문제와 기존 데이터셋 간의 언어적 스타일, 문제 구조 또는 난이도에서 차이가 있었기 때문에 모델이 해당 데이터를 적절히 일반화하지 못했을 가능성이 있다.</span></p>
+<p data-ke-size="size16"><span style="background-color: #ffffff; color: #0d0d0d;">추가된 데이터가 단 56개로, 전체 학습 데이터에 비해 비중이 낮아 성능 향상보다는 오히려 모델의 학습 방향에 혼란을 주었을 가능성이 있다.</span></p>
+<p data-ke-size="size16"><span style="background-color: #ffffff; color: #0d0d0d;">해당 데이터는 성능 향상에 효과가 없었기 때문에, 이후 실험에서는 이 방법을 적용하지 않았다.</span><b><br/></b></p>
+<h4 data-ke-size="size20"><span style="color: #000000;">2.2.4. LLM을 활용한 데이터 증강</span></h4>
+<p data-ke-size="size16"><span style="color: #000000;">2.2.4.1. LLM 합성 데이터1</span></p>
+<p data-ke-size="size16"><span style="color: #000000;"> LLM 프롬프트를 통해 데이터를 생성해보았다.</span></p>
+<p data-ke-size="size16"><span style="color: #000000;"> 방법은 크게 2가지를 사용하였다. </span></p>
+<ol data-ke-list-type="decimal" style="list-style-type: decimal;">
+<li style="list-style-type: decimal; color: #000000;"><span style="color: #000000;">paragraph에 question, choices, answer을 생성하는 방법</span></li>
+<li style="list-style-type: decimal; color: #000000;"><span style="color: #000000;">choice를 늘려 문제의 난이도를 늘리는 방법</span></li>
+</ol>
+<p data-ke-size="size16"><span style="color: #000000;"> 먼저 첫 번째 방법에 대한 프롬프트 예시이다.</span></p>
+<div>
+<table border="1" data-ke-align="alignLeft" style="border-collapse: collapse; width: 100%;">
+<tbody>
+<tr>
+<td><span><span style="color: #000000;">prompt = ("###Explain \n " </span></span><br/><span><span style="color: #000000;">        "You create a different type of problem in the next question text. "</span></span><br/><span><span style="color: #000000;">        "There is no duplicate, and answer is necessarily one, and the answer is necessarily written by numbers. "</span></span><br/><span><span style="color: #000000;">        "We need to create as many plausible options as possible. "</span></span><br/><span><span style="color: #000000;">        "It does not generate any additional text other than question, choices, and answer when it is created, but it is generated according to the following Style and includes braces. "</span></span><br/><span><span style="color: #000000;">        "Generation must be in Korean! </span><span style="background-color: #d9ead3; color: #000000;">I'll give a penalty if you don't follow these rules</span><span style="color: #000000;">. \n\n"</span></span><br/><span><span style="color: #000000;">        "###Style \n"</span></span><br/><span><span style="color: #000000;">        "{'question': 'Question', 'choices': ['choice 1', 'choice 2', 'choice 3', 'choice 4', 'choice 5'], 'answer': 'Answer'} \n\n"</span></span><br/><span><span style="color: #000000;">        "###Question Text \n"</span></span><br/><span><span style="color: #000000;">        f"Text: \n{paragraph}\n"</span></span><br/><span><span style="color: #000000;">        f"Question: \n{question}\n"</span></span><br/><span><span style="color: #000000;">        f"Choices: \n{choice}\n"</span></span><br/><span><span style="color: #000000;">        f"Answer: \n{answer}"</span></span><br/><span><span style="color: #000000;">)</span></span></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p data-ke-size="size16"><span style="color: #000000;"> 프롬프트에는 영어 사용를 사용하여 생성 데이터의 질을 높이고자 하였고, 패널티를 언급해서 규칙을 지키도록 강제하였다. 또한 구조화를 통해 참고할 부분을 확실히 나누고, { ~~ }와 같은 형식을 지정해주어 이외에 불필요한 생성이 이루어지지 않도록 제한하였다. 이러한 방법을 사용하지 않았을 때보다 데이터의 질이 더 좋아졌느냐라고 말한다면 앞서 10개 정도의 생성만을 하여 비교했기에 정확하지는 않지만, 읽어보았을 때 보다 나았다고 할 수 있겠다. 비교 데이터를 남기지 못한 것이 아쉽다.</span></p>
+<p data-ke-size="size16"><span style="color: #000000;"> 생성은 한 paragraph 당 MMLU 출처의 데이터를 3개, MRC 출처의 데이터를 1개 생성하였다. 이렇게 생성 개수를 달리한 이유는 기존 문제에서도 MMLU 출처의 문제가 적기도 하며 난이도가 높기 때문이다.</span></p>
+<p data-ke-size="size16"><span style="color: #000000;"> 생성했을 때 4가지 정도의 문제가 발생했다.</span></p>
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li style="list-style-type: disc; color: #000000;"><span style="color: #000000;">{ ~~ } 형식을 아예 지키지 않는 경우</span><span style="color: #000000;"><br/></span><span style="color: #000000;">이 경우 원하는 정보를 분리해내기 어려웠기에 드랍하였다.</span></li>
+<li style="list-style-type: disc; color: #000000;"><span style="color: #000000;">question과 choices는 정상적이지만 answer가 주관식으로 생성된 경우</span><span style="color: #000000;"><br/></span><span style="color: #000000;">이것은 choice number로 바꿔주기만 하면 되기에 수정하였다.</span></li>
+<li style="list-style-type: disc; color: #000000;"><span style="color: #000000;">choices가 4개인데 answer가 8이 나오는 것처럼 Out Of Range가 발생한 경우</span><span style="color: #000000;"><br/></span><span style="color: #000000;">사람이 직접 문제를 풀어야하는 상황이기에 드랍하였다.</span></li>
+<li style="list-style-type: disc; color: #000000;"><span style="color: #000000;">choices가 2개, 3개, 7개, 8개씩 불규칙적으로 생성된 경우</span><span style="color: #000000;"><br/></span><span style="color: #000000;">너무 불규칙적으로 생성되었기에 결과적으로 드랍하였다. → 이 부분은 굳이 드랍하기 보다는 score를 비교해본 후 판단했어도 좋았을 것 같다.</span></li>
+</ul>
+<p data-ke-size="size16"><span style="color: #000000;"> 각각의 문제를 이렇게 처리하고 실제 점수를 비교해보았다.</span></p>
+<p data-ke-size="size16"><span style="background-color: #ffffff; color: #0d0d0d;">실험은 모델 </span><span style="color: #000000;"> </span><span style="background-color: #efefef; color: #000000;">EXAONE-3.0-7.8B-Instruct</span><span style="color: #000000;">을 사용하였으며 </span><span style="background-color: #ffffff; color: #0d0d0d;">사용된 데이터를 제외한 모든 환경을 동일하게 설정하여 진행하였다.</span></p>
+<div>
+<table border="1" data-ke-align="alignLeft" style="border-collapse: collapse; width: 100%;">
+<tbody>
+<tr>
+<td style="background-color: #efefef;"><span><span style="color: #000000;">Used Data</span></span></td>
+<td style="background-color: #efefef;"><span><span style="color: #000000;">Accuracy</span></span></td>
+</tr>
+<tr>
+<td><span><span style="color: #000000;">only Train Data (2029)</span></span></td>
+<td><span><span style="color: #000000;">0.6132</span></span></td>
+</tr>
+<tr>
+<td style="background-color: #cfe2f3;"><span><span style="color: #000000;">Train Data + MMLU_aug (3725)</span></span></td>
+<td style="background-color: #cfe2f3;"><span><span style="color: #000000;">0.6521</span></span></td>
+</tr>
+<tr>
+<td><span><span style="color: #000000;">Train Data + MMLU_aug + MRC_aug (4920)</span></span></td>
+<td><span><span style="color: #000000;">0.6244</span></span></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p data-ke-size="size16"><span style="color: #000000;">위의 score와 차이가 나는 이유는 중간 베이스라인 코드 수정과 프롬프트 수정으로 인해 잠시 score 하락이 발생한 이슈 동안 테스트하였기 때문이다.</span></p>
+<p data-ke-size="size16"><span style="color: #000000;"> 결과를 보면 기존 only Train Data보다 MMLU_aug를 추가하였을 때 score가 많이 오른 것을 확인할 수 있다. 그러나 MRC_aug를 더 추가해주었을 때는 오히려 점수가 하락하였다. 이 경우 MRC 데이터의 질이 좋지 않았거나, 데이터 자체에 다른 문제가 있지 않았을까 생각한다. 조금 더 자세히 살펴보았어야 했으나 시간이 부족하여 그러지 못했다.</span></p>
+<p data-ke-size="size16"><b> </b></p>
+<p data-ke-size="size16"><span style="color: #000000;"> 이 다음은 선택지를 늘려보았다. 위의 프롬프트에서 choice만 생성해달라 수정하였으나, 워낙 생성할 필요가 없는 데이터까지 생성되어 오답인 choice만 추가적으로 생성하기로 하였다. 그러면 해당 choice를 choices에 추가해주고, random.shuffle(choices)를 통해 셔플 후 answer를 다시 저장하여 정답 비율을 조정해주었다.</span></p>
+<p data-ke-size="size16"><span style="color: #000000;"> 그렇게 MRC data만 학습하여 비교해보았다. choice 하나만 추가했을 때, 기존보다 소폭 하락하였다.</span></p>
+<p data-ke-size="size16"><b> </b></p>
+<p data-ke-size="size16"><span style="background-color: #ffffff; color: #0d0d0d;">실험은 모델 </span><span style="color: #000000;"> </span><span style="background-color: #efefef; color: #000000;">EXAONE-3.0-7.8B-Instruct</span><span style="color: #000000;">을 사용하였으며 </span><span style="background-color: #ffffff; color: #0d0d0d;">사용된 데이터를 제외한 모든 환경을 동일하게 설정하여 진행하였다.</span></p>
+<div>
+<table border="1" data-ke-align="alignLeft" style="border-collapse: collapse; width: 100%;">
+<tbody>
+<tr>
+<td style="background-color: #efefef;"><span><span style="color: #000000;">Used Data</span></span></td>
+<td style="background-color: #efefef;"><span><span style="color: #000000;">Accuracy</span></span></td>
+</tr>
+<tr>
+<td style="background-color: #cfe2f3;"><span><span style="color: #000000;">MRC (1380 ~ )</span></span></td>
+<td style="background-color: #cfe2f3;"><span><span style="color: #000000;">0.6175</span></span></td>
+</tr>
+<tr>
+<td><span><span style="color: #000000;">MRC (1380 ~ ) (choice + 1)</span></span></td>
+<td><span><span style="color: #000000;">0.6152</span></span></td>
+</tr>
+</tbody>
+</table>
+<b></b></div>
+<p data-ke-size="size16"><span style="color: #000000;"> 이유를 생각해보았는데 두 가지 정도를 떠올릴 수 있었다.</span></p>
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li style="list-style-type: disc; color: #000000;"><span style="color: #000000;">생성된 오답이 중복되거나, 매력적인 오답이 아니었다.</span></li>
+<li style="list-style-type: disc; color: #000000;"><span style="color: #000000;">test set의 경우 5지선다이기에 train set에서 6지선다가 되며 데이터의 일관성이 떨어졌다.</span></li>
+</ul>
+<p data-ke-size="size16"><span style="color: #000000;">2.2.4.2. LLM 합성 데이터2 </span></p>
+<p data-ke-size="size16"><span style="background-color: #ffffff; color: #0d0d0d;">0장 프로젝트 개요에서 알 수 있듯이 </span><span style="color: #000000;">학습데이터는 KMMLU, MMMLU(Ko), KLUE MRC 데이터, 평가 데이터는 수능형문제, KMMLU, MMMLU(Ko), KLUE MRC 데이터로 구성되어있다. 평가 데이터셋에 포함된 수능형 문제가 데이터셋에는 포함되지 않아, 수능형 문제를 증강해야한다는 필요성을 확인하였다.  가장 먼저 사회영역 중 윤리 과목의 데이터를 증강한 이유는 학습 데이터에 윤리 데이터만 포함되지 않았기 때문이다. </span></p>
+<p data-ke-size="size16"><b> </b></p>
+<p data-ke-size="size16"><span style="color: #000000;">OpenAI API(chatGPT 4o-mini)를 활용하여 윤리 문제 데이터(지문, 문제, 보기, 정답)을 생성하였다. 생성 주제는 위키백과 철학 항목을 참고하여 선정하였다. Train 데이터셋에서 가장 유사한 문제를 기반으로 one-shot prompt를 생성하였다. 이후 prompt를 openAI가 생성한 윤리 문제로 변경하여 데이터를 증강하였다.</span></p>
+<p data-ke-size="size16"><b> </b></p>
+<p data-ke-size="size16"><span style="color: #000000;">윤리 데이터를 증강한 결과, 약간의 성능 향상이 관찰되었다. </span></p>
+<p data-ke-size="size16"><span style="background-color: #ffffff; color: #0d0d0d;">실험은 모델 </span><span style="background-color: #efefef; color: #000000;">Qwen/Qwen2.5-7B-Instruct</span><span style="color: #000000;">을 사용하였으며 </span><span style="background-color: #ffffff; color: #0d0d0d;"> 사용된 데이터를 제외한 모든 환경을 동일하게 설정하여 진행하였다.</span></p>
+<div>
+<table border="1" data-ke-align="alignLeft" style="border-collapse: collapse; width: 100%;">
+<tbody>
+<tr>
+<td style="background-color: #efefef;"><span><span style="color: #000000;">데이터</span></span></td>
+<td style="background-color: #efefef;"><span><span style="color: #000000;">data length</span></span></td>
+<td style="background-color: #efefef;"><span><span style="color: #000000;">accuracy</span></span></td>
+</tr>
+<tr>
+<td style="background-color: #cfe2f3;"><span><span style="color: #000000;">train + 윤리데이터</span></span></td>
+<td style="background-color: #cfe2f3;"><span><span style="color: #000000;">2130</span></span></td>
+<td style="background-color: #cfe2f3;"><span><span style="color: #000000;">0.6659</span></span></td>
+</tr>
+<tr>
+<td><span><span style="background-color: #ffffff; color: #1f2328;">train</span></span></td>
+<td><span><span style="color: #000000;">2030</span></span></td>
+<td><span><span style="color: #000000;">0.6613</span></span></td>
+</tr>
+</tbody>
+</table>
+<b></b></div>
+<p data-ke-size="size16"><span style="color: #000000;">그러나 윤리데이터와 2.2.4.1장의 엑사원으로 증강한 데이터를 함께 사용한 경우, 성능이 오르지 않았다. </span></p>
+<p data-ke-size="size16"><span style="background-color: #ffffff; color: #0d0d0d;">실험은 모델 </span><span style="background-color: #efefef; color: #000000;">Qwen/Qwen2.5-7B-Instruct</span><span style="color: #000000;">을 사용하였으며 </span><span style="background-color: #ffffff; color: #0d0d0d;"> 사용된 데이터를 제외한 모든 환경을 동일하게 설정하여 진행하였다.</span></p>
+<div>
+<table border="1" data-ke-align="alignLeft" style="border-collapse: collapse; width: 100%;">
+<tbody>
+<tr>
+<td style="background-color: #efefef;"><span><span style="color: #000000;">데이터</span></span></td>
+<td style="background-color: #efefef;"><span><span style="color: #000000;">data length</span></span></td>
+<td style="background-color: #efefef;"><span><span style="color: #000000;">accuracy</span></span></td>
+</tr>
+<tr>
+<td style="background-color: #cfe2f3;"><span><span style="color: #000000;">train +  aug</span></span></td>
+<td style="background-color: #cfe2f3;"><span><span style="color: #000000;">3224</span></span></td>
+<td style="background-color: #cfe2f3;"><span><span style="color: #000000;">0.5899</span></span></td>
+</tr>
+<tr>
+<td><span><span style="background-color: #ffffff; color: #1f2328;">train + aug + 윤리데이터</span></span></td>
+<td><span><span style="color: #000000;">3311</span></span></td>
+<td><span><span style="color: #000000;">0.5737</span></span></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p data-ke-size="size16"><span style="color: #000000;">이는 증강 데이터 자체가 윤리 데이터를 포함한 특정 문제 유형보다 더 강하게 모델 학습에 영향을 미쳐, 모델이 윤리 데이터를 학습했더라도 전체적인 학습 성과에 기여하지 못했을 수 있다고 생각한다.</span></p>
+<p data-ke-size="size16"><span style="color: #000000;">2.2.4.3. LLM 합성 데이터3</span></p>
+<p data-ke-size="size16"><span style="color: #000000;">사람과 모델의 시험 대비 과정에 대해서 생각해보았다. </span></p>
+<p data-ke-size="size16"><span style="color: #000000;">1) 공부: 시험을 잘보기 위해서는 똑똑한 머리(성능 좋은 모델)이 필요하다.</span></p>
+<p data-ke-size="size16"><span style="color: #000000;">2) 공부 자료: 학습을 위해서는 공부 자료(train.csv)가 필요하다.</span></p>
+<p data-ke-size="size16"><span style="color: #000000;">3) 학습방식: 문제와 답을 학습하고, 답을 고르는 기본적인 방법(base prompt)을 알려주거나 풀이 과정을 포함한 학습(CoT)을 진행한다.</span></p>
+<p data-ke-size="size16"><b> </b></p>
+<p data-ke-size="size16"><span style="background-color: #ffffff; color: #0d0d0d;">풀이 과정을 학습함으로써 문제 해결 방식을 익히는 동시에, 풀이 자체에 대한 사고 과정도 학습할 수 있을 것이라는 가설을 세웠다.</span></p>
+<p data-ke-size="size16"><b> </b></p>
+<p data-ke-size="size16"><span style="color: #000000;">실험 진행 과정은 다음과 같다. Train 데이터셋에 대해 DSPy의 ChainOfThought를 사용하여 CoT 데이터를 생성한다. OpenAI API(4o-mini)를 활용해 단계별 풀이 과정을 포함한 데이터를 생성하였다. CoT 데이터를 사용하여 모델이 문제 푸는 방식을 방식하도록 설계하였다.</span></p>
+<p data-ke-size="size16"><b> </b></p>
+<p data-ke-size="size16"><span style="color: #000000;">실험결과 작은 모델의 경우, 미미한 성능 향상의 효과가 있었다.</span></p>
+<p data-ke-size="size16"><span style="background-color: #ffffff; color: #0d0d0d;">실험은 모델 </span><span style="background-color: #efefef; color: #000000;">Qwen/Qwen2.5-7B-Instruct</span><span style="color: #000000;">을 사용하였으며</span><span style="background-color: #ffffff; color: #0d0d0d;"> 사용된 데이터를 제외한 모든 환경을 동일하게 설정하여 진행하였다.</span></p>
+<div>
+<table border="1" data-ke-align="alignLeft" style="border-collapse: collapse; width: 100%;">
+<tbody>
+<tr>
+<td style="background-color: #efefef;"><span><span style="color: #000000;">데이터</span></span></td>
+<td style="background-color: #efefef;"><span><span style="color: #000000;">data length</span></span></td>
+<td style="background-color: #efefef;"><span><span style="color: #000000;">accuracy</span></span></td>
+</tr>
+<tr>
+<td style="background-color: #cfe2f3;"><span><span style="color: #000000;">train + CoT</span></span></td>
+<td style="background-color: #cfe2f3;"><span><span style="color: #000000;">2023</span></span></td>
+<td style="background-color: #cfe2f3;"><span><span style="color: #000000;">0.6659</span></span></td>
+</tr>
+<tr>
+<td><span><span style="background-color: #ffffff; color: #1f2328;">train</span></span></td>
+<td><span><span style="color: #000000;">2023</span></span></td>
+<td><span><span style="color: #000000;">0.6590</span></span></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p data-ke-size="size16"><b> </b></p>
+<p data-ke-size="size16"><span style="color: #000000;">큰 모델의 경우 CoT 데이터를 추가한 데이터의 성능이 더 낮은 것을 확인할 수 있었다.</span></p>
+<p data-ke-size="size16"><span style="background-color: #ffffff; color: #0d0d0d;">실험은 모델 </span><span style="background-color: #efefef; color: #1f2328;">Qwen/Qwen2.5-32B-Instruct-GPTQ-Int4</span><span style="color: #000000;">을 사용하였으며</span><span style="background-color: #ffffff; color: #0d0d0d;"> 사용된 데이터를 제외한 모든 환경을 동일하게 설정하여 진행하였다.</span></p>
+<div>
+<table border="1" data-ke-align="alignLeft" style="border-collapse: collapse; width: 100%;">
+<tbody>
+<tr>
+<td style="background-color: #efefef;"><span><span style="color: #000000;">데이터</span></span></td>
+<td style="background-color: #efefef;"><span><span style="color: #000000;">data length</span></span></td>
+<td style="background-color: #efefef;"><span><span style="color: #000000;">accuracy</span></span></td>
+</tr>
+<tr>
+<td style="background-color: #cfe2f3;"><span><span style="color: #000000;">train </span></span></td>
+<td style="background-color: #cfe2f3;"><span><span style="color: #000000;">2023</span></span></td>
+<td style="background-color: #cfe2f3;"><span><span style="color: #000000;">0.7465</span></span></td>
+</tr>
+<tr>
+<td><span><span style="background-color: #ffffff; color: #1f2328;">train + CoT</span></span></td>
+<td><span><span style="color: #000000;">2023</span></span></td>
+<td><span><span style="color: #000000;">0.7373</span></span></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p data-ke-size="size16" style="background-color: #ffffff;"><span style="color: #0d0d0d;">CoT 데이터를 추가한 학습이 성능 향상에 기여하지 못한 이유는 다음 세 가지로 분석할 수 있다.</span><span style="color: #0d0d0d;"><br/></span><span style="color: #0d0d0d;">1) 생성 모델과 학습 모델 간의 불일치</span><span style="color: #0d0d0d;"><br/></span><span style="color: #0d0d0d;">CoT 데이터는 4o-mini를 사용해 생성했지만, 학습은 Qwen 모델로 진행되었다.</span><span style="color: #0d0d0d;"><br/></span><span style="color: #0d0d0d;">모델이 자신이 생성한 토큰이 아닐 경우, 성능 향상이 제한적일 수 있다.</span><span style="color: #0d0d0d;"><br/></span><span style="color: #0d0d0d;">2) Instruct 모델의 학습 한계</span><span style="color: #0d0d0d;"><br/></span><span style="color: #0d0d0d;">Instruct 모델은 이미 충분히 학습된 모델이기 때문에, 추가적인 CoT 데이터를 학습하더라도 성능 향상이 크지 않을 가능성이 있다.</span><span style="color: #0d0d0d;"><br/></span><span style="color: #0d0d0d;">3) 작은 모델에서의 repetition 문제</span><span style="color: #0d0d0d;"><br/></span><span style="color: #0d0d0d;">작은 모델에서는 반복성(repetition) 문제가 발생할 수 있으며, 이는 CoT 데이터가 효과적으로 활용되지 못했을 가능성을 시사한다.</span></p>
+<p data-ke-size="size16"><span style="color: #000000;">2.2.4. 데이터 정제</span></p>
+<p data-ke-size="size16"><span style="color: #000000;">2.2.4.1. 선택지 분포 불균형 해소</span></p>
+<p data-ke-size="size16"><span style="color: #000000;">대회 제공 데이터 셋은 4지선다와 5지선다가 혼합된 형태이다. 그렇기 때문에 5번 문항이 답안인 문제가 매우 적었고, 추론 과정에서 5번 문항을 답안으로 선택하는 확률이 다른 선지에 비해 적지 않을까에 대한 의구심이 있었다. 실제로 데이터셋의 선지 분포가 불균형한 점이 있어 선택지를 랜덤하게 섞어 불균형을 해소하였다. Classification Task가 아닌 QA Task이기 때문에 선지 불균형에 그렇게 민감하지 않아 점수 개선에 직접적으로 이어지지는 않았으나, 학습 과정에서 오버피팅되어 특정 선지로 찍는 경우를 최소화하여 학습 안정성을 향상시켰다.</span><b></b></p>
+<h4 data-ke-size="size20"><span style="color: #000000;">2.2.5. 난이도기반 데이터증강</span></h4>
+<p data-ke-size="size16"><span style="color: #000000;">성능은 데이터와 모델의 종류에 함께 영향을 받는다. 따라서 모델의 추론능력이 어느정도 보장된다면, 데이터만 보고 증강 하는 것보다 데이터와 모델의 특성을 고려하는 것이 효율적인 증강 방법론이라고 생각했다. 따라서 부족해보이는 데이터를 증강하는 것이 아닌, 모델이 못 맞추는 형태의 데이터가 뭔지 모델별로 직접 확인해보고, 못 맞추는 데이터를 증강해주는 것을 목표로 하였다.</span></p>
+<p data-ke-size="size16"><span style="color: #000000;">test set에 대한 정답을 알 수 없으므로 train set을 inference하여 어떤 데이터를 못 맞추고 잘 맞추는지 확인하였다. 또한 LLM을 통해 증강을 한다면, 증강에 사용할 LLM은 해당 데이터를 맞춘 LLM이어야 한다고 생각했다. 따라서 증강에 사용할 LLM역시 train set을 inference해보았다. 아래 데이터는 train set을 inference한 후 각 모델이 몇개의 데이터를 틀렸는지, 겹치는 오답은 무엇인지 그린 벤다이어그램이다.</span></p>
+<p><figure class="imageblock alignCenter" data-ke-mobilestyle="widthOrigin" data-origin-height="750" data-origin-width="742"><span data-phocus="https://blog.kakaocdn.net/dna/bJ21dL/btsK49LD8Gf/AAAAAAAAAAAAAAAAAAAAANAalRa4N9uHG9rao8tZzWpnn8KjwPq94-GnyoDeI5ki/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&amp;expires=1796050799&amp;allow_ip=&amp;allow_referer=&amp;signature=Dy5ZWoo4eV08HkuM3TJfiwSSiXg%3D" data-url="https://blog.kakaocdn.net/dna/bJ21dL/btsK49LD8Gf/AAAAAAAAAAAAAAAAAAAAANAalRa4N9uHG9rao8tZzWpnn8KjwPq94-GnyoDeI5ki/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&amp;expires=1796050799&amp;allow_ip=&amp;allow_referer=&amp;signature=Dy5ZWoo4eV08HkuM3TJfiwSSiXg%3D"><img data-origin-height="750" data-origin-width="742" height="274" loading="lazy" onerror="this.onerror=null; this.src='//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png'; this.srcset='//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png';" src="/assets/images/04a60d3467ac6d0e0224d485.png" width="272"/></span></figure>
+</p>
+<p data-ke-size="size16"><span style="color: #000000;">qwen 3.2 14b- instruct 모델을 타겟모델로 하였을때, 해당 모델은 199개의 문제를 틀렸음을 알 수 있다. 그중에 108개의 오답는 qwen 모델만 틀렸으며, 92개의 오답은 2개의 고성능 LLM을 포함한 3개 모델이 전부 틀린 오답이다.</span></p>
+<p data-ke-size="size16"><span style="color: #000000;">92개의 오답은 3개의 모델이 틀렸으므로, 매우 난이도가 높거나 문제에 오류가 있을 가능성을 생각하여 drop하였다. GPT-4o와 타겟모델(qwen)이 틀린 문제는 36개로, 해당문제는 GPT-4o-mini는 정답을 추론하였다. 해당 36개는 GPT-4o-mini가 증강하고, 타겟모델과 GPT-4o-mini가 오답을 유추한 63개 데이터는 GPT-4o를 통해 증강하였다. qwen만 틀린 108개의 데이터에 대해서는 GPT-4o가 증강을 맡는 형식으로 진행하였다.(여러 벤치마크에서 비교적 고성능 이므로)</span></p>
+<p data-ke-size="size16"><span style="color: #000000;">그렇게 증강된 데이터를 통해 타겟모델(qwen)을 학습하여 testset의 결과를 보았을 때, 오차범위 내에서 차이없는 모습을 보였다.</span><b></b></p>
+<h2 data-ke-size="size26"><span style="color: #000000;">3. 추론</span></h2>
+<h3 data-ke-size="size23"><span style="color: #000000;">3.1. 프롬프트</span></h3>
+<h4 data-ke-size="size20"><span style="color: #000000;">3.1.1. 프롬프트에 따른 성능 비교</span></h4>
+<p data-ke-size="size16"><span style="color: #000000;">“수능 국어 1등급에 도전하는 AI”</span><span style="color: #000000;">를 참고하여 다양한 프롬프트 실험을 진행하였다. </span></p>
+<p><figure class="imageblock alignCenter" data-ke-mobilestyle="widthOrigin" data-origin-height="762" data-origin-width="1280"><span data-phocus="https://blog.kakaocdn.net/dna/tSLei/btsK6ldhAWM/AAAAAAAAAAAAAAAAAAAAAG7uMjmrN1Hcu39iJYngWdhXVBaMN0wP5Rnmrnms5elA/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&amp;expires=1796050799&amp;allow_ip=&amp;allow_referer=&amp;signature=S3pLgj1b1ZhM2yDKklvl7yvsA3E%3D" data-url="https://blog.kakaocdn.net/dna/tSLei/btsK6ldhAWM/AAAAAAAAAAAAAAAAAAAAAG7uMjmrN1Hcu39iJYngWdhXVBaMN0wP5Rnmrnms5elA/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&amp;expires=1796050799&amp;allow_ip=&amp;allow_referer=&amp;signature=S3pLgj1b1ZhM2yDKklvl7yvsA3E%3D"><img data-origin-height="762" data-origin-width="1280" height="284" loading="lazy" onerror="this.onerror=null; this.src='//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png'; this.srcset='//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png';" src="/assets/images/6ddc22e0fcf8f9dfe2dce4a5.png" width="477"/></span></figure>
+</p>
+<p data-ke-size="size16"><span style="background-color: #ffffff; color: #0d0d0d;">실험 결과, 베이스라인 프롬프트가 가장 우수한 성능을 보였다. 성능이 다른 프롬프트에서 향상된 경우는 OpenAI 모델을 사용했을 때였다. OpenAI 모델은 다양한 형태의 텍스트 데이터를 기반으로 학습되었기 때문에, Prompt2~Prompt4와 같은 다양한 유형의 프롬프트에서도 성능 저하 없이 효과적으로 적응할 수 있었던 것으로 보인다.</span><b></b></p>
+<h3 data-ke-size="size23"><span style="color: #000000;">3.2. RAG</span></h3>
+<h4 data-ke-size="size20"><span style="color: #000000;">3.2.1.Sparse</span></h4>
+<p data-ke-size="size16"><span style="color: #000000;">3.2.1.1. BM25</span></p>
+<p data-ke-size="size16"><span style="color: #000000;">우선 검색 증강에서 가장 일반적인 형태인 BM25를 쉽게 구현 가능한 </span><span style="color: #000000;">rank-bm25</span><span style="color: #000000;"> 라이브러리를 통해 RAG를 구현했다. 0.9GB의 위키피디아 데이터셋 44만건에 대해 pickle 파일로 저장하는데 약 4시간이 소요되었고 1000개의 문서에 대해 3개씩 검색하는데 1시간 이상이 걸렸다. 이정도 속도로는 문서를 확장하고 및 검색 기능을 개선하기에 어렵다고 판단되었기 때문에 다른 방식을 사용하기로 결정했다.</span></p>
+<p data-ke-size="size16"><b> </b></p>
+<p data-ke-size="size16"><span style="color: #000000;">3.2.1.2. Elasticsearch</span></p>
+<p data-ke-size="size16"><span style="color: #000000;">Elasticsearch는 도커 이미지를 내려받고 컨테이너를 실행하기만 하면 쉽게 서빙이 가능하며, 모든 팀원이 URL과 PORT정보만 알고 있으면 REST API 호출을 통해 동일한 index에 접근하여 사용할 수 있기 때문에 프로젝트에 사용하기로 결정했다. 시간적인 측면에서도 문서 300만건을 삽입하는데 5분 내로 걸릴 정도로 매우 빠르고, 벌크 쿼리를 사용했을 때 검색 시간 또한 약 2000개 문서에 대해 관련 60개씩 검색하는데 30분 이내로 처리 가능했다. Elasticsearch 도입을 통해 더 많은 문서를 수집하고, 하나의 검색 쿼리에 대해 더 많은 문서를 가져올 수 있었다.</span><b></b></p>
+<h4 data-ke-size="size20"><span style="color: #000000;">3.2.2. Dense</span></h4>
+<p data-ke-size="size16"><span style="color: #000000;">3.2.2.1. DPR</span></p>
+<p data-ke-size="size16"><span style="color: #000000;">DPR은 주어진 질문에 대해 가장 관련성이 높은 패시지를 검색하기 위해 구축하였다.모델이 입력된 쿼리를 인코딩하여 벡터로 변환하고, 이 벡터를 사용하여 FAISS 인덱스를 통해 유사한 패시지를 검색하고, 검색된 패시지와 그 유사도 점수를 기반으로 최종 결과를 생성하였다. 유사도 점수가 특정 임계값 이상인 경우에만 결과에 포함하였다. 지문에서 질문에 대한 답을 찾기 어려운 문제를 위해  질문에 대한 답변을 위키피디아에서 신속하게 찾아 모델이 답변에 도움이 될 수 있도록 하기 위함이었다. 결과적으로 모델이 지문에 적한한 지문을 찾는 경우도 있었지만, 아닌 경우도 많았다.</span><span style="color: #000000;"> 모델이 질문에 적합한 지문을 찾지 못하는 문제는 주로 학습 데이터의 다양성과 품질 부족에서 기인할 수 있다. 또한, 인코더의 성능이나 검색 프로세스의 최적화 부족도 주요 원인으로 작용할 수 있다고 생각한다. </span></p>
+<p data-ke-size="size16"><b> </b></p>
+<p data-ke-size="size16"><span style="color: #000000;">3.2.2.2. Rerank</span></p>
+<p data-ke-size="size16"><span style="color: #000000;">Retrieve 성능에서 가장 중요한 점은 Negative Passage를 줄이는 것이다. 그렇기 때문에 Reranker는 RAG에서 필수적이며, 임계값 이하의 문서는 가져오지 않도록 한번 더 필터링해주는 과정을 통해 이를 최소화 할 수 있다. 또한 사용 가능한 입력 토큰 길이에 제한이 있었기 때문에 많은 문서를 가져올 수 없었다. 그래서 Reranker로 단 1개의 문서만 가져오도록 하였고, Retriever가 1차적으로 가져오는 문서 수를 약 60-80건으로 매우 크게 하여 성능 하락을 최소화했다.</span></p>
+<h4 data-ke-size="size20"><span style="color: #000000;">3.2.3. Document</span></h4>
+<p data-ke-size="size16"><span style="color: #000000;">3.2.3.1. 위키피디아 데이터 추출</span></p>
+<p data-ke-size="size16"><span style="color: #000000;">사회 탐구 영역의 문제들에서 정답률이 낮았던 이유는 모델이 필요한 정보를 찾기 어렵기 때문이라고 생각했다. 외부 데이터에서 유용한 정보를 추출하기 위해서는 RAG 기법이 필요하다고 판단하였다. 따라서 위키피디아 데이터를 텍스트 파일로 통합하여 외부 지식을 활용해 모델이 정확한 정보를 기반으로 답을 고를 수 있도록 시도하였다.</span></p>
+<p data-ke-size="size16"><b> </b></p>
+<p data-ke-size="size16"><span style="color: #000000;">3.2.3.2. 나무위키, 텍스트북 데이터 수집 </span></p>
+<p data-ke-size="size16"><span style="color: #000000;">한국어 위키는 위키피디아에 비해 나무위키가 더 활발하게 작성되고 읽히기 때문에 이 데이터를 추가적으로 사용할 필요성을 느꼈다. 또한 사회 관련 문제에 더 적합한 문서는 텍스트북 데이터에 많을 것이라고 예상하고 함께 수집했다. </span></p>
+<p data-ke-size="size16"><b> </b></p>
+<p data-ke-size="size16"><span style="color: #000000;">3.2.3.3. 필터링</span></p>
+<p data-ke-size="size16"><span style="color: #000000;">쓸모 없는 문서량이 많아질 수록 검색 속도도 느려지고 잘못된 문서를 가져올 확률이 높아졌다. 이를 위해 문서를 분류하는 방법을 고안했으나 문서량이 너무 많았기 때문에 작업량과 실행 시간이 너무 오래 걸릴 것으로 예상되어 문서 길이 기반, 단어 기반으로 필터링하는 방식을 선택했다. 우선 매우 짧은 문서같은 경우는 문서가 생성되었으나 아직 작성되지 않은 문서나 정보량을 거의 담고있지 않은 한 두 문장의 문서이기 때문에 전부 제거했다. 그 다음으로는 웹 베이스 데이터라는 특성을 고려하여 연예인이나 유명인의 인물 문서가 많다는 점과, 게임이나 애니메이션 같은 서브컬쳐 관련 문서가 많다는 점을 파악하여 해당 문서에서 자주 나오는 단어를 휴리스틱하게 추출하고 필터링에 사용했다. 그렇게하여 길이 기반으로 위키피디아 150만건 </span><span style="color: #000000;">→</span><span style="color: #000000;"> 44.3만건으로 줄일 수 있었고, 단어 기반으로 44.3만건 </span><span style="color: #000000;">→</span><span style="color: #000000;"> 27.1만건으로 줄일 수 있었다. 나무위키는 덤프 데이터를 추출하여 1차 가공된 heegyu/namuwiki-extracted</span><span style="color: #000000;">를 사용하였으며, 65.5만건 </span><span style="color: #000000;">→ </span><span style="color: #000000;">18.8만건으로 줄일 수 있었다. 텍스트북 데이터는 따로 필터링하지 않고 전부 사용했다.</span></p>
+<p data-ke-size="size16"><b> </b></p>
+<p data-ke-size="size16"><span style="color: #000000;">3.2.3.4. 전처리</span></p>
+<p data-ke-size="size16"><span style="color: #000000;">문서의 길이가 늘어남에 따라 입력 토큰 길이 제한에 의해 문서가 잘리는 경우가 발생했다. 그렇기 때문에 문서를 최대한 압축하여 적은 토큰에 많은 정보를 담아내야 했다. 국어/사회 영역의 문제라는 특성을 이용하여 한글 문자와 숫자, 일부 특수문자를 제외한 다른 문자를 전부 제거했다. 기본적으로 수능 문제는 영어나 한자 단어를 직접적으로 제시하지 않고 괄호나 각주 등을 통해 한글로 정보를 제공한다. MRC/MMLU 문제 또한 마찬가지였다. 그리고 위키 문서 또한 한자나 영어 단어를 제거하더라도 충분히 의미가 전달 될 수 있도록 한글 단어와 함께 작성되었기 때문에 이를 제거하여 문서의 길이를 줄였다. 더 나아가 RAG 시스템에 요약이나 삭제, 추가 정보 탐색과 같은 파이프라인을  적용하고 싶었으나 시간 부족으로 구현하지는 못했다.</span><b></b></p>
+<h4 data-ke-size="size20"><span style="color: #000000;">3.2.4. Training with RAG</span></h4>
+<p data-ke-size="size16"><span style="color: #000000;">일반적으로 RAG를 추론 단계에서 사용하지만, RAG를 이용할 때 관련 없는 문서를 가져오는 경우 성능 하락이 발생했다. threshold 값의 조정을 통해 이를 줄일 수 있으나, 그만큼 관련된 문서를 가져오는 경우도 함께 줄어든다. 이런 문제를 극복하고자 훈련 과정에서도 RAG를 사용하여 훈련했다. 이렇게 했을 때 일정 수준의 관련 없는 문서를 검색해 온 경우에도 모델이 더 강건하게 동작할 수 있을 것이라고 기대했다. 실제 결과도 추론 단계에서 사용한 것에 비해 성능이 더 우수했다. 프로젝트 마감 이후 솔루션 발표에서 이 내용을 언급했을 때, 마스터님이 </span><span style="color: #000000;">RAFT</span><span style="color: #000000;"> (LLM이 긍정적 문서(답변에 도움이 되는 문서)와 부정적 문서(답변에 도움이 되지 않는 문서)를 구분하며, 이를 통해 모델이 더 효과적으로 정보를 추출하고 학습할 수 있도록 하는 방식)</span><span style="color: #000000;">라는 이름의 방법론이 존재한다는 것을 말씀해주셨다. 리서치를 통해 발견한 방법론이 아닌 우리가 스스로 고안한 방법론이 실제로 존재했던 경험도 몹시 흥미로웠다. 우리의 추정 및 실험이 합리적인 과정으로 진행되었다는 것을 간접적으로 확인할 수 있어 좋았지만, 반대로는 깊게 조사했다면 충분히 발견할 수 있는 내용이였다는 점이 아쉬웠다.</span><b></b></p>
+<h2 data-ke-size="size26"><span style="color: #000000;">4. 앙상블</span></h2>
+<h3 data-ke-size="size23"><span style="color: #000000;">4.1.hard voting</span></h3>
+<p data-ke-size="size16"><span style="color: #000000;">단일 모델의 예측 성능은 다양한 요인에 따라 달라질 수 있다. 각 모델이 서로 다른 특징을 학습하고, 데이터의 다양한 측면을 반영할 수 있기 때문에, 여러 모델의 예측 결과를 결합함으로써 전반적인 성능을 향상시킬 수 있다. 하드 보팅은 다수결 원칙에 따라 가장 많이 선택된 답변을 최종 결정으로 채택함으로써, 개별 모델의 약점을 보완하고 더 나은 결과를 제공할 수 있기 때문에 시도하였다.</span><b></b></p>
+<h2 data-ke-size="size26"><span style="color: #000000;">5. 최종 제출 데이터</span><span style="color: #000000;"><span></span></span></h2>
+<p><figure class="imageblock alignCenter" data-ke-mobilestyle="widthOrigin" data-origin-height="724" data-origin-width="1280"><span data-phocus="https://blog.kakaocdn.net/dna/JsEux/btsK6OeZMqf/AAAAAAAAAAAAAAAAAAAAAAdmjrH2NRoMQDVB_WQwm7fSJz5hwizG4gc4E3unu221/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&amp;expires=1796050799&amp;allow_ip=&amp;allow_referer=&amp;signature=cEjlixByzlqHCNrUxj%2F542IOwBE%3D" data-url="https://blog.kakaocdn.net/dna/JsEux/btsK6OeZMqf/AAAAAAAAAAAAAAAAAAAAAAdmjrH2NRoMQDVB_WQwm7fSJz5hwizG4gc4E3unu221/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&amp;expires=1796050799&amp;allow_ip=&amp;allow_referer=&amp;signature=cEjlixByzlqHCNrUxj%2F542IOwBE%3D"><img data-origin-height="724" data-origin-width="1280" height="283" loading="lazy" onerror="this.onerror=null; this.src='//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png'; this.srcset='//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png';" src="/assets/images/ec777f1744d2586373723be5.png" width="500"/></span></figure>
+</p>
+<p data-ke-size="size16"><b> </b></p>
+<p data-ke-size="size16" style="background-color: #ffffff;"><span style="color: #0d0d0d;">대회에서 제공된 train 데이터셋, 엑사원을 활용하여 증강한 데이터, 그리고 공무원 크롤링 데이터셋을 합쳐 총 6568개의 데이터를 구성하였으며, 여기에 RAG를 적용하여 train 데이터를 생성하였다. 또한, test 데이터셋에도 동일한 방식으로 RAG를 적용하였다.</span></p>
+<p data-ke-size="size16" style="background-color: #ffffff;"><span style="color: #0d0d0d;">모델 학습 과정에서는 8가지 Lora target modules를 사용하였고, max-length는 4096으로 설정하였으며, base prompt를 활용하여 학습을 진행하였다. 사용된 모델은 Qwen2.5-32B-Instruct-GPTQ-int4였으며, 전체 과정에 소요된 시간은 약 10시간이었다.</span></p>
+<p data-ke-size="size16" style="background-color: #ffffff;"><span style="color: #0d0d0d;">public score</span><span style="color: #0d0d0d;"><span></span></span></p>
+<p><figure class="imageblock alignCenter" data-ke-mobilestyle="widthOrigin" data-origin-height="73" data-origin-width="1280"><span data-phocus="https://blog.kakaocdn.net/dna/dio6S6/btsK4ZboU0D/AAAAAAAAAAAAAAAAAAAAAAVa97Gvp97fMnoXf30K0MuesY3T-c55n8_gwM-p2SEL/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&amp;expires=1796050799&amp;allow_ip=&amp;allow_referer=&amp;signature=cE45l1Uxlj3xnSJd18dzhhpWdF4%3D" data-url="https://blog.kakaocdn.net/dna/dio6S6/btsK4ZboU0D/AAAAAAAAAAAAAAAAAAAAAAVa97Gvp97fMnoXf30K0MuesY3T-c55n8_gwM-p2SEL/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&amp;expires=1796050799&amp;allow_ip=&amp;allow_referer=&amp;signature=cE45l1Uxlj3xnSJd18dzhhpWdF4%3D"><img data-origin-height="73" data-origin-width="1280" height="35" loading="lazy" onerror="this.onerror=null; this.src='//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png'; this.srcset='//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png';" src="/assets/images/4fd85b334c7582b35ca3043b.png" width="602"/></span></figure>
+</p>
+<p data-ke-size="size16" style="background-color: #ffffff;"><span style="color: #0d0d0d;">private score</span></p>
+<p><figure class="imageblock alignCenter" data-ke-mobilestyle="widthOrigin" data-origin-height="77" data-origin-width="1280"><span data-phocus="https://blog.kakaocdn.net/dna/c6ld0I/btsK6PLIFxe/AAAAAAAAAAAAAAAAAAAAAH5LFQ2xpj6JwazfCscqBMlu4PCfwb1ffumOAQs4iLMY/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&amp;expires=1796050799&amp;allow_ip=&amp;allow_referer=&amp;signature=99gbUTFnHPdLZXWurp6gM%2BF8NxA%3D" data-url="https://blog.kakaocdn.net/dna/c6ld0I/btsK6PLIFxe/AAAAAAAAAAAAAAAAAAAAAH5LFQ2xpj6JwazfCscqBMlu4PCfwb1ffumOAQs4iLMY/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&amp;expires=1796050799&amp;allow_ip=&amp;allow_referer=&amp;signature=99gbUTFnHPdLZXWurp6gM%2BF8NxA%3D"><img data-origin-height="77" data-origin-width="1280" height="36" loading="lazy" onerror="this.onerror=null; this.src='//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png'; this.srcset='//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png';" src="/assets/images/93c978ef59fad4341d40fa28.png" width="602"/></span></figure>
+</p>
+<h2 data-ke-size="size26">6. 개인 회고</h2>
+<p data-ke-size="size16"><span style="color: #000000;">한정된 컴퓨팅 성능과 시간 내에서 더 큰 모델, 더 긴 입력 토큰, 더 많은 데이터를 사용하기 위해 시행착오를 겪었다. 가장 만족스러운 점은 </span><b><span style="color: #000000;">하나에 매몰되지 않고 다양한 각도에서 시행착오를 겪었다는 점</span></b><span style="color: #000000;">이다. <b>데이터 관점</b>에서는 테스트 셋을 가장 잘 따르는 훈련 셋을 구축하기 위해 데이터 전처리 / LLM 기반 증강 / Hugging Face, 크롤링, PDF 파싱을 통한  외부 데이터 수집을 진행했다. <b>모델 관점</b>에서는 경량화/양자화 등 다양한 메모리 최적화 기법을 시도했고, PEFT(LoRA)를 통해 하이퍼파라미터 튜닝으로 성능을 개선했다. 또한 <b>RAG 도입</b>과 <b>Prompting 기법 활용 </b>등 할 수 있는 방법은 전부 시도했다. 좋은 결과로 이어지지 않은 것들도 많았지만 다른 실험을 이어갈 수 있는 근거가 되었다. </span></p>
+<p data-ke-size="size16"><span style="color: #000000;"><b>협업 관점</b>에서는 GitHub에서 100개 이상의 ISSUE/PR/Discussion 수를 달성, 200개 이상의 commit 수 달성, 모든 PR에 대해 리뷰를 남기는 규칙, PR/ISSUE Template, MakeFile과 Linter 적용, Pre-commit과 github-action으로 style check 등 첫 프로젝트와 비교했을 때 훨씬 개선된 모습을 보였다는 점이 만족스럽다. </span></p>
+<p data-ke-size="size16"><span style="color: #000000;"><b>아쉬웠던 점</b>은 한 가지 모델로 모든 과정이 동작하는 것이 아닌 파이프라인을 구축하고 싶었으나 이를 구현하지 못했다는 점이다. 문제가 입력으로 들어오고 출력으로 예상 정답을 도출하는 모델을 구축한다는 관점에서, 내부 동작에는 지문 요약, 검색 증강 및 문서 요약, 선지 소거, 등등 내부 과정을 잘게 쪼개어 어떤 과정에서는 더 작은 모델을 쓰고 어떤 과정에서는 큰 모델을 사용하여 효율화하는 등을 구현하고 이를 통해 성능을 끌어올리고 싶었으나 시간 부족으로 구현하지 못했던 점이 가장 큰 아쉬움으로 남는다.</span></p>
+<p data-ke-size="size16"> </p>
+{% endraw %}

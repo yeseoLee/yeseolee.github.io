@@ -1,0 +1,166 @@
+---
+layout: post
+title: Cache와 Retry로 시간·비용 효율적 API 호출하기
+date: '2024-11-24T14:27:35+09:00'
+categories:
+- 개발
+- 문제해결
+source_url: https://ohge.tistory.com/67
+source_blog: tistory
+permalink: /tistory/67/
+---
+{% raw %}
+<h1>문제상황</h1>
+<p><figure class="imageblock alignCenter" data-ke-mobilestyle="widthOrigin" data-origin-height="1530" data-origin-width="2044"><span data-phocus="https://blog.kakaocdn.net/dna/bODGHv/btsKVt3kH6c/AAAAAAAAAAAAAAAAAAAAAIrOAoJyPMdLb6hhgq9jYaDwIawBljqaWDuhc8XmItcz/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&amp;expires=1796050799&amp;allow_ip=&amp;allow_referer=&amp;signature=cs0RrMifXaC2s7UhcUGCdvTSQLs%3D" data-url="https://blog.kakaocdn.net/dna/bODGHv/btsKVt3kH6c/AAAAAAAAAAAAAAAAAAAAAIrOAoJyPMdLb6hhgq9jYaDwIawBljqaWDuhc8XmItcz/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&amp;expires=1796050799&amp;allow_ip=&amp;allow_referer=&amp;signature=cs0RrMifXaC2s7UhcUGCdvTSQLs%3D"><img data-origin-height="1530" data-origin-width="2044" height="1530" loading="lazy" onerror="this.onerror=null; this.src='//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png'; this.srcset='//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png';" src="/assets/images/259c15a2f7a818a812562b3b.png" width="2044"/></span></figure>
+</p>
+<ul>
+<li>허깅페이스에 SQuAD 데이터를 불러와서 한국어로 번역하여 학습 데이터로 사용하기 위해, 구글번역기 api를 이용하여 이를 구현하려고 한다.</li>
+<li>데이터를 살펴보니 <code>context</code> 컬럼에는 중복된 데이터가 많이 보인다. 중복된 데이터를 번역하기 위해 매번 API를 호출하면 비효율적이다.</li>
+<li>실행 시간뿐만 아니라 유료 api를 사용한다면 비용적으로도 많이 부담이 될 것이다.</li>
+</ul>
+<h1>코드 설명</h1>
+<h2>의존성 설치</h2>
+<ul>
+<li>번역에 필요한 <code>googletrans</code>와 진행 상황을 출력하기위한 <code>tqdm</code>패키지를 설치한다.</li>
+</ul>
+<pre><code>!pip install googletrans tqdm</code></pre><h2>캐시 구현</h2>
+<p>이미 한번 api를 호출한 데이터를 반복하지 않도록, 캐시 파일을 json으로 생성하고 관리하는 <code>TranslationCache</code>클래스를 구현한다.</p>
+<ul>
+<li><code>enter</code>와 <code>exit</code>함수를 통해 인스턴스 생성시 json 파일을 로드하고, 해제시 json 파일을 저장한다.</li>
+<li><code>get_translation</code>으로 캐시된 데이터를 가져오고, <code>add_translation</code>으로 새로운 데이터를 캐시에 저장한다.</li>
+</ul>
+<p><figure class="imageblock alignCenter" data-ke-mobilestyle="widthOrigin" data-origin-height="1236" data-origin-width="1528"><span data-phocus="https://blog.kakaocdn.net/dna/owT9i/btsKUlETnsM/AAAAAAAAAAAAAAAAAAAAAJ-UNkq6Q42WapyX-CItmQ5Rt6Jii-prfH2iiLMn3Oxc/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&amp;expires=1796050799&amp;allow_ip=&amp;allow_referer=&amp;signature=Fry5Vcthkh1LDTwU33Rf7g5z8d8%3D" data-url="https://blog.kakaocdn.net/dna/owT9i/btsKUlETnsM/AAAAAAAAAAAAAAAAAAAAAJ-UNkq6Q42WapyX-CItmQ5Rt6Jii-prfH2iiLMn3Oxc/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&amp;expires=1796050799&amp;allow_ip=&amp;allow_referer=&amp;signature=Fry5Vcthkh1LDTwU33Rf7g5z8d8%3D"><img data-origin-height="1236" data-origin-width="1528" height="1236" loading="lazy" onerror="this.onerror=null; this.src='//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png'; this.srcset='//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png';" src="/assets/images/8bddeea8891447f03a3a1562.png" width="1528"/></span></figure>
+</p>
+<h2>구글 번역 api 구현</h2>
+<p>구글 번역 api를 호출하는 함수와 캐시를 이용하여 효율적으로 번역을 수행하는 함수를 구현한다.</p>
+<ul>
+<li><code>translate_with_retry</code>은 실제 api 호출부이며 입력받은 최대 재시도 횟수만큼 반복 시도한다.</li>
+<li>예시 코드에서는 간단하게 1초 대기 후 재시도하는 로직을 작성하지만, 표준 오류 처리 전략 중 하나인 <a href="https://cloud.google.com/memorystore/docs/valkey/exponential-backoff?hl=ko">지수 백오프 알고리즘</a>을 구현하는 것도 좋은 방법이다.</li>
+</ul>
+<p><figure class="imageblock alignCenter" data-ke-mobilestyle="widthOrigin" data-origin-height="1906" data-origin-width="1660"><span data-phocus="https://blog.kakaocdn.net/dna/t4BNd/btsKVzvudiN/AAAAAAAAAAAAAAAAAAAAAAAr0SeVfu8r-3RXvS7QxxxkAGCNbor2agvzTUAYMu00/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&amp;expires=1796050799&amp;allow_ip=&amp;allow_referer=&amp;signature=RhmOLU9cAxSGJLtEYq7ZzIx1zbc%3D" data-url="https://blog.kakaocdn.net/dna/t4BNd/btsKVzvudiN/AAAAAAAAAAAAAAAAAAAAAAAr0SeVfu8r-3RXvS7QxxxkAGCNbor2agvzTUAYMu00/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&amp;expires=1796050799&amp;allow_ip=&amp;allow_referer=&amp;signature=RhmOLU9cAxSGJLtEYq7ZzIx1zbc%3D"><img data-origin-height="1906" data-origin-width="1660" height="1906" loading="lazy" onerror="this.onerror=null; this.src='//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png'; this.srcset='//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png';" src="/assets/images/6fcb848399ffdd980c1b7286.png" width="1660"/></span></figure>
+</p>
+<h2>SQuAD 데이터에 적용하기</h2>
+<p>SQuAD 데이터를 가져와서 Dataframe으로 변환하고, 각 column에 대해 번역 기능을 수행한다.</p>
+<ul>
+<li>예시 코드에서는 SQuAD 데이터에서 <code>context</code>와 <code>question</code>컬럼만 가져오고, validation 데이터 중 일부만 slice하여 사용한다.</li>
+<li>인스턴스 생성시 with로 감싸서 사용하면 자동으로 enter를 호출하고, 스코프에서 벗어날 때 자동으로 exit을 호출하고 메모리를 반환한다.</li>
+</ul>
+<p><figure class="imageblock alignCenter" data-ke-mobilestyle="widthOrigin" data-origin-height="1236" data-origin-width="1528"><span data-phocus="https://blog.kakaocdn.net/dna/CpXQk/btsKTJzwIWm/AAAAAAAAAAAAAAAAAAAAAD7aHLE3QiJc5iI_SMXv2SF74zyU68vjFPfKPL4Iq-R3/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&amp;expires=1796050799&amp;allow_ip=&amp;allow_referer=&amp;signature=WxNITUa68xwJioVlvRbfF7Ke7ug%3D" data-url="https://blog.kakaocdn.net/dna/CpXQk/btsKTJzwIWm/AAAAAAAAAAAAAAAAAAAAAD7aHLE3QiJc5iI_SMXv2SF74zyU68vjFPfKPL4Iq-R3/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&amp;expires=1796050799&amp;allow_ip=&amp;allow_referer=&amp;signature=WxNITUa68xwJioVlvRbfF7Ke7ug%3D"><img data-origin-height="1236" data-origin-width="1528" height="1236" loading="lazy" onerror="this.onerror=null; this.src='//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png'; this.srcset='//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png';" src="/assets/images/e18996238e1cc3014950e736.png" width="1528"/></span></figure>
+</p>
+<h2>테스트</h2>
+<p>캐시 기능을 사용하지 않았을 때에 비해 api 호출 횟수 비교는 다음과 같다.</p>
+<ul>
+<li>context는 50 → 2</li>
+<li>paragraph는 50 → 47</li>
+</ul>
+<p><figure class="imageblock alignCenter" data-ke-mobilestyle="widthOrigin" data-origin-height="778" data-origin-width="1802"><span data-phocus="https://blog.kakaocdn.net/dna/IXBJO/btsKVzbbJYb/AAAAAAAAAAAAAAAAAAAAAJFO4G3YPTf946qkZhEyU4KmhGVnfOk9Z5R03m743D1V/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&amp;expires=1796050799&amp;allow_ip=&amp;allow_referer=&amp;signature=1zRNFAzktI6wyPZNPLABAWaYiTk%3D" data-url="https://blog.kakaocdn.net/dna/IXBJO/btsKVzbbJYb/AAAAAAAAAAAAAAAAAAAAAJFO4G3YPTf946qkZhEyU4KmhGVnfOk9Z5R03m743D1V/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&amp;expires=1796050799&amp;allow_ip=&amp;allow_referer=&amp;signature=1zRNFAzktI6wyPZNPLABAWaYiTk%3D"><img data-origin-height="778" data-origin-width="1802" height="778" loading="lazy" onerror="this.onerror=null; this.src='//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png'; this.srcset='//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png';" src="/assets/images/1f88ccb49a5ae84b5f89cb7c.png" width="1802"/></span></figure>
+</p>
+<p>캐시 파일에 정상적으로 원본 데이터와 번역 데이터가 쌍으로 저장되었다.</p>
+<p><figure class="imageblock alignCenter" data-ke-mobilestyle="widthOrigin" data-origin-height="1076" data-origin-width="2556"><span data-phocus="https://blog.kakaocdn.net/dna/57Zdc/btsKTEydY6e/AAAAAAAAAAAAAAAAAAAAAPXKVHT8mSeimyjq_CZ2bT9ZOVXIjdqy3_4S_CBhKmk5/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&amp;expires=1796050799&amp;allow_ip=&amp;allow_referer=&amp;signature=SkqZS4w0InASMKBOcPWJqyZfkDo%3D" data-url="https://blog.kakaocdn.net/dna/57Zdc/btsKTEydY6e/AAAAAAAAAAAAAAAAAAAAAPXKVHT8mSeimyjq_CZ2bT9ZOVXIjdqy3_4S_CBhKmk5/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&amp;expires=1796050799&amp;allow_ip=&amp;allow_referer=&amp;signature=SkqZS4w0InASMKBOcPWJqyZfkDo%3D"><img data-origin-height="1076" data-origin-width="2556" height="1076" loading="lazy" onerror="this.onerror=null; this.src='//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png'; this.srcset='//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png';" src="/assets/images/49be2f5dd7e56c0939da06db.png" width="2556"/></span></figure>
+</p>
+<p>csv 파일도 번역 결과가 정상적으로 저장되었다.</p>
+<p><figure class="imageblock alignCenter" data-ke-mobilestyle="widthOrigin" data-origin-height="822" data-origin-width="2678"><span data-phocus="https://blog.kakaocdn.net/dna/bRM27c/btsKVyDrmi2/AAAAAAAAAAAAAAAAAAAAAFpoTSNnSG9uBzpzb-6I8DdmVpn0qiWjYeAuYZwrkmVY/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&amp;expires=1796050799&amp;allow_ip=&amp;allow_referer=&amp;signature=utvD9zSvvHFpPIi13W2fXwmK5kY%3D" data-url="https://blog.kakaocdn.net/dna/bRM27c/btsKVyDrmi2/AAAAAAAAAAAAAAAAAAAAAFpoTSNnSG9uBzpzb-6I8DdmVpn0qiWjYeAuYZwrkmVY/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&amp;expires=1796050799&amp;allow_ip=&amp;allow_referer=&amp;signature=utvD9zSvvHFpPIi13W2fXwmK5kY%3D"><img data-origin-height="822" data-origin-width="2678" height="822" loading="lazy" onerror="this.onerror=null; this.src='//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png'; this.srcset='//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png';" src="/assets/images/d1734706bb41963eb33ef25a.png" width="2678"/></span></figure>
+</p>
+<h1>결론</h1>
+<ul>
+<li>Cache를 구현하여 효율적으로 API를 호출하여 시간과 비용을 절약할 수 있다.</li>
+<li>구글 번역 API 뿐만 아니라 맞춤법 검사기, OpenAPI 등에도 응용하여 사용할 수 있다.</li>
+<li>의도하지 않은 결과가 있다면 캐시 파일만 수정하여 일괄적으로 변경을 적용할 수 있다.</li>
+</ul>
+<h1>전체 소스 코드</h1>
+<pre><code class="language-python">import json
+import os
+import time
+
+from datasets import load_dataset
+from googletrans import Translator
+import pandas as pd
+from tqdm import tqdm
+
+
+class TranslationCache:
+    def __init__(self, cache_file="translation_cache.json"):
+        self.cache_file = cache_file
+        self.cache = {}
+
+    def __enter__(self):
+        if os.path.exists(self.cache_file):
+            with open(self.cache_file, "r", encoding="utf-8") as f:
+                self.cache = json.load(f)
+        return self
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        with open(self.cache_file, "w", encoding="utf-8") as f:
+            json.dump(self.cache, f, ensure_ascii=False, indent=2)
+        self.cache.clear()  # 메모리 해제
+
+    def get_translation(self, text):
+        return self.cache.get(text)
+
+    def add_translation(self, text, translation):
+        self.cache[text] = translation
+
+
+def call_googletrans_api_with_retry(translator, text, cache, max_retries=3):
+    # 캐시에서 번역 확인
+    cached_translation = cache.get_translation(text)
+    if cached_translation:
+        return cached_translation
+
+    # 캐시에 없는 경우 번역 수행
+    for attempt in range(max_retries):
+        try:
+            translated = translator.translate(text, src="en", dest="ko").text
+            time.sleep(0.01)
+            cache.add_translation(text, translated)
+            return translated
+        except Exception as e:
+            if attempt == max_retries - 1:
+                print(f"번역 실패: {str(e)}")
+                return text
+            time.sleep(1)
+
+
+def translate(texts, cache):
+    translator = Translator()
+    translated_texts = []
+
+    # 중복 제거를 위해 유니크한 텍스트만 추출
+    unique_texts = list(set(texts))
+
+    for text in tqdm(unique_texts, desc="텍스트 번역 중"):
+        translated = call_googletrans_api_with_retry(translator, text, cache)
+
+    # 원본 순서대로 캐시에서 번역 가져오기
+    for text in texts:
+        translated = cache.get_translation(text)
+        translated_texts.append(translated)
+
+    return translated_texts
+
+
+def squad_datasets_to_csv(slice_length, output_filename):
+    data = load_dataset("rajpurkar/squad")
+    df = pd.DataFrame(data["validation"])[["context", "question"]]
+
+    sliced_df = df.iloc[:slice_length]
+    sliced_df.to_csv(output_filename, index=False)
+
+
+def translate_csv(input_filename, output_filename):
+    df = pd.read_csv(input_filename)
+
+    print("context 번역 중...")
+    with TranslationCache("context_cache.json") as context_cache:
+        df["context"] = translate(df["context"], context_cache)
+
+    print("질문 번역 중...")
+    with TranslationCache("question_cache.json") as question_cache:
+        df["question"] = translate(df["question"], question_cache)
+
+    df.to_csv(output_filename, index=False)
+
+
+squad_datasets_to_csv(50, "squad_en_50.csv")
+translate_csv("squad_en_50.csv", "squad_ko_50.csv")</code></pre>
+{% endraw %}

@@ -1,0 +1,185 @@
+---
+layout: post
+title: '[리뷰] DeepSeek이 바꿔버린 모든 것: MoE와 RLVR, 2025년 AI 회고'
+date: '2026-02-19T15:56:07+09:00'
+categories:
+- 개발
+- 리뷰
+source_url: https://ohge.tistory.com/77
+source_blog: tistory
+permalink: /tistory/77/
+---
+{% raw %}
+<p data-ke-size="size16"><a href="https://youtu.be/iDd-7trU3VE">https://youtu.be/iDd-7trU3VE</a></p>
+<p><iframe allowfullscreen="true" frameborder="" height="484" src="https://www.youtube.com/embed/iDd-7trU3VE" width="860"></iframe></p>
+<p data-ke-size="size16">위 팟캐스트 영상를 보고 생각을 정리한 리뷰 입니다. 해당 영상의 댓글로 PDF 자료와 전사본(transcript)을 제공하니 참고해서 보시는 것을 추천합니다.</p>
+<h1>1. MoE</h1>
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>MoE란
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>MoE는 전체 파라미터는 매우 크지만, <b>실제 토큰 생성 시에는 일부 전문가(Expert) 모델만 활성화하여 연산 효율을 극대화</b>하는 아키텍처</li>
+<li><b>Scailing Raw 처럼 Sparcity가 커질수록, Compute Multiplier가 더 커짐</b></li>
+<li>같은 FLOPs를 유지한 채 총 파라미터를 더 키울 수 있음. 이제 MoE가 아닌 모델을 보기 힘들어짐</li>
+<li>10의 24승 FLOPs(연산량) 수준에서 MoE 모델은 일반적인 Dense 모델보다 7배 이상의 효율을 냄</li>
+</ul>
+</li>
+<li>MoE가 왜 좋을까
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>"수학은 이 expert가, 과학은 이 expert가"라는 식으로 생각하기 쉬우나 사실 그렇지 않음<br/>
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>"수학 전문", "과학 전문" 같은 거시적 전공 분담이 아님. 문법적 구조, 문맥, 논리적 연결 등 아주 미세한 Feature 단위로 전문가가 나뉨</li>
+<li>한 문장 안에서도 각 토큰은 서로 다른 전문가 조합을 거치며 결과값을 도출</li>
+<li><b>Router(Gating Network)</b>: 각 토큰이 들어오면 어떤 전문가에게 보낼지 결정하는 역할을 수행</li>
+<li><b>Shared Experts</b>: 모든 토큰이 공통적으로 거치는 expert를 두어 기초적인 범용 지식을 처리. 이는 개별 전문가들이 너무 중복된 학습을 하지 않도록 돕는 장치</li>
+</ul>
+</li>
+<li>결론은 <b>"희소성"</b>
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>모듈화되어 있고, 각각의 모듈 중에서도 일부만 사용</li>
+<li>전체 파라미터는 굉장히 많고 매번 토큰에 따라 다른 모듈을 사용</li>
+<li><b>Top-k Routing</b>: 성능과 비용의 타협점에 따라 몇 개의 전문가를 깨울지 결정하며, 이 숫자가 모델의 핵심적인 성능 지표</li>
+<li>이는 실제 전체 파라미터가 증폭되는 효과가 있음</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>DeepSeek의 영향
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>MoE가 좋은건 알았지만 이정도로 좋을 줄은 몰랐음. <b>"MoE의 레시피를 잘 정립한 것이 DeepSeek의 굉장히 큰 기여"</b></li>
+<li>DeepSeekMoE 아키텍처와 보조 손실 없는(auxiliary-loss-free) 로드 밸런싱 전략을 사용하여 학습 안정성을 확보</li>
+<li>DeepSeek이 설계한 아키텍처가 이전 세대의 Llama 같은 아키텍처가 되어서 그 베이스 아키텍처가 됨</li>
+<li>Moonshot의 Kimi <b>"DeepSeek 아키텍처를 굳이 개선하려고 노력하는 게 불필요하다. 이 아키텍처는 충분히 좋기 때문에 구조를 그대로 끌고 가면 된다."</b></li>
+</ul>
+</li>
+<li>수많은 (오픈) 프론티어 모델이 등장.
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>GPU 1000~2000장 정도로 프론티어 도전이 가능하다고?</li>
+<li>우리도 할 수 있겠는데? 수많은 경쟁자 등장</li>
+<li>DeepSeek, MiniMax, Z.ai, Xiaomi, Tencent, Moonshot, Ant, Alibaba, Meituan 등등</li>
+</ul>
+</li>
+</ul>
+<h1>2. RLVR</h1>
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>RLVR (검증 가능한 보상을 통한 강화학습)
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>LLM의 추론 능력의 향상과 에이전트화. 이는 OpenAI의 o1 모델과 DeepSeek-R1이 주도한 흐름</li>
+<li> ◦ 단순히 정답을 맞히는 것(RFT)보다, RL을 통해 학습했을 때 복잡한 조합 문제(Level 3~4)까지 해결하는 일반화 능력이 생김</li>
+</ul>
+</li>
+<li>RLHF -&gt; RLVR
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>챗봇을 위한 강화학습 -&gt; 에이전트를 위한 강화학습으로 패러다임의 전환</li>
+</ul>
+</li>
+</ul>
+<h2 data-ke-size="size26">2-1. RL 인프라</h2>
+<ul data-ke-list-type="disc" style="list-style-type: disc; color: #333333; text-align: start;">
+<li>RL 인프라의 발전
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>기존 pre-training 인프라 시절에는 학습 인프라가 전부였고, 이를 효율적으로 하는 것 자체도 굉장히 어려운 일임</li>
+<li>LLM RL의 등장으로 이질적인 인프라들이 상호 작용하게 되었음.</li>
+<li>모델 학습, 샘플 생성, 학습과 생성의 전환, 평가와 보상 부여. 이 모든 과정이 정확해야함</li>
+<li>MoE가 주류가 되면서 MoE 모델을 어떻게 안정적으로 RL 학습을 할 것인가도 굉장히 중요</li>
+</ul>
+</li>
+</ul>
+<h2 data-ke-size="size26">2-2. RL에 대한 이해</h2>
+<ul data-ke-list-type="disc" style="list-style-type: disc; color: #333333; text-align: start;">
+<li>RL에 대한 이해
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>RL은 새로운 능력을 부여할 수 있는 건가? 혹은 기존의 능력을 끌어내는 것인가?</li>
+<li>RL이 부여하는 새로운 능력에 대한 아이디어: <b>atomic skill &amp; composition</b></li>
+</ul>
+</li>
+<li>Atomic Skill과 Composition 능력
+<ul data-ke-list-type="disc" style="list-style-type: disc; color: #333333; text-align: start;">
+<li>atomic skill은 pre-training을 통해 학습한다면,<span> </span>이를 조합하는 능력은 RL을 통해서 학습하는 것 같음</li>
+<li>예를 들어, 사칙연산을 pre-training을 통해서 학습하고, RL을 통해<span> </span>순서에 맞게 조합해서 어떤 새로운 문제를 풀 수 있게 해주는 능력을 학습</li>
+</ul>
+</li>
+</ul>
+<h1>3. 다음 단계는?</h1>
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>모두 스케일 업을 원하고 있다
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>큰 규모의 모델은 더 강력한 RLVR과 에이전트 학습을 가능하게 하기 때문
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>Deepseek-R1: 작은 모델로는 잘 안 되는데 더 큰 모델로 하니까 RLVR이 잘 되기 시작했음</li>
+</ul>
+</li>
+<li>pre-trained model 전체 파라미터가 1~2T 수준이여도, 대부분의 모델의 실제 사용되는 파라미터는 100B 이하
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li> 200B, 300B active 파라미터를 가져가면 어떻게 될까?</li>
+</ul>
+</li>
+<li><span style="color: #333333; text-align: start;">pre-trained model이 </span>15T 정도 토큰으로 학습
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>15T 정도 이렇게 된다면 한 50T, 100T 학습을 하면 어떻게 될까?</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>다만, 데이터 수급과 끝없는 롱테일이 제약
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>99%→99.9%로 가는 롱테일 문제</li>
+<li>끊임없이 데이터를 수집해서 조금씩 조금씩 올려 나가야 함.</li>
+<li>그것 자체가 엄청나게 큰 병목인데, 이걸 언제까지 이렇게 할 수 있을까에 대한 의문</li>
+<li>이것이 "지속 학습"에 대한 담론으로 이어짐</li>
+</ul>
+</li>
+</ul>
+<h2 data-ke-size="size26">3-1. 보다 자율적인 에이전트</h2>
+<ul data-ke-list-type="disc" style="list-style-type: disc; color: #333333; text-align: start;">
+<li>에이전트에게 맡겨 놓으면 에이전트가 알아서 코드를 계속 최적화하는 형태
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>현재: 아직도 여전히 채팅 인터페이스에 가까움. 사람이 지시를 하면 그 지시에 따라서 어떤 작업을 하고 다음 지시를 기다림</li>
+<li>미래: 에이전트는 알아서 계속 일을 하고, 그러면 그때그때 결과물, 중간 결과를 보고 사람이 어떤 피드백을 주는 형태</li>
+</ul>
+</li>
+</ul>
+<h2 data-ke-size="size26">3-2. 지속 학습</h2>
+<ul data-ke-list-type="disc" style="list-style-type: disc; color: #333333; text-align: start;">
+<li>계속해서 그냥 데이터를 추가해 준다는 정도를 넘어서, 모델이 알아서 학습하는 것에 가까움</li>
+<li>사람이 각 시나리오에 대해 모두 데이터를 만드는 것이 아닌, 모델이 알아서 그 시나리오에 대해서 데이터를 알아서 만들거나 해서 학습하는 형태</li>
+<li>학습을 할 수 있다는 것 자체가 중요한 게 아님. 그걸 사용해서 <b>실제 상황에 던져졌을 때 필요한 것들을 배우는 능력이 필요</b></li>
+</ul>
+<h2 data-ke-size="size26">3-3. Self-Play</h2>
+<ul data-ke-list-type="disc" style="list-style-type: disc; color: #333333; text-align: start;">
+<li>예시: 알파고가 self-play를 통해서 모델 성능이 향상된 사례
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>그러나 수학이나 에이전트 코딩은 바둑 같은 "zero-sum game"이 아님</li>
+</ul>
+</li>
+<li>정답률 0%나 50% 문제를 만드는 것은 쉬움</li>
+<li><b>흥미로운 문제 (가치가 높은 문제)를 만드는 것은 매우 어려움</b>
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>Self-Play SWE-RL 논문: 모델이 스스로 제거된 코드 복구나 히스토리 기반 버그 같은 문제를 생성하여 학습 데이터를 무한히 확장하는 시도</li>
+<li>최신 담론: "사람과 모델이 정렬되어 있지 않으면 안된다"</li>
+</ul>
+</li>
+</ul>
+<h2 data-ke-size="size26">3-4. 내적 동기, 인간과의 정렬?</h2>
+<ul data-ke-list-type="disc" style="list-style-type: disc; color: #333333; text-align: start;">
+<li>결국 내적 동기, 인간과의 정렬 문제로 수렴</li>
+<li>사람이 보기에 가치 있는 동기를, 가치 있는 것을 추구하는 동기가 모델에 부여되어야함</li>
+</ul>
+<h1 style="color: #000000; text-align: start;"> </h1>
+<h1 style="color: #000000; text-align: start;">느낀점</h1>
+<ul data-ke-list-type="disc" style="list-style-type: disc; color: #333333; text-align: start;">
+<li>2026년 올해는 에이전트가 얼마나 자율적일 수 있느냐가 관전 포인트가 될 것 같음
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>벌써 OpenClaw(Clawdbot)이 세상을 뜨겁게 달군 일이 생겼음</li>
+<li>Antropic에서는 claude cowork를 출시함</li>
+</ul>
+</li>
+<li>기술 관점에서는, "지속 학습"의 가능성이 충분히 보일 것 같음
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>Nemotron paper에서도 데이터를 가공하는데 대부분 Qwen 30B 모델로 가공했다고 함</li>
+<li>현재 오픈 모델들이 데이터 가공에 대해서 굉장히 큰 역할들을 해주고 있음</li>
+<li>결국 점점 더 모델 기반으로 가고 있다는 의미</li>
+<li>누군가 잘 align해준다면 폭발적인 발전을 기대할 수 있지 않을까</li>
+</ul>
+</li>
+</ul>
+{% endraw %}

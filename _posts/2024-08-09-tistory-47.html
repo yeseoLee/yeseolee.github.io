@@ -1,0 +1,407 @@
+---
+layout: post
+title: PyTorch 입문 - Tensor 기본 함수와 연산 이해하기
+date: '2024-08-09T16:17:00+09:00'
+categories:
+- 강의노트
+- 네이버 부스트캠프 AI Tech 7기
+source_url: https://ohge.tistory.com/47
+source_blog: tistory
+permalink: /tistory/47/
+---
+{% raw %}
+<h2 data-ke-size="size26">PyTorch를 위한 배경지식</h2>
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>표본분산</li>
+<li>연속 균등 분포</li>
+<li>표준 정규 분포</li>
+<li>상관 관계</li>
+</ul>
+<h2 data-ke-size="size26">PyTorch 자료형과 Tensor</h2>
+<h3 data-ke-size="size23">Data Type</h3>
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>텐서 생성시 다음과 같이 데이터 타입을 지정할 수 있다.</li>
+<li><code>t = torch.tensor(10.2, dtype=torch.float64)</code></li>
+<li>Type Casting (타입 변환)은 다음과 같다.Tensor</li>
+<li><code>t = t.type(torch.IntTensor) # torch.FloatTensor, torch.DoubleTensor</code></li>
+<li>0D tensor (=Scalar)</li>
+<li>1D tensor (=Vector)</li>
+<li>2D tensor (=Matrix)</li>
+<li>3D tensor</li>
+<li>4,5,6...D tensor</li>
+</ul>
+<h3 data-ke-size="size23">Tensor Basic Functions</h3>
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li><code>min(), max(), sum(), prod(), mean(), var(), std()</code></li>
+<li><code>prod()</code>는 모든 요소의 곱을 반환한다.</li>
+<li><code>var()</code>과 <code>std()</code>는 지정한 차원에 대한 분산과 표준편차를 계산한다.</li>
+</ul>
+<hr data-ke-style="style1"/>
+<h2 data-ke-size="size26">Tensor 생성, 복제, 삭제</h2>
+<h3 data-ke-size="size23">Tensor 생성</h3>
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>직접 생성</li>
+<li><code>t = torch.tensor([[1, 2, 3], [4, 5, 6]])</code></li>
+<li>특정 값을 초기화</li>
+<li><code>t = torch.zeros(5) # (5) 크기의 0로 초기화된 Tensor t = torch.ones([3, 2]) # (3,2) 크기의 1로 초기화된 Tensor</code></li>
+<li>특정 구간으로 초기화</li>
+<li><code># 0에서 10까지 1씩 증가하는 1-D Tensor t = torch.arange(start=0,end=10,step=1) # t.shape: torch.Size([10])</code></li>
+<li>난수로 초기화</li>
+<li><code>torch.rand(size) # 연속 균등 분포를 따르는 난수 Tensor torch.randn(size) # 표준 정규 분포를 따르는 난수 Tensor torch.randint(low,high,size) # [low, high) 범위의 정수 난수 Tensor</code></li>
+</ul>
+<p data-ke-size="size16">torch.rand_like(t) # t와 동일한 형태의 연속 균등 분포 난수 Tensor<br/>torch.randn_like(t) # t와 동일한 형태의 표준 정규 분포 난수 Tensor</p>
+<pre class="angelscript"><code>
+- list, numpy에서 가져오기  
+```python
+s = [1, 2, 3, 4, 5, 6]
+t = torch.tensor(s)
+
+import numpy as np
+s = np.array([[0, 1],[2, 3]])
+v = torch.from_numpy(s)</code></pre>
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>초기화하지 않고 생성<br/>목적: 성능 향상, 메모리 최적화</li>
+</ul>
+<pre class="angelscript"><code>t = torch.empty([2, 4])</code></pre>
+<h3 data-ke-size="size23">Tensor 복제</h3>
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li><code>torch.clone()</code>
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>복사한 텐서를 새로운 메모리에 할당(<code>deepcopy()</code>와 유사)</li>
+<li>기존 계산 그래프를 유지</li>
+<li>e.g. 딥러닝 모델 계산에서 분기를 만드는 경우에 같은 데이터가 서로 다른 layer로 들어갈 때, 이러한 구조의 가독성을 높이기 위해 사용할 수 있음</li>
+</ul>
+</li>
+<li><code>torch.detach()</code>
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>복사 대상 텐서와 메모리를 공유</li>
+<li>gradient 전파가 안되는 텐서 생성 (<code>no_grad()</code> 적용한 텐서와 기능적으로 동일)</li>
+<li>e.g. 딥러닝 모델로 부터 받은 output 값 평가를 위해 특정 메트릭을 적용하여 사용되는 연산에 포함되지 않도록 하기 위해 사용할 수 있음</li>
+</ul>
+</li>
+<li><code>torch.clone().detach()</code>
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>기존 텐서를 복사한 새로운 텐서를 생성하지만 기울기에 영향을 주지는 않겠다는 의미</li>
+</ul>
+</li>
+</ul>
+<h3 data-ke-size="size23">Tensor 삭제(메모리 해제)</h3>
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li><code>torch.cuda.empty_cache()</code> 를 통해 사용되지 않은 GPU상의 cache를 정리</li>
+<li><code>del</code> 함수를 사용하여 메모리에서 해제</li>
+<li><code>torch.cuda.empty_cache() t = torch.tensor(\[\[1, 2, 3\], \[4, 5, 6\]\]) del t</code></li>
+</ul>
+<h2 data-ke-size="size26">Tensor indexing &amp; slicing</h2>
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>1차원 tensor는 python list와 동일하다.</li>
+<li>2차원 tensor 조작은 다음과 같다.</li>
+</ul>
+<pre class="angelscript"><code>t = torch.tensor([[1, 2, 3], [4, 5, 6]])
+
+t[1, 2] # 1행, 2열의 요소에 접근 -&gt; tensor(6)
+t[0, 1:] # 0행, 1열 부터 끝열(2열)까지 -&gt; tensor([2, 3])
+t[:, -2:] # 전체 행, 뒤에서부터 두번째 열(1열) 부터 끝열(2열)까지 -&gt; tensor([[2, 3], [5, 6]])
+t[-1, ...] # 뒤에서부터 첫번째 행(1행), 전체 열 -&gt; tensor([4, 5, 6])</code></pre>
+<hr data-ke-style="style1"/>
+<h2 data-ke-size="size26">Tensor 모양 변경</h2>
+<h3 data-ke-size="size23"><code>contiguous</code> , <code>storage</code>에 대한 이해</h3>
+<pre class="haxe"><code>t = torch.tensor([[1, 2, 3],[4, 5, 6]])
+
+new_t = t[:2, :2] # tensor([[1, 2], [4, 5]])
+new_t.is_contiguous() # False
+new_t_cont = new_t.contiguous()
+new_t_cont.is_contiguous() # True</code></pre>
+<p><figure class="imageblock alignCenter" data-ke-mobilestyle="widthOrigin" data-origin-height="1596" data-origin-width="1460"><span data-phocus="https://blog.kakaocdn.net/dna/Wt3bI/btsI0S4Mhw3/AAAAAAAAAAAAAAAAAAAAAJJCJgdaIfr5VwIEDZCPNJYl8_fIyeWSNQFTLdQ8dKwJ/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&amp;expires=1796050799&amp;allow_ip=&amp;allow_referer=&amp;signature=703D1VHjF93ekTSzVydy8ipj9L0%3D" data-url="https://blog.kakaocdn.net/dna/Wt3bI/btsI0S4Mhw3/AAAAAAAAAAAAAAAAAAAAAJJCJgdaIfr5VwIEDZCPNJYl8_fIyeWSNQFTLdQ8dKwJ/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&amp;expires=1796050799&amp;allow_ip=&amp;allow_referer=&amp;signature=703D1VHjF93ekTSzVydy8ipj9L0%3D"><img data-origin-height="1596" data-origin-width="1460" height="1596" loading="lazy" onerror="this.onerror=null; this.src='//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png'; this.srcset='//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png';" src="/assets/images/42d77ed119fd68875857299b.png" width="1460"/></span></figure>
+</p>
+<p data-ke-size="size16"><code>contiguous()</code>를 사용하면 연속체로 만들어 주는데, 만약 연속체가 아닌 경우 새로운 <code>storage</code>를 만들어 할당한다.</p>
+<h3 data-ke-size="size23"><code>view()</code></h3>
+<p data-ke-size="size16">입력</p>
+<pre class="angelscript"><code>t = torch.tensor([[1, 2, 3],[4, 5, 6]])
+
+print(t.view(1, -1))
+print(t.view(2,-1))
+print(t.view(3, -1))
+print(t.view(6, -1))</code></pre>
+<p data-ke-size="size16">출력</p>
+<pre class="angelscript"><code>tensor([[1, 2, 3, 4, 5, 6]])
+
+tensor([[1, 2, 3],
+        [4, 5, 6]])
+
+tensor([[1, 2],
+        [3, 4],
+        [5, 6]])
+
+tensor([[1],
+        [2],
+        [3],
+        [4],
+        [5],
+        [6]])</code></pre>
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>shape이 [2,3] 인 Tensor 't'에 대해 <code>s = t[:2, :1]</code>일 때, view를 사용해 s의 모양을 변경할 수 있는 이유<br/>PyTorch에서는 텐서의 슬라이스 연산를 통해 생성된 텐서가 메모리 연속성을 유지하고 있다면(슬라이스를 얻는 과정에서 데이터의 순서가 바뀌지 않았다면) 자동으로 메모리에서 연속적인 형태로 다뤄질 수 있다.
+<ol data-ke-list-type="decimal" style="list-style-type: decimal;">
+<li>슬라이스 연산의 연속성 유지: t[:2, :1]과 같은 슬라이스 연산이 메모리에서 연속적인 영역을 참조하는 경우, PyTorch는 이를 자동으로 인식하고 s를 연속적인 텐서로 처리한다.</li>
+<li>데이터의 실제 복사 없음: 슬라이스 연산은 원본 텐서의 데이터를 복사하지 않고 참조만 한다. 원본 텐서가 연속적이었고, 슬라이스된 텐서가 메모리에서 연속적인 영역을 참조하는 경우, 슬라이스된 텐서도 연속성을 가지게 된다. 따라서 view를 사용할 수 있다.<br/>view를 사용하려면 텐서가 연속적이어야 하지만, 슬라이스 연산으로 얻어진 텐서가 메모리에서 연속적인 부분을 참조하고 있다면 PyTorch는 이를 연속적으로 간주한다. 따라서 t[:2, :1]으로 생성된 s가 연속적인 텐서로 다뤄지기 때문에 view를 사용할 수 있다.</li>
+</ol>
+</li>
+<li>정리: <code>view()</code> 메소드를 사용할 수 있는데 <code>is_contiguous()</code> 메소드가 False를 반환하는 이유
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li><code>is_contiguous()</code>는 실제로 메모리 공간에서 인접한가를 판단하는 것이기 때문에 <code>t[0][0]</code>의 다음 원소인<code>t[0][1]</code>은 인접하지만 <code>s1[0][0]</code>의 다음 원소인 <code>s1[1][0]</code>은 인접하지 않다.</li>
+<li><code>view()</code>는 stride(보폭)이 일정하면 연속적으로 참조할 수 있기 때문에 실제로 메모리 공간에서 인접하다면 사용 가능하고, 실제로 인접하지 않더라도 폭이 일정하다면 사용할 수 있다.</li>
+</ul>
+</li>
+</ul>
+<p data-ke-size="size16">입력</p>
+<pre class="stylus"><code>t = torch.tensor([[1, 2, 3], [4, 5, 6]])
+
+s1 = t[:2,:1]
+print(s1)
+print(s1.is_contiguous())
+print(s1.view(1,-1))
+print(t.untyped_storage().data_ptr() == s1.untyped_storage().data_ptr())  </code></pre>
+<p data-ke-size="size16">출력</p>
+<pre class="lua"><code>tensor([[1],
+        [4]])
+False
+tensor([[1, 4]])
+True</code></pre>
+<p data-ke-size="size16">입력</p>
+<pre class="stylus"><code>s2 = t[:, :2]
+print(s2)
+print(s2.is_contiguous())
+print(s2.view(1,-1))
+print(t.untyped_storage().data_ptr() == s2.untyped_storage().data_ptr())</code></pre>
+<p data-ke-size="size16">출력</p>
+<pre class="yaml"><code>
+tensor([[1, 2],
+        [4, 5]])
+False
+RuntimeError: view size is not compatible with input tensor's size and stride
+True</code></pre>
+<h3 data-ke-size="size23"><code>flatten()</code></h3>
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>tensor 평탄화<br/>입력</li>
+<li><code>t = torch.tensor([[1, 2, 3], [4, 5, 6]])</code></li>
+</ul>
+<p data-ke-size="size16">t.flatten() # 또는 torch.flatten(t)</p>
+<pre class="angelscript"><code>
+출력
+``` python
+tensor([1, 2, 3, 4, 5, 6])</code></pre>
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>tensor 특정 차원 평탄화<br/>입력</li>
+<li><code>t = torch.tensor([[[1, 2], [3, 4]], [[5, 6], [7, 8]]])</code></li>
+</ul>
+<p data-ke-size="size16">print(t.flatten(0))<br/>print(t.flatten(1))<br/>print(t.flatten(2))</p>
+<pre class="angelscript"><code>
+출력
+``` python
+
+tensor([1, 2, 3, 4, 5, 6, 7, 8])
+
+tensor([[1, 2, 3, 4],
+        [5, 6, 7, 8]])
+
+tensor([[[1, 2],
+         [3, 4]],
+         [[5, 6],
+         [7, 8]]])</code></pre>
+<h3 data-ke-size="size23"><code>reshape()</code></h3>
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li><code>reshape()</code> vs <code>view()</code><br/><code>view()</code> 메서드와 달리 메모리가 연속적이지 않아도 사용 가능<br/>입력</li>
+</ul>
+<pre class="angelscript"><code>t = torch.tensor([[1, 2, 3], [4, 5, 6]])
+print(t.reshape(1, 6))
+print(t.reshape(3,2))
+print(t.reshape(6, 1))</code></pre>
+<p data-ke-size="size16">출력</p>
+<pre class="angelscript"><code>tensor([[1, 2, 3, 4, 5, 6]])
+tensor([[1, 2],
+        [3, 4],
+        [5, 6]])
+
+tensor([[1],
+        [2],
+        [3],
+        [4],
+        [5],
+        [6]])</code></pre>
+<h3 data-ke-size="size23"><code>transpose()</code></h3>
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>특정한 두 차원의 축을 서로 바꾸는 메서드</li>
+<li><code>t = torch.tensor([[1, 2, 3], [4, 5, 6]]) t.transpose(0,1) &gt;&gt;&gt; tensor([[1, 2], [3, 4], [5, 6]])</code></li>
+</ul>
+<h3 data-ke-size="size23"><code>squeeze()</code> &amp; <code>unsqueeze()</code></h3>
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li><code>squeeze()</code>는 지정한 차원에 대해 크기가 1이라면 축소시키고, 따로 dim을 지정하지 않으면 모든 차원에 대해 수행한다.</li>
+<li><code>unsqueeze()</code>는 지정한 차원에 크기가 1인 차원을 추가하여 확장한다.</li>
+<li><code>t = torch.tensor([[1, 2, 3], [4, 5, 6]]) t.squeeze(dim=1) &gt;&gt;&gt; tensor([[1, 2], [3, 4], [5, 6]])</code></li>
+</ul>
+<h3 data-ke-size="size23">Tensor 결합</h3>
+<h4 data-ke-size="size20"><code>stack()</code></h4>
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>Tensor들을 새로운 차원으로 결합 - 차원의 개수가 증가</li>
+</ul>
+<pre class="angelscript"><code>t1 = torch.zeros(2, 2)
+t2 = torch.ones(2, 2)
+
+t3 = torch.stack([t1, t2], dim=0)
+t4 = torch.stack([t1, t2], dim=1)
+
+print(t3)
+&gt;&gt;&gt; tensor([[[1., 1.],
+     [1., 1.]],
+
+    [[0., 0.],
+     [0., 0.]]])
+
+print(t3.shape)
+&gt;&gt;&gt; torch.Size([2, 2, 2])
+
+print(t4)
+&gt;&gt;&gt; tensor([[[1., 1.],
+     [0., 0.]],
+
+    [[1., 1.],
+     [0., 0.]]])
+
+print(t4.shape)
+&gt;&gt;&gt; torch.Size([2, 2, 2])</code></pre>
+<p><figure class="imageblock alignCenter" data-ke-mobilestyle="widthOrigin" data-origin-height="220" data-origin-width="907"><span data-phocus="https://blog.kakaocdn.net/dna/lnEUg/btsIZQfSFPC/AAAAAAAAAAAAAAAAAAAAAPcZdcunv49NaCSY2jm9_zgJhuV3yw75uhOi9h-ZhSPc/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&amp;expires=1796050799&amp;allow_ip=&amp;allow_referer=&amp;signature=e%2FLUWirFmhcx6pdWf2ib9QZSozc%3D" data-url="https://blog.kakaocdn.net/dna/lnEUg/btsIZQfSFPC/AAAAAAAAAAAAAAAAAAAAAPcZdcunv49NaCSY2jm9_zgJhuV3yw75uhOi9h-ZhSPc/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&amp;expires=1796050799&amp;allow_ip=&amp;allow_referer=&amp;signature=e%2FLUWirFmhcx6pdWf2ib9QZSozc%3D"><img data-origin-height="220" data-origin-width="907" height="220" loading="lazy" onerror="this.onerror=null; this.src='//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png'; this.srcset='//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png';" src="/assets/images/6f10f386847be5a930c5032c.png" width="907"/></span></figure>
+</p>
+<h4 data-ke-size="size20"><code>cat()</code></h4>
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>Tensor들을 주어진 차원에 맞춰 연결 - 개수가 유지되고 해당 차원이 늘어남</li>
+<li><code>dim</code> 옵션에 따라 concat 되는 방향 설정</li>
+</ul>
+<pre class="angelscript"><code>t1 = torch.ones(2, 2)
+t2 = torch.zeros(2, 2)
+
+t3 = torch.cat([t1, t2], dim=0)
+t4 = torch.cat([t1, t2], dim=1)
+
+print(t3)
+&gt;&gt;&gt; tensor([[1., 1.],
+    [1., 1.],
+    [0., 0.],
+    [0., 0.]])
+
+print(t3.shape)
+&gt;&gt;&gt; torch.Size([4, 2])
+
+print(t4)
+&gt;&gt;&gt; tensor([[1., 1., 0., 0.],
+    [1., 1., 0., 0.]])
+
+print(t4.shape)
+&gt;&gt;&gt; torch.Size([2, 4])</code></pre>
+<p><figure class="imageblock alignCenter" data-ke-mobilestyle="widthOrigin" data-origin-height="208" data-origin-width="1009"><span data-phocus="https://blog.kakaocdn.net/dna/bmxeTN/btsIZszHYhi/AAAAAAAAAAAAAAAAAAAAAEEA-4ImTATGLdCq2GP4FRTGMMTi7AMr6y1lkM43YF5k/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&amp;expires=1796050799&amp;allow_ip=&amp;allow_referer=&amp;signature=Pnr3myWRl4KeRlBywCqEk%2FAVy5E%3D" data-url="https://blog.kakaocdn.net/dna/bmxeTN/btsIZszHYhi/AAAAAAAAAAAAAAAAAAAAAEEA-4ImTATGLdCq2GP4FRTGMMTi7AMr6y1lkM43YF5k/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&amp;expires=1796050799&amp;allow_ip=&amp;allow_referer=&amp;signature=Pnr3myWRl4KeRlBywCqEk%2FAVy5E%3D"><img data-origin-height="208" data-origin-width="1009" height="208" loading="lazy" onerror="this.onerror=null; this.src='//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png'; this.srcset='//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png';" src="/assets/images/534a5db11dda8edede10a8a7.png" width="1009"/></span></figure>
+</p>
+<p data-ke-size="size16">이미지 출처: <a href="https://sanghyu.tistory.com/85">https://sanghyu.tistory.com/85</a></p>
+<h3 data-ke-size="size23">Tensor 확장</h3>
+<h4 data-ke-size="size20"><code>expand()</code></h4>
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>주어진 Tensor의 차원 중 일부의 크기가 1일 때, 해당 차원의 크기를 확장<code>repeat()</code></li>
+<li>Tensor의 요소들을 반복하는 방식으로 크기 확장</li>
+</ul>
+<hr data-ke-style="style1"/>
+<h2 data-ke-size="size26">Tensor 연산 1</h2>
+<h3 data-ke-size="size23">기본 연산</h3>
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li><code>add()</code> 더하기</li>
+<li><code>sub()</code> 빼기</li>
+<li><code>mul()</code> 곱하기 (스칼라 또는 요소별 곱)</li>
+<li><code>div()</code> 나누기</li>
+<li><code>pow()</code> 거듭 제곱, 거듭 제곱근</li>
+</ul>
+<h3 data-ke-size="size23">비교 연산</h3>
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li><code>eq(v,w)</code> 대응 요소들이 같은지를 비교</li>
+<li><code>ne(v,w)</code> 대응 요소들이 다른지를 비교</li>
+<li><code>gt(v,w)</code> 텐서 v의 요소들이 텐서 w의 대응 요소들보다 큰지를 비교</li>
+<li><code>ge(v,w)</code> 텐서 v의 요소들이 텐서 w의 대응 요소들보다 크거나 같은지를 비교</li>
+<li><code>lt(v,w)</code> 텐서 v의 요소들이 텐서 w의 대응 요소들보다 작은지를 비교</li>
+<li><code>le(v,w)</code> 텐서 v의 요소들이 텐서 w의 대응 요소들보다 작거나 같은지를 비교</li>
+</ul>
+<h3 data-ke-size="size23">논리 연산</h3>
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li><code>torch.logical_and(x,y)</code> AND(논리곱) 연산</li>
+<li><code>torch.logical_or(x,y)</code> OR(논리합) 연산</li>
+<li><code>torch.logical_xor(x,y)</code> XOR(배타적 논리합) 연산</li>
+</ul>
+<h3 data-ke-size="size23">in-place 연산 vs out-of-place 연산</h3>
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li><code>add_()</code>는 in-place operation 이고 <code>add()</code>는 out-of-place operation이다. in-place는 메모리의 값을 바꿔주고, out-of-place는 연산 결과를 반환한다.</li>
+</ul>
+<h3 data-ke-size="size23">크기가 다른 Tensor 연산</h3>
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>같은 크기가 되도록 확장하여 연산이 이루어짐</li>
+</ul>
+<hr data-ke-style="style1"/>
+<h2 data-ke-size="size26">Tensor 연산 2</h2>
+<h3 data-ke-size="size23">Tensor Norm (노름, 놈)</h3>
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>L1 Norm (Manhatten norm)</li>
+<li>L2 Norm (euclidean norm)</li>
+<li>L∞ Norm (infinite norm)</li>
+</ul>
+<pre class="angelscript"><code>t = torch.tensor([4, 3], dtype=torch.float32)
+torch.norm(t, p=1)
+&gt;&gt;&gt; 7.0
+
+
+t = torch.tensor(\[4, 3\], dtype=torch.float32)  
+torch.norm(t, p=2)
+
+&gt; &gt; &gt; 5.0
+
+t = torch.tensor(\[4, 3\], dtype=torch.float32)  
+torch.norm(t, p=float('inf')) # torch.max(t.abs())와 같음
+
+&gt; &gt; &gt; 4.0</code></pre>
+<h3 data-ke-size="size23">유사도 계산</h3>
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>manhattan similarity (맨해튼 유사도)</li>
+<li>euclidean similarity (유클리드 유사도)</li>
+<li>cosine similarity (코사인 유사도)</li>
+</ul>
+<pre class="makefile"><code>t1 = torch.tensor([1, 0, 2], dtype=torch.float32)
+t2= torch.tensor([0, 1, 2], dtype=torch.float32)
+
+# 맨해튼 유사도
+manhattan_distance = torch.norm(t1 - t2, p = 1)
+manhattan_similarity = 1 / (1 + manhattan_distance)
+manhattan_similarity
+&gt;&gt;&gt; 0.3333333432674408
+
+# 유클리드 유사도
+euclidean_distance = torch.norm(t1 - t2, p = 2)
+euclidean_similarity = 1 / (1 + euclidean_distance)
+euclidean_similarity
+&gt;&gt;&gt; 0.41421353816986084
+
+# 코사인 유사도
+dot_product = torch.dot(t1, t2)
+norm_t1 = torch.norm(t1, p = 2)
+norm_t2 = torch.norm(t2, p = 2)
+cosine_similarity = dot_product / (norm_t1 * norm_t2)
+cosine_similarity
+&gt;&gt;&gt; 0.800000011920929</code></pre>
+<h3 data-ke-size="size23">행렬의 곱셈</h3>
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li><code>matmul()</code>, <code>mm()</code>, <code>@</code></li>
+<li><code>matmul()</code>은 broadcasting을 지원</li>
+<li><code>mm()</code>은 broadcasting을 지원X</li>
+<li>Broadcasting: 텐서 연산을 수행할 때 자동적으로 크기를 맞춰서 연산을 수행하는 기능</li>
+<li>Broadcasting은 의도와 다르게 연산이 동작할 수 있어 주의가 필요하다(<code>mm()</code>이 비교적 안전)</li>
+</ul>
+<pre class="sas"><code>weight = torch.randn(out_features, in_features)
+bias = torch.randn(out_features)
+
+x @ weight.t() + bias
+
+x.matmul(weight.t()) + bias
+
+x.mm(weight.t()) + bias</code></pre>
+{% endraw %}

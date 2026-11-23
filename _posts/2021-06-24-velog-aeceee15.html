@@ -1,0 +1,201 @@
+---
+layout: post
+title: '[Python 알고리즘] python으로 순열과 조합 직접 구현하기'
+date: '2021-06-24T12:35:27.664000+09:00'
+categories:
+- python
+- 알고리즘
+source_url: https://velog.io/@yeseolee/python으로-순열과-조합-직접-구현하기
+source_blog: velog
+permalink: /velog/aeceee15/
+---
+{% raw %}
+<h2>💡 순열과 조합 (combinations, permutations)</h2>
+<h3>📌 순열과 조합의 정의</h3>
+<p>순열: 서로 다른 n개의 원소에서 r개를 중복없이 골라 순서대로 나열하는 경우의 수
+조합: 서로 다른 n개의 원소에서 r개를 뽑는 경우의 수</p>
+<h3>📌 순열 구현</h3>
+<h4>📚 1. 재귀를 이용한 구현 - 원소를 하나씩 뽑아서 수열을 구성하고 출력</h4>
+<pre><code class="language-python">def permutation(arr, r):
+    # 1.
+    arr = sorted(arr)
+    used = [0 for _ in range(len(arr))]
+
+    def generate(chosen, used):
+        # 2.
+        if len(chosen) == r:
+            print(chosen)
+            return
+	
+	# 3.
+        for i in range(len(arr)):
+            if not used[i]:
+                chosen.append(arr[i])
+                used[i] = 1
+                generate(chosen, used)
+                used[i] = 0
+                chosen.pop()
+    generate([], used)
+    
+출처: https://shoark7.github.io/programming/algorithm/Permutations-and-Combinations
+</code></pre>
+<pre><code class="language-python">def printPermutation(number, digit):
+    permutation[digit]=number
+    if(digit==n-1):
+        for i in permutation:
+            print(i,end= ' ')
+        print()
+        return
+    for i in range(1,n+1):
+        if(visited[i]): continue
+        visited[i]=True
+        printPermutation(i,digit+1)
+        visited[i]=False
+
+n=int(input())
+visited=[False for i in range(n+1)]
+permutation=[0]*(n)
+for i in range(1,n+1):
+    visited[i]=True
+    printPermutation(i,0)
+    visited[i]=False
+</code></pre>
+<h4>📚 2. 반복문으로 구현 - 한 배열에서 계속 순서를 바꿔가며 출력</h4>
+<pre><code class="language-python">def permute(arr):
+    result = [arr[:]]
+    c = [0] * len(arr)
+    i = 0
+    while i &lt; len(arr):
+        if c[i] &lt; i:
+            if i % 2 == 0:
+                arr[0], arr[i] = arr[i], arr[0]
+            else:
+                arr[c[i]], arr[i] = arr[i], arr[c[i]]
+            result.append(arr[:])
+            c[i] += 1
+            i = 0
+        else:
+            c[i] = 0
+            i += 1
+    return result
+    
+출처: https://programmers.co.kr/learn/courses/4008/lessons/12836
+</code></pre>
+<h4>📚 3. 제너레이터(yield)를 이용한 구현 - 한 원소를 뽑고 그 원소를 제외한 나머지 배열로 다시 함수 호출</h4>
+<pre><code class="language-python">def permutations_2(array, r):
+    for i in range(len(array)):
+        if r == 1:
+            yield [array[i]]
+        else:
+            for next in permutations_2(array[:i]+array[i+1:], r-1):
+                yield [array[i]] + next
+
+
+출처: https://juhee-maeng.tistory.com/91
+</code></pre>
+<h3>📌 조합 구현</h3>
+<h4>📚 1. 재귀를 이용한 구현</h4>
+<pre><code class="language-python">def combination(arr, r):
+    # 1.
+    arr = sorted(arr)
+    used = [0 for _ in range(len(arr))]
+
+    # 2.
+    def generate(chosen):
+        if len(chosen) == r:
+            print(chosen)
+            return
+
+    	# 3.
+        start = arr.index(chosen[-1]) + 1 if chosen else 0
+        for nxt in range(start, len(arr)):
+            if used[nxt] == 0 and (nxt == 0 or arr[nxt-1] != arr[nxt] or used[nxt-1]):
+                chosen.append(arr[nxt])
+                used[nxt] = 1
+                generate(chosen)
+                chosen.pop()
+                used[nxt] = 0
+    generate([])
+    
+출처: https://shoark7.github.io/programming/algorithm/Permutations-and-Combinations
+</code></pre>
+<h4>📚 2. 제너레이터(yield)를 이용한 구현</h4>
+<pre><code class="language-python">def combinations_2(array, r):
+    for i in range(len(array)):
+        if r == 1: # 종료 조건
+            yield [array[i]]
+        else:
+            for next in combinations_2(array[i+1:], r-1):
+                yield [array[i]] + next
+
+
+출처: https://juhee-maeng.tistory.com/91
+</code></pre>
+<h3>📌 순열과 조합 라이브러리</h3>
+<p>👉 입력</p>
+<pre><code class="language-python">import itertools
+
+pool = ['A', 'B', 'C']
+import itertools
+pool = ['A', 'B', 'C']
+print(list(map(''.join, itertools.permutations(pool)))) # 3개의 원소로 수열 만들기
+print(list(map(''.join, itertools.permutations(pool, 2)))) # 2개의 원소로 수열 만들기
+print(list(map(''.join, itertools.combinations(pool,2)))) # 2개의 원소로 수열 만들기
+</code></pre>
+<p>👉 출력</p>
+<pre><code>['ABC', 'ACB', 'BAC', 'BCA', 'CAB', 'CBA']
+['AB', 'AC', 'BA', 'BC', 'CA', 'CB']
+['AB', 'AC', 'BC']
+</code></pre>
+<p>👉 메소드 소스</p>
+<pre><code class="language-python">def permutations(iterable, r=None):
+    # permutations('ABCD', 2) --&gt; AB AC AD BA BC BD CA CB CD DA DB DC
+    # permutations(range(3)) --&gt; 012 021 102 120 201 210
+    pool = tuple(iterable)
+    n = len(pool)
+    r = n if r is None else r
+    if r &gt; n:
+        return
+    indices = list(range(n))
+    cycles = list(range(n, n-r, -1))
+    yield tuple(pool[i] for i in indices[:r])
+    while n:
+        for i in reversed(range(r)):
+            cycles[i] -= 1
+            if cycles[i] == 0:
+                indices[i:] = indices[i+1:] + indices[i:i+1]
+                cycles[i] = n - i
+            else:
+                j = cycles[i]
+                indices[i], indices[-j] = indices[-j], indices[i]
+                yield tuple(pool[i] for i in indices[:r])
+                break
+        else:
+            return
+</code></pre>
+<pre><code class="language-python">def combinations(iterable, r):
+    # combinations('ABCD', 2) --&gt; AB AC AD BC BD CD
+    # combinations(range(4), 3) --&gt; 012 013 023 123
+    pool = tuple(iterable)
+    n = len(pool)
+    if r &gt; n:
+        return
+    indices = list(range(r))
+    yield tuple(pool[i] for i in indices)
+    while True:
+        for i in reversed(range(r)):
+            if indices[i] != i + n - r:
+                break
+        else:
+            return
+        indices[i] += 1
+        for j in range(i+1, r):
+            indices[j] = indices[j-1] + 1
+        yield tuple(pool[i] for i in indices)
+</code></pre>
+<h3>📌 참고: yield란?</h3>
+<p>return 대신 사용하면 함수가 제너레이터를 반환한다.
+값을 밖으로 전달하고 대기하는 상태를 반복하며, 함수를 호출해도 함수 내에 있는 코드들이 실행되지 않고 제너레이터 객체를 반환하고, 코드는 실제로 for 루프로 제너레이터를 돌 때 실행된다. 자세한 설명은 아래 링크를 참고하면 된다.
+https://dojang.io/mod/page/view.php?id=2412</p>
+
+{% endraw %}

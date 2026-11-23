@@ -1,0 +1,163 @@
+---
+layout: post
+title: Numpy로 직접 구현하는 Linear Regression
+date: '2024-08-18T14:18:15+09:00'
+categories:
+- 강의노트
+- 네이버 부스트캠프 AI Tech 7기
+source_url: https://ohge.tistory.com/51
+source_blog: tistory
+permalink: /tistory/51/
+---
+{% raw %}
+<h2 data-ke-size="size26">Regression</h2>
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>회귀 분석: 관찰된 연속형 변수들에 대해 두 변수 사이의 모형을 구한 뒤 적합도를 측정하는 분석 방법</li>
+<li>변수: 값이 변하는 데이터 요소 또는 속성
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>독립변수(설명변수) : 원인(x, input)</li>
+<li>종속변수(응답변수): 결과(y, output)</li>
+</ul>
+</li>
+</ul>
+<h2 data-ke-size="size26">Linear Regression</h2>
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li><b>독립 변수 하나 이상 + 종속 변수 하나 의 관계를 모델링</b>하는 통계적 방법</li>
+<li>$y=mx+b$</li>
+<li>가정
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>선형성: 종속 변수와 독립 변수간의 관계가 선형적</li>
+<li>독립성: 관측값들은 서로 독립적 (잔차(<b>residual, 오차의 추정치</b>)들이 무작위 분포)</li>
+<li>등분산성: 오류의 분산이 일정 (잔차들이 일정한 분포를 보임)</li>
+<li>정규성: 오류가 정규분포를 따름</li>
+</ul>
+</li>
+</ul>
+<h2 data-ke-size="size26">최소 제곱법(OLS) 방법</h2>
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>예측된 값 $\hat{y} = Xw$와 실제 값 y 사이의 차이(잔차)를 최소화하는 가중치 벡터 $w$를 찾는 closed-form solution이다.</li>
+<li>선형회귀모델의 파라미터를 추정하는 방법 중 하나로, 다른 방식으로는 WLS(weighted least squares), GLS(generalized least squares), LASSO, Ridge 등이 있다.<br/>$$Cost(mb) = \sum(y_i - (mx_i +b))^2$$</li>
+</ul>
+<p data-ke-size="size16">$$L(w) = ||y-Xw||^2 $$<br/>$$\frac{\partial L(w)}{\partial w} = -2X^T(y - Xw)$$<br/>$$ X^T X w = X^T y$$<br/>$$w = \left(X^T X\right)^{-1} X^T y$$<br/>이렇게 마지막으로 구한 식은 <b>정규방정식(Normal Equation)</b>이라 불리며, 다음과 같은 형태로 잘 알려져 있다.<br/>$$ \beta = (X^TX)^{-1}X^Ty $$ numpy 코드로 구현하면 다음과 같다.</p>
+<pre class="gauss"><code>import numpy as np
+beta = np.linalg.inv(X.T.dot(X)).dot(X.T).dot(y)</code></pre>
+<h2 data-ke-size="size26">모델 평가 지표</h2>
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>펑균 절대 오차(MAE)
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>해석이 간단하고 단위가 종속 변수와 동일<br/>$$MAE = \frac{1}{n}\sum_{i=1}^{n}(y_i-\hat{y}_i)$$</li>
+</ul>
+</li>
+<li>평균 제곱 오차(MSE)
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>제곱하므로 큰 오차에 더 큰 패널티 부여하여 큰 오차를 줄이는데 유용<br/>$$MSE = \frac{1}{n}\sum_{i=1}^{n}(y_i-\hat{y}_i)^2$$</li>
+</ul>
+</li>
+<li>제곱근 평균 제곱 오차(RMSE)
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>해석이 용이하고 큰 오차에 민감하게 반응함과 동시에 실제 값과 같은 단위<br/>$$RMSE = \sqrt{\frac{1}{n}\sum_{i=1}^{n}(y_i-\hat{y}_i)^2}$$</li>
+</ul>
+</li>
+<li>결정계수($R^2$, Coefficient of Determination)
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>모델이 종속 변수의 변동성을 얼마나 설명하는지 나타냄</li>
+<li>0~1 사이 값을 가지며 1에 가까울수록 x와 y는 완변한 선형 상관관계를 이룸</li>
+</ul>
+</li>
+</ul>
+<p data-ke-size="size16">$$ R^2 = \frac{SSR}{SST} = 1 - \frac{SSE}{SST}$$</p>
+<p data-ke-size="size16">(총 변동 SST = 설명 가능한 변동 SSR + 설명 불가능한 변동 SSE)</p>
+<p data-ke-size="size16">$$R^2 = 1 - \frac{\sum_{i=1}^{n}(y_i - \hat{y}_i)^2}{\sum_{i=1}^{n}(y_i - \bar{y}_i)^2}$$</p>
+<h2 data-ke-size="size26">Numpy로 Linear Regression 코드 구현</h2>
+<h3 data-ke-size="size23">Iris Data 불러오기</h3>
+<pre class="angelscript"><code>from sklearn.datasets import load_iris
+from sklearn.model_selection import train_test_split
+import numpy as np
+
+iris = load_iris() # iris 데이터
+X = iris.data[:, [0]] # 특성 데이터에서 첫 번째 특성만 사용
+y = iris.data[:, 2] # 타겟 데이터로 세 번째 특성 사용
+
+# 학습-테스트 데이터 분리
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+X_train = np.array(X_train).reshape(-1, 1)
+y_train = np.array(y_train)
+X_test = np.array(X_test).reshape(-1, 1)
+y_test = np.array(y_test)
+
+print(X_train.shape, y_train.shape)
+print(X_test.shape, y_test.shape)
+
+&gt;&gt;&gt; (120, 1) (120,)
+&gt;&gt;&gt; (30, 1) (30,)</code></pre>
+<h3 data-ke-size="size23">Linear Regression</h3>
+<pre class="haskell"><code>class LinearRegression:
+    def __init__(self):
+        self.weights = None
+        self.bias = None
+
+    def fit(self, X, y):
+        # X에 절편(bias) 추가
+        X = np.hstack((np.ones((X.shape[0], 1)), X))
+        # 최소제곱법(OLS)로 구한 정규 방정식(Normal Equation)
+        beta = np.linalg.inv(X.T.dot(X)).dot(X.T).dot(y)
+        self.weights = beta[0]
+        self.bias = beta[1]
+
+    def predict(self, X):
+        # X에 절편 추가
+        X = np.hstack((np.ones((X.shape[0], 1)), X))
+        # 학습한 가중치와 바이어스로 y = Wx+b 예측값 반환
+        y_pred = X.dot(np.hstack((self.weights, self.bias)))
+        return y_pred
+
+model = LinearRegression()
+model.fit(X_train, y_train)
+predictions = model.predict(X_test)</code></pre>
+<h3 data-ke-size="size23">평가지표</h3>
+<pre class="properties"><code>def mean_squared_error(y_true, y_pred):
+    squared_errors = np.square(y_true - y_pred)
+    mse = np.mean(squared_errors)
+
+    return mse
+
+def r_squared(y_true, y_pred):
+    mean_y_true = np.sum(y_true) / len(y_true)
+    tss = np.sum(np.square(y_true - mean_y_true))
+    rss = np.sum(np.square(y_true - y_pred))
+    r2 = 1 - (rss / tss)
+
+    return r2
+
+# 직접 구현
+MSE = mean_squared_error(y_test, predictions)
+r2 = r_squared(y_test, predictions)
+MSE, r2
+
+&gt;&gt;&gt; (0.5960765879745361, 0.8181245472591383)
+
+from sklearn.metrics import mean_squared_error
+from sklearn.metrics import r2_score
+
+# sklearn metric 함수와 비교
+MSE_sklearn = mean_squared_error(y_test, predictions)
+r2_sklearn = r2_score(y_test, predictions)
+MSE_sklearn,r2_sklearn
+
+&gt;&gt;&gt; (0.5960765879745361, 0.8181245472591383)</code></pre>
+<h3 data-ke-size="size23">시각화</h3>
+<pre class="routeros"><code>import matplotlib.pyplot as plt
+
+plt.scatter(X_test, y_test, label='Data')
+plt.plot(X_test, predictions, color="r", label="Regression Line")
+
+for i in range(len(X_test)):
+    plt.plot([X_test[i], X_test[i]], [y_test[i], predictions[i]], color='gray', linestyle='--', linewidth=0.5)
+
+plt.title('Iris Linear Regression')
+plt.legend()
+plt.show()</code></pre>
+<p><figure class="imageblock alignCenter" data-ke-mobilestyle="widthOrigin" data-origin-height="0" data-origin-width="0"><span data-phocus="https://blog.kakaocdn.net/dna/lPGjM/btsI7Ia1utq/AAAAAAAAAAAAAAAAAAAAAKNAy0KE2iCx54LXwxYNbhcOlGb5ic4jHdpmknFuS2Rr/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&amp;expires=1796050799&amp;allow_ip=&amp;allow_referer=&amp;signature=kQAU%2FR1aHjLCcZLtMUALXeTXqX8%3D" data-url="https://blog.kakaocdn.net/dna/lPGjM/btsI7Ia1utq/AAAAAAAAAAAAAAAAAAAAAKNAy0KE2iCx54LXwxYNbhcOlGb5ic4jHdpmknFuS2Rr/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&amp;expires=1796050799&amp;allow_ip=&amp;allow_referer=&amp;signature=kQAU%2FR1aHjLCcZLtMUALXeTXqX8%3D"><img data-origin-height="0" data-origin-width="0" loading="lazy" onerror="this.onerror=null; this.src='//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png'; this.srcset='//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png';" src="/assets/images/eb4f8604262f032a770c6a89.png"/></span></figure>
+</p>
+{% endraw %}

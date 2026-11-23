@@ -1,0 +1,171 @@
+---
+layout: post
+title: 정형 데이터 전처리
+date: '2024-08-23T14:56:46+09:00'
+categories:
+- 강의노트
+- 네이버 부스트캠프 AI Tech 7기
+source_url: https://ohge.tistory.com/53
+source_blog: tistory
+permalink: /tistory/53/
+---
+{% raw %}
+<h1>정형 데이터</h1>
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>범주형 데이터: 순서형 / 명목형</li>
+<li>수치형 데이터: 이산형 / 연속형</li>
+</ul>
+<h3 data-ke-size="size23">대푯값</h3>
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>평균 / 총합</li>
+<li>기댓값 (가중평균)</li>
+<li>최빈값</li>
+<li>중앙값</li>
+<li>사분위값</li>
+<li>절사평균</li>
+</ul>
+<h2 data-ke-size="size26">1. 범주형 데이터</h2>
+<p data-ke-size="size16">집단 간 분석에 용이한 데이터</p>
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>명목형 데이터
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>순서 상관없이 항목으로 구분</li>
+</ul>
+</li>
+<li>순서형 데이터
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>각 값이 우위 등 순서가 존재</li>
+<li>(수치형과 헷갈린다면 산술 연산이 적용되는지 확인)</li>
+<li>e.g. 별점 4점은 별점 2점보다 2배 좋은가?</li>
+</ul>
+</li>
+</ul>
+<h3 data-ke-size="size23">명목형 데이터 전처리</h3>
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li><b>Label Encoding</b>
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li><code>sklearn.preprocessing.OrdinalEncoder()</code></li>
+<li>없는 레이블에 대해 미리 전처리 필요</li>
+<li><code>[0,1,2]</code> 등으로 라벨링 한다면 자체적인 순서 발생</li>
+</ul>
+</li>
+<li><b>One-Hot Encoding</b>
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li><code>sklearn.preprocessing.OneHotEncoder()</code></li>
+<li>다수 범주가 동시에 포함될 수 있는 경우에도 효율적인 인코딩</li>
+<li>변수에 따라 데이터가 커질 수 있어 학습 속도와 퀄리티에 악영향
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>빈도 기반 범주를 일부 줄이기, 데이터 증강 등을 사용할 수 있음</li>
+<li>그러나 이것 역시 long-tail 데이터에 대한 학습 퀄리티 악화될 수 있음</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><b>Binary Encoding</b>
+<ol data-ke-list-type="decimal" style="list-style-type: decimal;">
+<li>레이블링을 우선한다. <code>(0,1,2,3...)</code></li>
+<li>이를 이진수로 변환한다. <code>(000, 001, 010, ... 111)</code></li>
+<li>이를 컬럼 데이터로 변환한다 <code>[0, 0, 0] [0, 0, 1]</code><br/>범주의 개수가 k개 일때 k &lt; 2^N 을 만족하는 최소 N만큼의 컬럼 생성</li>
+</ol>
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>Pros: 순서 정보를 없애며, 개수가 많은 범주에 대해 효과적</li>
+<li>Cons: 범주의 의미가 거의 사라짐</li>
+</ul>
+</li>
+<li><b>Embedding</b>
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>자연어 처리에 있어 적절한 임베딩 모델을 사용</li>
+</ul>
+</li>
+<li><b>Hashing</b>
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>랜덤 해시 값 사용으로 순서 정보를 없앰</li>
+</ul>
+</li>
+<li><b>특정 값에 따른 인코딩</b>
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>해당 범주가 가진 통계값의 사용</li>
+<li>예시로 빈도수로 한다면 여자가 30명, 남자가 70명 이라면 =&gt; <code>[여자,남자] =&gt; [30,70]</code></li>
+<li>표본집단의 통계량과 모집단 다른 경우 치명적</li>
+<li>캐글 등에서 테크닉으로 사용할 수 있지만 범용적으로 사용하기엔 어려움</li>
+</ul>
+</li>
+</ul>
+<h3 data-ke-size="size23">순서형 데이터</h3>
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>순서형 데이터</li>
+<li>순환형 데이터</li>
+</ul>
+<hr data-ke-style="style1"/>
+<h2 data-ke-size="size26">2. 수치형 데이터</h2>
+<p data-ke-size="size16">구분 1</p>
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>이산형 데이터: 띄엄띄엄한 정수 형태</li>
+<li>연속형 데이터: 연속적인 실수 형태<br/>구분 2</li>
+<li>구간형 데이터: 구간의 값이 중요 (온도, 시간)</li>
+<li>비율형 데이터: 원점과의 거리가 중요 (인구수, 횟수, 밀도)</li>
+</ul>
+<h3 data-ke-size="size23">데이터에 대한 해석</h3>
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>왜도 (skewness)</li>
+<li>첨도 (Kurtosis)</li>
+<li>형태</li>
+</ul>
+<h3 data-ke-size="size23">정규화와 표준화</h3>
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>정규화(Normalization)
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>데이터 범위를 <code>[0,1]</code> 또는 <code>[-1,1]</code>과 같은 특정 범위로 변환</li>
+<li>모든 값에 최솟값을 빼주고, 최댓값에서 최솟값을 뺀 값으로 나눠준다.</li>
+</ul>
+</li>
+<li>표준화(Standardization)
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>데이터의 평균을 0, 표준편차를 1로 만들어, 데이터를 표준 정규 분포 형태로 변환</li>
+<li>각 값에서 평균을 빼주고 표준편차로 나눠준다.</li>
+</ul>
+</li>
+</ul>
+<h3 data-ke-size="size23">비대칭도 (Skewness)</h3>
+<p><figure class="imageblock alignCenter" data-ke-mobilestyle="widthOrigin" data-origin-height="231" data-origin-width="600"><span data-phocus="https://blog.kakaocdn.net/dna/q6ijr/btsJekfRpKF/AAAAAAAAAAAAAAAAAAAAAFIBXpGOSBtGUiac2OEtu-xHShsQSrLWyhaqmSl7YzVN/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&amp;expires=1796050799&amp;allow_ip=&amp;allow_referer=&amp;signature=u6KKVYSXQPQTOrLOjAEhOYhBlMQ%3D" data-url="https://blog.kakaocdn.net/dna/q6ijr/btsJekfRpKF/AAAAAAAAAAAAAAAAAAAAAFIBXpGOSBtGUiac2OEtu-xHShsQSrLWyhaqmSl7YzVN/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&amp;expires=1796050799&amp;allow_ip=&amp;allow_referer=&amp;signature=u6KKVYSXQPQTOrLOjAEhOYhBlMQ%3D"><img data-origin-height="231" data-origin-width="600" height="231" loading="lazy" onerror="this.onerror=null; this.src='//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png'; this.srcset='//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png';" src="/assets/images/2e1d8817f4a05409853fb0fb.png" width="600"/></span></figure>
+</p>
+<p data-ke-size="size16">이미지 출처: <a href="https://en.wikipedia.org/wiki/Skewness">https://en.wikipedia.org/wiki/Skewness</a></p>
+<ol data-ke-list-type="decimal" style="list-style-type: decimal;">
+<li>오른쪽으로 치우친 데이터 (<b>Negative Skew</b>)
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>큰 값의 구간을 작은 값보다 더 효과적으로 작게 만들기
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li><b>Square/Power Transformation</b>: 제곱 변환 또는 거듭 제곱</li>
+<li><b>Exponential Transformation</b>: 지수 함수</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>왼쪽으로 치우친 데이터 (<b>Positive Skew</b>)
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>작은 값의 구간을 큰 값보다 더 효과적으로 크게 만들기
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li><b>Log Transformation</b>: 로그 (조건: 0 이상 실수)</li>
+<li><b>Square-root Transformation</b>: 제곱근 (조건: 양수)</li>
+<li><b>Box-Cox Transformation</b>: 범용적인 Log Transformation 변형 방법론</li>
+</ul>
+</li>
+</ul>
+</li>
+</ol>
+<h3 data-ke-size="size23">Box-Cox Transformation</h3>
+<p data-ke-size="size16">$$
+f(x) =
+\begin{cases}
+\frac{x^\lambda - 1}{\lambda} &amp; \text{if } \lambda \neq 0 \
+\log(x) &amp; \text{if } \lambda = 0
+\end{cases}
+$$</p>
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>0인 경우, Log 변환</li>
+<li>0.5인 경우, 제곱근 변환</li>
+<li>1인 경우, 유지</li>
+<li>-1인 경우. 역수 변환</li>
+</ul>
+<hr data-ke-style="style1"/>
+{% endraw %}

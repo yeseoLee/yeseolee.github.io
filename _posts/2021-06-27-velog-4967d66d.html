@@ -1,0 +1,74 @@
+---
+layout: post
+title: '[Python 자료구조] 우선순위 큐(Priority Queue)'
+date: '2021-06-27T16:18:27.926000+09:00'
+categories:
+- python
+- 자료구조
+source_url: https://velog.io/@yeseolee/python-자료구조-우선순위-큐Priority-Queue
+source_blog: velog
+permalink: /velog/4967d66d/
+---
+{% raw %}
+<h2>💡 우선순위 큐 (Priority Queue)</h2>
+<h3>📌 우선순위 큐</h3>
+<p>가장 우선순위가 높은 데이터를 삭제하는 자료구조
+스텍이나 큐는 데이터를 입력 순서에 따라 꺼내어 사용하지만,
+우선순위 큐는 입력 순서에 상관없이 우선순위에 따라 작동한다.</p>
+<p>따라서 값이 입력되고 삭제될 때마다 자료구조가 내부적으로 정렬해줘야 하기 때문에, 구현방법과 시간 복잡도에서 차이가 있다.</p>
+<h4>📚구현방법</h4>
+<p>리스트나 힙으로 구현할 수 있다.
+리스트는 삽입 <code>O(1)</code> 삭제 <code>O(N)</code> 의 복잡도를 가지지만,
+힙은 삽입 <code>O(logN)</code> 삭제 <code>O(logN)</code> 의 복잡도를 가진다.
+(그래서 우선순위 큐는 보통 힙으로 구현하고, 시간복잡도도 힙으로 구현한 시간복잡도를 사용한다.)
+자세한 구현방법은 다루지 않겠다. 힙(Heap)에 대한 내용을 참고하면 좋겠다.</p>
+<h4>📚시간 복잡도</h4>
+<p>스텍이나 큐는 삽입과 삭제에서 <code>O(1)</code>의 성능을 보이지만,
+우선순위 큐는 삽입과 삭제에서 <code>O(logN)</code>의 성능을 보인다.</p>
+<h3>📌 우선순위 큐 사용법</h3>
+<p>📚 클래스 불러오기</p>
+<pre><code class="language-python">from queue import PriorityQueue
+</code></pre>
+<p>📚 우선순위 큐 생성 (Priority Queue는 내부적으로 heap 모듈을 사용함)</p>
+<pre><code class="language-python">que = PriorityQueue()
+limitedQue = PriorityQueue(maxsize=10) #크기 제한이 있는 우선순위 큐
+</code></pre>
+<p>📚 원소 삽입 - 정수</p>
+<pre><code class="language-python">que.put(item)
+que.put(1)
+que.put(2)
+</code></pre>
+<p>📚 원소 삽입 - 튜플 (우선순위,값)</p>
+<pre><code class="language-python">que.put((priority, item))
+que.put((2,'hello'))
+que.put((1,'world'))
+</code></pre>
+<p>📚 원소 삭제 및 반환 -&gt; 크기 순서대로 삭제됨</p>
+<pre><code class="language-python">print(que.get())
+print(que,get()[1]) # tuple에서 값 반환
+</code></pre>
+<h3>📌 예시- BOJ 1715 카드 정렬하기</h3>
+<p><img alt="BOJ1715문제" src="/assets/images/91ed455e2678463d3705ceed.png"/>
+<img alt="BOJ1715입출력예시" src="/assets/images/8821736eec496317d369e18b.png"/></p>
+<p>가장 작은 값 두 개를 꺼내서 더하고 다시 집어넣은 후, 그 비용을 저장한다. 새로 넣은 값과 나머지 값들 중 다시 가장 작은 값을 두 개 꺼내서 더하는 과정을 반복하면 가장 최소 비용이 구해진다.
+결국 모든 값을 한 번씩 더해야 하고 먼저 더해진 비용은 반복되기 때문에 최소인 값을 우선적으로 더해가면 된다.</p>
+<pre><code class="language-python">import sys
+from queue import PriorityQueue
+n=int(sys.stdin.readline())
+que = PriorityQueue()
+for i in range(n):
+    que.put(int(sys.stdin.readline()))
+
+cnt=0
+while(1):
+    if(que.qsize()==1):
+        break
+    a=que.get()
+    b=que.get()
+    cnt+=(a+b)
+    que.put(a+b)
+
+print(cnt)
+</code></pre>
+
+{% endraw %}

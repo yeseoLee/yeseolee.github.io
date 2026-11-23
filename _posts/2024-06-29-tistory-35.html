@@ -1,0 +1,95 @@
+---
+layout: post
+title: '[강의노트] 02-3 Text Preprocessing - Part 3'
+date: '2024-06-29T22:33:35+09:00'
+categories:
+- 강의노트
+- Text Analytics (강필성 교수님)
+source_url: https://ohge.tistory.com/35
+source_blog: tistory
+permalink: /tistory/35/
+---
+{% raw %}
+<blockquote data-ke-style="style1"><p data-ke-size="size16"><span style="font-family: 'Noto Serif KR';"><p>위 강의노트는 고려대학교 산업경영공학부 대학원 강필성 교수님의<br/><a href="https://www.youtube.com/playlist?list=PLetSlH8YjIfVzHuSXtG4jAC2zbEAErXWm">비정형데이터분석 (Text Analytics)</a> 을 듣고 정리한 강의노트입니다.</p>
+</span></p></blockquote><h1>Syntax Analysis (구문 분석)</h1>
+<h3>Syntax Analysis</h3>
+<ul>
+<li>형식 문법의 규칙을 따르는 위계구조/형태/문장구조를 분석하는 과정</li>
+</ul>
+<h3>Parser</h3>
+<ul>
+<li>입력 문자열을 특정한 문법에 걸맞게 변환(파악)하는 알고리즘</li>
+<li><strong>Directionality(방향성)</strong><br/>e.g.) top-down / bottom-up</li>
+<li><strong>Search strategy(탐색전략)</strong><br/>e.g.) depth-first, breadth-first</li>
+</ul>
+<h3>Parsing Representation</h3>
+<ul>
+<li>Tree vs List<br/><img alt="" src="/assets/images/6656b9f0fe23ef252f201f27.png"/></li>
+<li>Meaning<ul>
+<li>문장 S는 명사절 NP와 동사절 VP로 구성된다.</li>
+<li>명사절은 이름(John)을 가진다.</li>
+<li>동사절은 동사(ate) 과 다른 명사절을 가진다.</li>
+<li>다른 명사절은 관사(the)와 명사(apple)을 가진다.</li>
+</ul>
+</li>
+</ul>
+<h3>Ambiguity</h3>
+<ul>
+<li>Lexical ambiguity (어휘적 모호성)<ul>
+<li>하나의 같은 단어가 서로 다른 형태소(품사)로 사용됨</li>
+<li>어휘적 모호성이 구조적 모호성(structural ambiguity)을 야기함</li>
+<li><figure class="imageblock alignCenter" data-ke-mobilestyle="widthOrigin" data-origin-height="940" data-origin-width="1948"><span data-phocus="https://blog.kakaocdn.net/dna/b7ohqD/btsIiPua9QZ/AAAAAAAAAAAAAAAAAAAAALfFOyVMWWzLOnduCq5neBcpf-uzgNuT5VcIWjjSVPXz/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&amp;expires=1796050799&amp;allow_ip=&amp;allow_referer=&amp;signature=j0j3FgaPsQGqII%2F1Mo0pzMV1GJU%3D" data-url="https://blog.kakaocdn.net/dna/b7ohqD/btsIiPua9QZ/AAAAAAAAAAAAAAAAAAAAALfFOyVMWWzLOnduCq5neBcpf-uzgNuT5VcIWjjSVPXz/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&amp;expires=1796050799&amp;allow_ip=&amp;allow_referer=&amp;signature=j0j3FgaPsQGqII%2F1Mo0pzMV1GJU%3D"><img data-origin-height="940" data-origin-width="1948" height="940" loading="lazy" onerror="this.onerror=null; this.src='//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png'; this.srcset='//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png';" src="/assets/images/c7a710a95b8eef135b6bcb56.png" width="1948"/></span></figure>
+</li>
+</ul>
+</li>
+<li>Structural ambiguity (구조적 모호성)<ul>
+<li>하나의 문장이 다른 방식으로 이해될 수 있음</li>
+<li>품사를 전부 동일하게 태깅되지만 다른 의미로 해석됨</li>
+<li><figure class="imageblock alignCenter" data-ke-mobilestyle="widthOrigin" data-origin-height="1448" data-origin-width="2016"><span data-phocus="https://blog.kakaocdn.net/dna/c6W0lv/btsIizru0Ki/AAAAAAAAAAAAAAAAAAAAADku4aV5ozUoD9ycnFHCy3RuSajzKTe4hK35HrPOHwXI/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&amp;expires=1796050799&amp;allow_ip=&amp;allow_referer=&amp;signature=BlUzR9td0m7wLAcFLGQr1puWZeA%3D" data-url="https://blog.kakaocdn.net/dna/c6W0lv/btsIizru0Ki/AAAAAAAAAAAAAAAAAAAAADku4aV5ozUoD9ycnFHCy3RuSajzKTe4hK35HrPOHwXI/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&amp;expires=1796050799&amp;allow_ip=&amp;allow_referer=&amp;signature=BlUzR9td0m7wLAcFLGQr1puWZeA%3D"><img data-origin-height="1448" data-origin-width="2016" height="1448" loading="lazy" onerror="this.onerror=null; this.src='//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png'; this.srcset='//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png';" src="/assets/images/26f3414febce7f9dd4faeb48.png" width="2016"/></span></figure>
+</li>
+</ul>
+</li>
+</ul>
+<h1>Other Topics in NLP</h1>
+<h2>Language Modeling (언어 모델링)</h2>
+<h3>Probabilistic Language Model</h3>
+<ul>
+<li>문장에 확률을 부여 (확률이 POS tag가 아닌 문장 자체에 부여됨)</li>
+<li>문장이나 단어의 시퀀스가 주어졌을 때 얼마나 그럴듯한지(확률)을 결합확률분포를 통해 측정<br/>$P(W) = P(w_{1},w_{2},w_{3}, ..., w_{n})$</li>
+<li>연관된 task: 뒤에 올 단어의 확률 계산 (조건부확률)</li>
+<li>$P(W)$ 계산: <strong>Chain Rules</strong> of Probability를 통해 Decompose<br/>$P(w_{1},w_{2},w_{3}, ..., w_{n}) = P(w_{1})P(w_{2}|w_{1})P(w_{3}|w_{1},w_{2})...P(w_{n}|w_{1},...,w_{n-1})$</li>
+</ul>
+<h3>Applications</h3>
+<ul>
+<li>Machine Translation(기계 번역)<br/>e.g.) high wind tonight가 large wind tonight 보다 확률이 높음</li>
+<li>Spell correction (오탈자 교정)<br/>더 확률이 높은 문장으로 교체</li>
+<li>Speech recognition (음성 인식)<br/>e.g.) P(I saw a van) &gt;&gt; (eyes awe of an) 발음은 비슷하나 확률이 다름</li>
+<li>Summarization, question-answering, etc...</li>
+</ul>
+<h3>Markov Assumption</h3>
+<ul>
+<li>$P(w_{n}|w_{1},w_{2},w_{3}, ..., w_{n-1})$에서 n이 커질수록 조건에 해당하는 부분의 계산이 어려워짐</li>
+<li>조건부 확률을 추정할 때 k개의 이전 단어만 고려</li>
+<li>가장 단순한 케이스: <strong>Unigram model</strong> (각 단어가 독립적으로 발생할 때를 가정)</li>
+<li><strong>Bigram model</strong>: 이전 단어에만 영향을 받음(조건)을 가정</li>
+<li><strong>N-gram models</strong>: trigrams, 4-grams, 5-grams<ul>
+<li>언어 자체가 <strong>long-distance dependencies</strong>(먼 거리의 의존성)를 가진다면 파악하기 쉽지 않음</li>
+<li>e.g.) Google Books N-gram</li>
+</ul>
+</li>
+</ul>
+<h3>Neural Network-based Language Model</h3>
+<h3>(Recurrent Neural Network)RNN-based Language Model</h3>
+<h3>Sequence to Sequence Learning</h3>
+<h3>Performance Improvements</h3>
+<ul>
+<li>GPT-2 (Open AI): Too Good to open the source code (?)</li>
+</ul>
+<h1>요약</h1>
+<ul>
+<li>Syntax Analysis (구문 분석)은 형식 문법의 규칙을 따르는 위계구조/형태/문장구조를 분석하는 과정으로 문자열을 Parser를 통해 특정한 문법에 걸맞게 변환한다.</li>
+<li>구문 분석 또한 어휘적 모호성과 구조적 모호성을 가진다는 어려움이 있다.</li>
+<li>언어 모델은 문장 자체에 확률을 부여하는 것으로, 기계 번역, 오탈자 교정, 음성 인식, 요약, QA(질의응답) 등에 사용된다.</li>
+<li>언어 모델은 마르코프 가정을 통한 확률적 언어 모델에서 점차 신경망 기반, RNN이나 Sequence to Sequence 기반 등의 과정으로 발전되었다.</li>
+</ul>
+{% endraw %}

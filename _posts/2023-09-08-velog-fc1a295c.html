@@ -1,0 +1,65 @@
+---
+layout: post
+title: CORS(Cross-Origin Resource Sharing)
+date: '2023-09-08T09:47:51.374000+09:00'
+categories:
+- CS
+source_url: https://velog.io/@yeseolee/CORSCross-Origin-Resource-Sharing
+source_blog: velog
+permalink: /velog/fc1a295c/
+---
+{% raw %}
+<h2><strong>CORS(Cross-Origin Resource Sharing)란?</strong></h2>
+<ul>
+<li>“<strong>다른-출처 자원 공유”</strong> 권한을 부여하도록 브라우저에 알려주는 <strong>HTTP-header 기반</strong> 메커니즘</li>
+<li>한 출처에서 실행 중인 웹 애플리케이션이 <strong>다른출처의 리소스에 접근할 수 있는 권한을 부여</strong>하도록 브라주저에 알려주는 체제 → “다른 출처라도 요청을 보내게 해줄게”</li>
+<li>Resource가 자신의 **Origin(출처)**과 다를 때 <strong>cross-origin HTTP requests</strong>를 실행</li>
+</ul>
+<h3>왜 <strong>다른 출처 자원 공유가 안될까?</strong> SOP(Same-Origin Policy)</h3>
+<ul>
+<li>웹 브라우저에서 동작하는 프로그램은 <strong>로딩된 위치에 있는 리소스만 접근 할 수 있다는 정책</strong> → “같은 출처끼리만 요청을 보낼 수 있어”</li>
+<li>악성 웹사이트가 브라우저에서 JS를 실행하여 제3자 서비스에서 데이터를 읽는 것을 방지</li>
+</ul>
+<h3>출처(Origin)가 뭔데?</h3>
+<p>Origin : <code>Protocol</code> + <code>Host</code> + <code>Port</code></p>
+<ul>
+<li>서버의 위치를 찾아가기 위해 필요한 가장 기본적인 요소들</li>
+<li>출처 내의 포트 번호는 <strong><code>HTTP</code></strong>, <strong><code>HTTPS</code></strong> 등 기본 포트번호가 정해져 있는 프로토콜을 사용하는 경우 생략 가능</li>
+<li>출처에 포트 번호가 명시적으로 포함되어 있다면 이 포트 번호까지 모두 일치해야 같은 출처라고 인정됨</li>
+</ul>
+<h2>CORS 동작원리</h2>
+<ol>
+<li>Request: <code>Origin</code> Header를 통해 요청을 보내는 출처를 밝힌다.</li>
+<li>Respone: <code>Access-Control-Allow-Origin</code> Header를 통해 이 리소스에 접근이 허용된 출처들을 알려준다.</li>
+<li>브라우저가 <code>Origin</code> 헤더와 <code>Access-Control-Allow-Origin</code> 헤더를 비교하여 유효한 응답인지 결정한다.</li>
+</ol>
+<h2>CORS 시나리오</h2>
+<h3>Simple Request</h3>
+<p>CORS preflight 를 트리거하지 않는 요청이며 조건이 까다로워 거의 마주치기 어렵다.</p>
+<ul>
+<li>요청 메서드는 <code>GET</code>, <code>HEAD</code>, <code>POST</code> 중 하나</li>
+<li>user agent가 자동으로 설정하는 헤더를 제외하고, <a href="https://fetch.spec.whatwg.org/#cors-safelisted-request-header">Fetch 명세에서 "CORS-safelisted request-header"로 정의한 헤더</a>만 사용(<code>Accept</code>, <code>Accept-Language</code>, <code>Content-Language</code>, <code>Content-Type</code>, <code>Range</code>)</li>
+<li><code>Content-Type</code> 헤더를 사용하는 경우 <code>application/x-www-form-urlencoded</code>, <code>multipart/form-data</code>, <code>text/plain</code>만 허용</li>
+</ul>
+<h3>Preflight Request</h3>
+<ul>
+<li>쿠키나 세션같은 정보가 없는 Request에 대해 동작</li>
+<li><code>OPTIONS</code> Method를 통해 동작</li>
+</ul>
+<h3>Credentialed Request</h3>
+<ul>
+<li><code>OPTIONS</code> Method를 통해 동작</li>
+<li>쿠키나 세션같은 정보가 담긴 Request에 대해 동작</li>
+<li><code>Access-Control-Allow-Origin: "*"</code> 불가능</li>
+<li><code>Access-Control-Allow-Credentials: true</code> 필수</li>
+</ul>
+<hr/>
+<h3>출처</h3>
+<ul>
+<li>https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS</li>
+<li>https://evan-moon.github.io/2020/05/21/about-cors/</li>
+<li><a href="https://youtu.be/4iXWkBi2hCA?feature=shared">[10분 테코톡] 성하의 CORS</a></li>
+</ul>
+<hr/>
+
+{% endraw %}

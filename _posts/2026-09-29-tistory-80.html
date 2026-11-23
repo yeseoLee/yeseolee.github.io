@@ -1,0 +1,232 @@
+---
+layout: post
+title: 'Jev: 생성하지 않는 의사결정 모델'
+date: '2026-09-29T09:34:57+09:00'
+categories:
+- 개발
+- 리뷰
+source_url: https://ohge.tistory.com/80
+source_blog: tistory
+permalink: /tistory/80/
+---
+{% raw %}
+<p><figure class="imageblock alignCenter" data-filename="7mrsdG0GLSmP4CPp-3qgg-xStnevOwMXQwUiIuM_aRIwXXJ7VOV_KxzaLrrfjFCNoj5U-RvaiXKkhQc4xNl9Ui6pNnJxOsxsB1bPEzCYFI-OjG8MtDTpYRil4KDfSD9wcQdT7vBHrXXM9tyNaCF1XA.svg" data-ke-mobilestyle="widthOrigin" data-origin-height="120" data-origin-width="312"><span data-phocus="https://blog.kakaocdn.net/dna/VW5Bd/dJMb992nmuv/AAAAAAAAAAAAAAAAAAAAAJc_llaNxyQfJonIHNMCI5wf9FC6YKsH830_Iz_G57sw/tfile.svg?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&amp;expires=1796050799&amp;allow_ip=&amp;allow_referer=&amp;signature=TOCsdnyNUuPFG6LAqdfc8mSzcWg%3D" data-url="https://blog.kakaocdn.net/dna/VW5Bd/dJMb992nmuv/AAAAAAAAAAAAAAAAAAAAAJc_llaNxyQfJonIHNMCI5wf9FC6YKsH830_Iz_G57sw/tfile.svg?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&amp;expires=1796050799&amp;allow_ip=&amp;allow_referer=&amp;signature=TOCsdnyNUuPFG6LAqdfc8mSzcWg%3D"><img data-filename="7mrsdG0GLSmP4CPp-3qgg-xStnevOwMXQwUiIuM_aRIwXXJ7VOV_KxzaLrrfjFCNoj5U-RvaiXKkhQc4xNl9Ui6pNnJxOsxsB1bPEzCYFI-OjG8MtDTpYRil4KDfSD9wcQdT7vBHrXXM9tyNaCF1XA.svg" data-origin-height="120" data-origin-width="312" height="120" loading="lazy" onerror="this.onerror=null; this.src='//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png'; this.srcset='//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png';" src="/assets/images/aed1402c1f4cdde5fef670b3.svg" width="312"/></span></figure>
+</p>
+<p data-ke-size="size16">최근 <b>Jev</b>를 시작으로 생성하지 않고 판단만 수행하는 <b>Decision Model</b>이 주목받고 있다.</p>
+<p data-ke-size="size16">결론부터 말하면, 바닥부터 새로 배워야 할 신기술이 등장한 것은 아니니 안심해도 좋다.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">Jev는 비공개 모델이라 내부 구조를 정확히 알 수 없다.</p>
+<p data-ke-size="size16">대신 Jev 이후 비슷한 접근을 공개 가중치로 구현한 오픈 프로젝트가 여럿 나왔다.</p>
+<p data-ke-size="size16">그중 성격이 뚜렷하게 다른 두 가지가 다음과 같다.</p>
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li><b>OpenJev</b>: 27B Decoder LLM 기반. Jev와 호환되는 Decision API를 목표로 함</li>
+<li><b>Laya</b>: 421M ModernBERT 기반. 작고 빠른 경량 Decision Model</li>
+</ul>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">이 글에서는 이 두 모델을 기준으로 Decision Model을 설명한다.</p>
+<p data-ke-size="size16">핵심은 LLM이 긴 자연어 응답을 생성하는 대신, 주어진 후보별 점수를 계산해 바로 의사결정에 사용한다는 점이다.</p>
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>ChatGPT나 Claude에서 추론(Reasoning) 모드를 끄면 긴 사고 과정을 생략하고 바로 텍스트를 생성한다.</li>
+<li>Decision Model은 여기서 한 단계 더 나아가 <b>이어 말하기(Decode)</b> 자체를 없앤다.</li>
+<li>대신 <b>입력을 읽는 단계(Prefill 또는 Encoding)</b>의 결과만으로 객관식 문제처럼 정해진 후보 중 하나를 고른다.<hr contenteditable="false" data-ke-style="style5" data-ke-type="horizontalRule"/></li>
+</ul>
+<h2 data-ke-size="size26">1. 생성하지 않는 LLM</h2>
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>일반 LLM: <code>Prefill → Decode → Decode → ...</code></li>
+<li>Decision Model: <code>Prefill → Decision</code></li>
+<li>자연어 대신 후보별 Probability 반환</li>
+</ul>
+<p data-ke-size="size16">일반적인 Decoder LLM은 Prompt 전체를 처리하는 <b>Prefill</b> 이후, <b>Autoregressive Decode</b>를 반복하며 Token을 생성한다.</p>
+<p data-ke-size="size16">하지만 분류, Routing, Tool Selection처럼 최종적으로 선택지만 고르면 되는 문제라면 굳이 Token을 여러 개 생성할 필요가 없다.</p>
+<pre class="stata"><code>일반 LLM
+
+Prompt
+  ↓
+Prefill
+  ↓
+Token
+  ↓
+Decode
+  ↓
+Token
+  ↓
+Decode ...</code></pre>
+<p data-ke-size="size16">Decision Model은 다음과 같이 생각할 수 있다.</p>
+<pre class="angelscript"><code>Context + Candidates
+        ↓
+      Prefill
+        ↓
+  Decision Readout
+        ↓
+A 0.82 / B 0.13 / C 0.05</code></pre>
+<hr contenteditable="false" data-ke-style="style5" data-ke-type="horizontalRule"/>
+<h2 data-ke-size="size26">2. 동작 방식</h2>
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>Decoder LLM은 Prefill만으로도 다음 Token의 Logit을 계산</li>
+<li>Candidate Token의 Logit만 가져오면 분류 가능</li>
+<li>Multiple Choice 평가에서 흔히 사용하던 방식</li>
+</ul>
+<p data-ke-size="size16">사실 Decoder LLM은 Prefill이 끝난 시점에 이미 다음 Token의 Logit을 가지고 있다.</p>
+<p data-ke-size="size16">4지선다 문제라면 다음과 같이 사용할 수 있다.</p>
+<pre class="makefile"><code>outputs = model(**inputs)
+
+logits = outputs.logits[:, -1]
+
+choice_logits = logits[:, [
+    token_A,
+    token_B,
+    token_C,
+    token_D,
+]]
+
+probs = softmax(choice_logits)</code></pre>
+<p data-ke-size="size16">결과는 바로 Decision Probability가 된다.</p>
+<pre class="angelscript"><code>A    0.02
+B    0.91
+C    0.04
+D    0.03</code></pre>
+<h4 data-ke-size="size20">OpenJev와 Laya가 추가한 것</h4>
+<p data-ke-size="size16">두 모델은 같은 목표를 서로 다른 구조로 달성한다.</p>
+<p data-ke-size="size16"><b>OpenJev: Decoder Logit을 Decision에 맞게 다듬음</b></p>
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>선택지를 입력 시점에 동적으로 제공</li>
+<li>각 선택지를 후보 토큰으로 변환</li>
+<li>첫 출력 위치에서 후보별 Logit 계산</li>
+<li>Calibration을 적용해 Probability 반환</li>
+<li>선택지 순서가 바뀌어도 일관되게 판단하도록 Fine-tuning</li>
+</ul>
+<pre class="properties"><code>Context + Question + Candidates
+              ↓
+           OpenJev
+              ↓
+       Candidate Logits
+              ↓
+         Calibration
+              ↓
+        Probabilities</code></pre>
+<p data-ke-size="size16"><b>Laya: Encoder로 후보를 직접 점수화</b></p>
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>ModernBERT는 다음 토큰을 예측하지 않는 Encoder 모델</li>
+<li>따라서 Logit을 읽는 대신 Context와 후보를 함께 인코딩해 점수를 계산하는 방식으로 보임 (미확인, 구조 기반 추정)</li>
+<li>모델이 작아 Router, Guardrail처럼 호출 빈도가 높은 위치에 적합</li>
+</ul>
+<pre class="properties"><code>Context + Candidate_i
+        ↓
+  ModernBERT Encoder
+        ↓
+    Scoring Head
+        ↓
+    Probabilities</code></pre>
+<p data-ke-size="size16">방식은 달라도 결과는 같다. 별도의 자연어 답변 없이 한 번의 Forward Pass로 각 후보의 확률을 얻는다.</p>
+<p data-ke-size="size16">따라서 하나의 모델로 서로 다른 형태의 Decision을 처리할 수 있다.</p>
+<h3 data-ke-size="size23">예시</h3>
+<pre class="gams"><code>Sentiment
+[positive, neutral, negative]</code></pre>
+<pre class="routeros"><code>Agent Routing
+[search, coding, reasoning]</code></pre>
+<pre class="mipsasm"><code>Customer Support
+[billing, shipping, technical]</code></pre>
+<hr contenteditable="false" data-ke-style="style5" data-ke-type="horizontalRule"/>
+<h2 data-ke-size="size26">3. 어디에 사용하는가</h2>
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>Classification</li>
+<li>Routing</li>
+<li>Agent Tool Selection</li>
+<li>Ranking</li>
+<li>Guardrail</li>
+<li>Human Review 판단</li>
+</ul>
+<p data-ke-size="size16">예를 들어 Agent가 모든 요청에 비싼 LLM을 호출하는 대신 먼저 Decision Model을 사용할 수 있다.</p>
+<pre class="routeros"><code>사용자 요청
+    ↓
+Decision Model
+    ↓
+simple      0.81 → 작은 모델
+reasoning   0.14 → 큰 모델
+search      0.05 → Search Agent</code></pre>
+<p data-ke-size="size16">또 Confidence가 낮을 때만 큰 모델이나 사람에게 넘기는 구조 역시 합리적이다.</p>
+<pre class="angelscript"><code>confidence &gt;= 0.9
+→ 자동 처리
+
+confidence &lt; 0.9
+→ LLM / Human Review</code></pre>
+<p data-ke-size="size16">이런 구조에서는 자연어 생성보다 빠르고 잘 보정된 확률이 중요하다.</p>
+<p data-ke-size="size16">특히 작은 모델을 <b>Router, Guardrail, Classifier, Tool Selector</b>로 사용하는 경우 Decision Model로 대체하기 좋다.</p>
+<hr contenteditable="false" data-ke-style="style5" data-ke-type="horizontalRule"/>
+<h2 data-ke-size="size26">4. 직접 사용해보기</h2>
+<h3 data-ke-size="size23">Laya</h3>
+<p data-ke-size="size16">Laya는 Jev처럼 후보 중 하나를 고르는 Decision Model을 <b>421M 규모의 경량 모델</b>로 구현한 오픈소스 프로젝트다.</p>
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>421M 파라미터, ModernBERT 기반</li>
+<li>라이선스는 Apache 2.0이라 상업적 사용 가능</li>
+<li>작은 크기 덕분에 CPU나 소형 GPU에서도 Router, Classifier로 배치하기 쉬움 (미확인, 규모 기준 추정)</li>
+</ul>
+<p data-ke-size="size16">동작 구조는 2장에서 설명한 대로, Context와 각 후보를 함께 인코딩해 점수를 계산하는 방식이다.</p>
+<p data-ke-size="size16"><a href="https://huggingface.co/convaiinnovations/laya">Laya — Hugging Face</a></p>
+<hr contenteditable="false" data-ke-style="style5" data-ke-type="horizontalRule"/>
+<h2 data-ke-size="size26">5. Jev vs Laya</h2>
+<p data-ke-size="size16">Jev가 Decision Model이라는 개념을 주목받게 만들었지만, 사실 이전에 만들어진 더 작은 오픈소스 모델이 있다.</p>
+<table data-ke-align="alignLeft" data-ke-style="style12">
+<thead>
+<tr>
+<th>항목</th>
+<th>Jev</th>
+<th>Laya</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">규모</td>
+<td style="text-align: center;">비공개</td>
+<td style="text-align: center;">421M</td>
+</tr>
+<tr>
+<td style="text-align: center;">구조</td>
+<td style="text-align: center;">Decoder 기반으로 추정 (OpenJev 기준)</td>
+<td style="text-align: center;">ModernBERT(Encoder) 기반</td>
+</tr>
+<tr>
+<td style="text-align: center;">판단 방식</td>
+<td style="text-align: center;">Prefill 후 후보 Logit 읽기</td>
+<td style="text-align: center;">후보별 점수화 (미확인)</td>
+</tr>
+<tr>
+<td style="text-align: center;">배포</td>
+<td style="text-align: center;">TypeSafe 상용 API</td>
+<td style="text-align: center;">Open Weight, 자체 호스팅</td>
+</tr>
+<tr>
+<td style="text-align: center;">라이선스</td>
+<td style="text-align: center;">상용 API</td>
+<td style="text-align: center;">Apache 2.0</td>
+</tr>
+</tbody>
+</table>
+<p data-ke-size="size16">선택 기준은 다음과 같이 정리할 수 있다.</p>
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li><b>Jev가 맞는 경우</b>
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>판단에 긴 Context 이해나 일반 상식이 필요할 때</li>
+<li>인프라 운영 없이 API로 바로 쓰고 싶을 때</li>
+</ul>
+</li>
+<li><b>Laya가 맞는 경우</b>
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>지연 시간과 비용이 가장 중요한 Router, Guardrail</li>
+<li>데이터를 외부 API로 보낼 수 없는 환경</li>
+<li>상업 서비스에 오픈 가중치를 넣어야 할 때</li>
+<li>추가로 파인튜닝이 필요할 때</li>
+</ul>
+</li>
+</ul>
+<p data-ke-size="size16">그 사이에는 OpenJev(27B, 비상업), Kev(0.8B~27B, Apache 2.0), CLM-8B(Contrastive Learning 기반, Apache 2.0) 같은 선택지도 있다.</p>
+<hr contenteditable="false" data-ke-style="style5" data-ke-type="horizontalRule"/>
+<h2 data-ke-size="size26">참고자료</h2>
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li><a href="https://news.hada.io/topic?id=33751">GeekNews — Jev: 문장 대신 판단과 확률을 반환하는 AI 모델</a></li>
+<li><a href="https://typesafe.ai/blog/introducing-system-one-models-and-jev">TypeSafe AI — Introducing System One Models &amp; Jev</a></li>
+<li><a href="https://huggingface.co/openjev/openjev">OpenJev — Hugging Face</a></li>
+<li><a href="https://huggingface.co/convaiinnovations/laya" style="background-color: #e6f5ff; color: #0070d1; text-align: start;">Laya — Hugging Face</a></li>
+<li><a href="https://fornewchallenge.tistory.com/entry/%F0%9F%A5%8A-CLM-vs-Laya-vs-OpenJev-vs-Kev-vs-Jev-%EA%B2%B0%EC%A0%95-%EB%AA%A8%EB%8D%B8-5%EC%A2%85-%EC%86%8D%EB%8F%84%C2%B7%EC%A0%95%ED%99%95%EB%8F%84%C2%B7%EB%9D%BC%EC%9D%B4%EC%84%A0%EC%8A%A4-%EB%B9%84%EA%B5%90">CLM vs Laya vs OpenJev vs Kev vs Jev 비교</a></li>
+</ul>
+{% endraw %}

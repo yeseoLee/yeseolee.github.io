@@ -1,0 +1,57 @@
+---
+layout: post
+title: '[Linux] bash script에서 개행 문자를 사용하는 방법 '
+date: '2023-04-08T22:00:16.934000+09:00'
+categories:
+- linux
+source_url: https://velog.io/@yeseolee/Linux-bash-script에서-개행-문자를-사용하는-방법
+source_blog: velog
+permalink: /velog/93092e75/
+---
+{% raw %}
+<p>실행 환경: <code>Ubuntu 22.04.2 LTS</code></p>
+<h3>개행문자를 출력하는 방법</h3>
+<p>간단한 개행문자가 들어가는 변수를 선언하고 출력해 보겠다.</p>
+<pre><code class="language-bash">var="hello\nworld"
+echo $var
+</code></pre>
+<pre><code class="language-bash">hello\nworld
+</code></pre>
+<p><code>\n</code>을 문자 그대로 출력하는게 아닌 개행 문자로 사용하고 싶을 때, 아래 몇 가지 해결 방법이 존재한다.</p>
+<p>case 1.
+<code>printf</code> 명령어 사용</p>
+<pre><code class="language-bash">var="hello\nworld"
+printf "$var\n"
+</code></pre>
+<p>case 2.
+<code>echo -e</code> 명령어 사용</p>
+<pre><code class="language-bash">var="hello\nworld"
+echo -e $var
+</code></pre>
+<p>case 1,2 둘 다 아래와 같이 출력된다.</p>
+<pre><code class="language-bash">hello
+world
+</code></pre>
+<h3>개행문자를 변수에 저장하는 방법</h3>
+<p>위 예제처럼 단순히 변수를 출력하는 경우가 아닌 변수에 개행문자를 담아서 파라미터로 전달해야 하는 경우가 필요할 수도 있다. 그럴 땐 아래와 같이 사용할 수 있다.</p>
+<pre><code class="language-bash">var=hello$'\n'world
+echo "$var"
+</code></pre>
+<pre><code class="language-bash">hello
+world
+</code></pre>
+<p>참고: <a href="https://www.gnu.org/software/bash/manual/html_node/ANSI_002dC-Quoting.html#ANSI_002dC-Quoting"> ANSI-C Quoting </a> 에서 관련 내용을 확인할 수 있다.</p>
+<h3>curl 명령어로 텍스트 전송 시 텍스트 내 개행문자 사라짐</h3>
+<p>(약간 주제에서 벗어날 수 있으나, bash script에서 curl 명령어를 자주 사용하고, 같은 개행 문자 관련 이슈이기에 추가하였다)
+<code>--data-binary</code> 옵션을 사용하면 된다.</p>
+<p>ex) 텍스트 파일을 특정 스토리지 버킷에 업로드 요청을 보낼 때</p>
+<pre><code class="language-bash">curl -s -X PUT -H \
+"Content-Type: $ContentType" \
+-H "Authorization: $Authorization" \
+--data-binary "@$LocalFile" $BUCKET$Path
+</code></pre>
+<p>아래 스택오버플로우 글을 참고하여 해결하였다.
+<a href="https://stackoverflow.com/questions/3872427/how-to-send-line-break-with-curl">How to send line break with curl?
+</a></p>
+
+{% endraw %}

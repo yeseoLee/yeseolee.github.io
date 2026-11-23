@@ -1,0 +1,148 @@
+---
+layout: post
+title: '[강의노트] 01-1 Introduction to Text Analytics  - Part 1'
+date: '2024-06-24T16:42:57+09:00'
+categories:
+- 강의노트
+- Text Analytics (강필성 교수님)
+source_url: https://ohge.tistory.com/30
+source_blog: tistory
+permalink: /tistory/30/
+---
+{% raw %}
+<blockquote data-ke-style="style1">
+<p data-ke-size="size16">위 강의노트는 고려대학교 산업경영공학부 대학원 강필성 교수님의<br/><a href="https://www.youtube.com/playlist?list=PLetSlH8YjIfVzHuSXtG4jAC2zbEAErXWm">비정형데이터분석 (Text Analytics)</a> 을 듣고 정리한 강의노트입니다.</p>
+</blockquote>
+<h2 data-ke-size="size26">Text Analytics: Background</h2>
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>80% 이상의 새로운 데이터는 비정형 데이터, 그 중 많은 비중을 차지하는 것이 텍스트 데이터이다.</li>
+<li>검색어에 알맞는 문서를 반환해주는 검색 엔진으로는 부족하며, 새로운 지식을 발견하는 것이 요구된다.</li>
+</ul>
+<h2 data-ke-size="size26">Example: AI papers in arXiv</h2>
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>인공지능에 관련한 논문의 수가 기하급수적으로 증가 중 (2018년 기준 약 3000편 이상)</li>
+<li>텍스트 마이닝을 통한 논문의 단어 빈도 분석
+<ol data-ke-list-type="decimal" style="list-style-type: decimal;">
+<li>Machine learning eclipses knowledge-based reasoning</li>
+<li>The Neural-Network Boom</li>
+<li>The rise of reinforcement learning</li>
+</ol>
+</li>
+</ul>
+<h2 data-ke-size="size26">Text Analytics: Definition</h2>
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>비정형 텍스트 데이터를 분석하여 의미있는 지식이나 지혜를 뽑아내는 것이 목적</li>
+<li><b>For Unstructured Text Data -&gt; Using Various Analytical Methods -&gt; Extract Meaningful Information and Knowledge</b></li>
+</ul>
+<h2 data-ke-size="size26">Text Analytics: Applications</h2>
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>Information Abstraction/Summarization/Visualization (정보 추출/요약/시각화)
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>ex) 대통령 연설문 워드 클라우드 시각화, 중앙 은행 연설문 나라별 벡터 유사도 계산, 중앙 은행의 연도별 연설문 주요 키워드</li>
+<li>ex) 데이터 전처리 및 벡터화 -&gt; 특이 소비자 의견 탐지 -&gt; 키워드 및 관계도 분석</li>
+</ul>
+</li>
+<li>Document Clustering (문서 클러스터링)
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>ex) 특허 검색 시스템 (새로 출헌된 특허가 기존 특허와 얼마나 유사성을 가지고 있는지 판단, 과거 특허 Map을 형성하고 새로운 특허가 이미 충분히 밀집된 지역에 매핑된다면 참신하거나 새로운 특허일 확률이 낮음)</li>
+</ul>
+</li>
+<li>Topic Extraction (문서를 분석하여 코퍼스에 잠재된 토픽 찾기)
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>ex) Science 저널에 존재하는 17,000건의 논문에 대해 100개의 Topic으로 Modeling (Topic Naming은 지금까지는 도메인 전문가/데이터 분석가에 의해 수작업으로...)</li>
+<li>ex) 토픽 간 관계(유사도) 분석</li>
+</ul>
+</li>
+<li>Document Categorization/Classification (문서 분류)
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>ex) Spam mail filtering</li>
+<li>ex) Sport player evaluation (Term -&gt; STAT -&gt; Best Player Prediction)</li>
+<li>ex) Sentiment Analysis</li>
+</ul>
+</li>
+<li>Recommendation (추천)
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>ex) Named entity recognition/extraction (NEE/NER)을 활용한 검색엔진</li>
+</ul>
+</li>
+<li>Improve forecasting accuracy combined with structed data (정형 데이터와 결합하여 예측 정확도 향상)
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>SNS 게시글 기반 박스 오피스 스코어 예측</li>
+<li>금융 기업에 대한 조기 경고 모델</li>
+</ul>
+</li>
+<li>Natural Language Understanding: Question Answering
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>ex) IBM Watson</li>
+<li>ex) ChatBot (Dialogue system)</li>
+</ul>
+</li>
+</ul>
+<h2 data-ke-size="size26">Text Analytics: Challenges</h2>
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>High number of possible "dimensions" (고차원, 단어 수가 너무 많음)</li>
+<li>Complex and subtle relationship between concepts in texts (텍스트 내의 개념들 간의 복잡하고 미묘한 관계)</li>
+<li>Ambiguity and context sensitivity (중의성 및 문맥 민감성)</li>
+<li>Structure of text data</li>
+</ul>
+<h2 data-ke-size="size26">Text Analytics: Text Structures</h2>
+<h3 data-ke-size="size23">How Unstructured is "Unstructured"?</h3>
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>Weakly structured
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>논문, 뉴스 등</li>
+</ul>
+</li>
+<li>Semi-structured
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>E-mail, HTML/XML 등</li>
+</ul>
+</li>
+</ul>
+<h3 data-ke-size="size23">Why is Text Mining Hard?</h3>
+<p data-ke-size="size16">Language itself is ambigious (언어 자체의 중의성, 모호성)</p>
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>Contexts is needed to clarify</li>
+<li>Same word with different meanings, different words with same meaning</li>
+<li>Misspellings, abbreviations, etc.</li>
+</ul>
+<h2 data-ke-size="size26">Text Analytics:Areas</h2>
+<p><figure class="imageblock alignCenter" data-ke-mobilestyle="widthOrigin" data-origin-height="2376" data-origin-width="2998"><span data-phocus="https://blog.kakaocdn.net/dna/LOjqI/btsIa5j0oYI/AAAAAAAAAAAAAAAAAAAAABs5vO8nF-TYFxBtYvA4WGo9aRFMB1zeEXjAfjhKVnKm/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&amp;expires=1796050799&amp;allow_ip=&amp;allow_referer=&amp;signature=O5Q1p8nItSh7SVKU7IwCgs5QoaQ%3D" data-url="https://blog.kakaocdn.net/dna/LOjqI/btsIa5j0oYI/AAAAAAAAAAAAAAAAAAAAABs5vO8nF-TYFxBtYvA4WGo9aRFMB1zeEXjAfjhKVnKm/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&amp;expires=1796050799&amp;allow_ip=&amp;allow_referer=&amp;signature=O5Q1p8nItSh7SVKU7IwCgs5QoaQ%3D"><img data-origin-height="2376" data-origin-width="2998" height="2376" loading="lazy" onerror="this.onerror=null; this.src='//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png'; this.srcset='//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png';" src="/assets/images/6494f5063762d8340abf5bfd.png" width="2998"/></span></figure>
+</p>
+<h2 data-ke-size="size26">Types of Text Analytics</h2>
+<h3 data-ke-size="size23">Document Classification</h3>
+<p data-ke-size="size16">문서 분류 (라벨O)</p>
+<h3 data-ke-size="size23">Document Clustering</h3>
+<p data-ke-size="size16">문서 클러스터링 (라벨X)</p>
+<h3 data-ke-size="size23">Concept Extraction</h3>
+<p data-ke-size="size16">단어/구 유사성 추출</p>
+<h3 data-ke-size="size23">Search and Information Retrieval (IR)</h3>
+<h3 data-ke-size="size23">Information Extraction (IE)</h3>
+<h3 data-ke-size="size23">Web Mining</h3>
+<h3 data-ke-size="size23">Natural Language Processing(NLP)</h3>
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>저수준 언어 프로세싱</li>
+<li>자연어 전처리: 어휘 분석, 구문 분석</li>
+</ul>
+<h2 data-ke-size="size26">A Simplified Process of Text Analytics</h2>
+<ol data-ke-list-type="decimal" style="list-style-type: decimal;">
+<li>Define what to mind &amp; Collect text data</li>
+<li>Process &amp; Transform the data
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>From unstructured to structured (가변 길이의 문서를 고정 길이의 벡터로 표현)</li>
+</ul>
+</li>
+<li>Select/Extract features</li>
+<li>Algorithm Learning &amp; Evaluation
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>1(비구조화 데이터 수집) -&gt; 2,3을 통해 데이터 구조화 -&gt; 4(머신러닝 모델에 구조화된 데이터 적용)</li>
+</ul>
+</li>
+</ol>
+<h2 data-ke-size="size26">강의 요약</h2>
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>Text Analytics에 대한 전반적인 개요 강의이다.</li>
+<li>Text Analytics가 어떤 분야에 어떻게 사용되며 어떤 어려움이 있고, 어떤 과정을 통해 이루어지는지 설명한다.</li>
+<li>주로 어떻게 사용되는 지에 대한 applications 예시 위주의 설명이며, 앞으로 어떤 내용을 배울 지 감을 잡는 정도로 이해하면 될 듯하다.</li>
+</ul>
+{% endraw %}

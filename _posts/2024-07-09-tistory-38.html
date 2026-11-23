@@ -1,0 +1,129 @@
+---
+layout: post
+title: '[강의노트] 04 Text Representation I - Classic Methods'
+date: '2024-07-09T20:24:10+09:00'
+categories:
+- 강의노트
+- Text Analytics (강필성 교수님)
+source_url: https://ohge.tistory.com/38
+source_blog: tistory
+permalink: /tistory/38/
+---
+{% raw %}
+<blockquote data-ke-style="style1"><p data-ke-size="size16"><span style="font-family: 'Noto Serif KR';"><p>위 강의노트는 고려대학교 산업경영공학부 대학원 강필성 교수님의<br/><a href="https://www.youtube.com/playlist?list=PLetSlH8YjIfVzHuSXtG4jAC2zbEAErXWm">비정형데이터분석 (Text Analytics)</a> 을 듣고 정리한 강의노트입니다.</p>
+</span></p></blockquote><h1>Bag of Words</h1>
+<p>어떻게 가변 길이의 문서를 고정 길이의 숫자형 벡터로 변환할 것인가?</p>
+<h2>Bag of Words: Motivation</h2>
+<h3>Document Representation</h3>
+<ul>
+<li>어떻게 하나의 Document를 구조화된 vector/matrix 형태(Vector Space ModeL)로 변환할 것인가 (Transform unstructured data into structured data)</li>
+</ul>
+<h2>Bag of Words:Idea</h2>
+<ul>
+<li>가정: 문서들은 <strong>순서를 무시하는 단어들의 집합체</strong>이다.</li>
+<li>단어 하나 하나를 atomic symbol로 고려하여 discrete space로 표현</li>
+</ul>
+<h3>Term-Document Matrix</h3>
+<p>TDM vs DTM(각각의 객체가 행이고, 변수들이 열일 때)</p>
+<ul>
+<li>Binary representation: 해당하는 단어의 등장 여부</li>
+<li>Frequency representation: 해당하는 단어의 등장 빈도</li>
+</ul>
+<h3>Bag of words Representation in a Vector Space</h3>
+<ul>
+<li>가정: 컨텐츠는 단어의 사용 빈도로부터 추론될 수 있다.</li>
+<li><strong>단어의 순서를 고려하지 않기 때문에</strong> 의미가 다른 두 문장이 동일하게 표현될 수 있다. (e.g. A is better than B / B is better than A 가 BOW 표현에서는 일치한다.)</li>
+<li><strong>reconstruct 불가</strong> (tdm에서 original text로 복구할 수 없다.)</li>
+</ul>
+<h2>Stop Words</h2>
+<ul>
+<li>해당하는 문서를 이해하는데 필요없는 (주요 정보를 가지지 않고 문법적인 역할만 수행하는) 단어</li>
+<li>알고리즘으로 제거할 수도 있으나 불용어 리스트가 미리 존재하고 이를 매칭하여 제거한다.</li>
+<li>e.g.) SMART Stop Words, MySQL Stop Words</li>
+</ul>
+<h1>Word Weighting</h1>
+<h2>Term-Frequency (TF)</h2>
+<p>${tf}_{(t,d)}$ : <strong>특정 document d에서 특정 term t가 얼마나 등장했는가</strong></p>
+<h2>Document Frequency (DF)</h2>
+<p>${df}_{t}$ : <strong>특정 term t가 몇 개의 document에 등장했는가</strong></p>
+<h3>Issues on DF</h3>
+<ul>
+<li>자주 등장하는 term에 비해 희박하게 등장하는 term이 특정 문서에 대해 중요도가 높다 (e.g. is, can, the, of, ...는 DF가 높으나 중요하지 않을 가능성이 높다)</li>
+<li>Common Term 보다 Rare Term에 더 높은 가중치를 주어야 한다. -&gt; IDF</li>
+</ul>
+<h2>Inverse Document Frequency (IDF)</h2>
+<p>${idf}<em>{t} = {log}</em>{10}(N/df_t)$ (기하급수적으로 늘어나기 때문에 주로 로그를 씌워 사용한다)</p>
+<h2>TF-IDF</h2>
+<p>$$ TF-IDF(w) = tf(w) \times log(\frac{N}{df(w)}) $$</p>
+<ul>
+<li>Term Frequency는 커야하고, Inverse Document Frequency는 작아야 한다.</li>
+<li>단어는 하나의 <strong>target 문서에 자주 등장할수록</strong>, 전체 corpus 중에서 <strong>소수의 문서에만 등장할 수록</strong> 중요도가 높다.</li>
+</ul>
+<h3>|V|-dimensional vector space</h3>
+<ul>
+<li>Terms are axes of the space (단어가 공간의 축)</li>
+<li>Documents are points or vectors in this space (문서가 공간의 점 또는 벡터)</li>
+<li><strong>Very high dimensional</strong>: need to reduce the number of features (고차원)</li>
+<li><strong>Sparseness</strong>: most entries are zero (대부분이 0인 희소한 벡터 표현)</li>
+</ul>
+<h2>TF-IDF Variants</h2>
+<h3>Most commonly used TF-IDF Variants in general</h3>
+<h4>TF Variants</h4>
+<ul>
+<li>l(logarithm): $1+log(tf_{t,d})$</li>
+</ul>
+<h4>DF &amp; IDF Variants</h4>
+<ul>
+<li>t(idf): $log(\frac{N}{df_t})$</li>
+</ul>
+<h4>Normalization</h4>
+<ul>
+<li>c (cosine): $\frac{1}{\sqrt{w_1^2+w_2^2+\dots+w_M^2}}$Effects of TF-IDF Variants</li>
+</ul>
+<h4>Comparative Study</h4>
+<ul>
+<li>TF-IDF Variants 조합에 따라 성능이 다름</li>
+<li>통계적으로 가장 좋은가는 아님</li>
+<li>그러나 조합에 따라 상당히 큰 성능 차이가 나타남</li>
+<li>=&gt; Documents를 어떻게 representation하느냐에 따라 성능 차이가 나타난다.</li>
+</ul>
+<h1>N-Grams</h1>
+<h3>N-Gram-based Language Models in NLP</h3>
+<ul>
+<li>Use the previous N-I words in a sequence to predict the next word</li>
+</ul>
+<h3>N-Gram in Text Mining</h3>
+<ul>
+<li>Some phrses are very useful in text clustering/categorization!<ul>
+<li>Six sigma, big data, etc. (phrase가 하나의 관용구로 쓰일 때는 단어 각각으로 보는 것이 아닌 N-Gram 기준으로 보는게 더 타당할 것 / big data는 각각의 뜻을 이어서 보기보다 big data 하나로 보는 것이 더 타당함)</li>
+</ul>
+</li>
+<li>Term-frequency for n-grams can be utilized</li>
+<li>Domain-dependent</li>
+</ul>
+<h3>Empirical evaluation</h3>
+<ul>
+<li>Data sets: 20 newsgroup data set + 21578 REUTERS newswire articles</li>
+<li>Classification algorithm: RIPPER</li>
+</ul>
+<p><strong>Unigram에 비해 N-Gram을 사용했을 때 성능이 올라가는 정도가 찾는데 드는 비용에 비해 만족할만한가에 대한 의문점이 있음</strong></p>
+<h1>요약</h1>
+<ul>
+<li>Bag Of Words<ul>
+<li>가변 길이의 문서를 고정 길이의 숫자형 벡터로 변환</li>
+<li>각 단어를 고유하고 원자적인 기호로 고려하여 개별 공간으로 표현</li>
+<li>순서를 고려하지 않는다와 복원이 불가하다는 단점</li>
+</ul>
+</li>
+<li>Word Weighting<ul>
+<li>단어의 중요도에 따라 가중치를 부여</li>
+<li>TF-IDF: TF와 IDF의 곱. 하나의 <strong>target 문서에 자주 등장할수록</strong>, 전체 corpus 중에서 <strong>소수의 문서에만 등장할 수록</strong> 중요도가 높다</li>
+</ul>
+</li>
+<li>N-Grams<ul>
+<li>단어를 개별적으로을 보는 것이 아닌 n개씩 보는 것이 합리적인 경우</li>
+<li>성능이 올라가는 정도가 N-Gram을 찾는데 드는 비용에 비해 만족할만한가에 대한 의문점이 있음</li>
+</ul>
+</li>
+</ul>
+{% endraw %}

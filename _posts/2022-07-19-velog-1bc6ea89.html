@@ -1,0 +1,43 @@
+---
+layout: post
+title: JAVA Build Tool (Ant → Maven → Gradle)
+date: '2022-07-19T13:23:11.695000+09:00'
+categories:
+- Java
+source_url: https://velog.io/@yeseolee/JAVA-Build-Tool-Ant-Maven-Gradle
+source_blog: velog
+permalink: /velog/1bc6ea89/
+---
+{% raw %}
+<h3><strong>Apache Ant</strong></h3>
+<ul>
+<li>Java 기반의 빌드 도구로 각 프로젝트에 대한 <strong>XML</strong>기반 빌드 스크립트 개발</li>
+<li>형식적인 규칙이 없음</li>
+<li>명확한 빌드 절차 정의가 필요</li>
+<li>생명주기를 갖지않아 빌드 과정을 target으로 만들어 단계별로 수행</li>
+<li>각 프로젝트마다 빌드</li>
+<li>Remote Repository를 가져올 수 없었음 (IVY 도입)</li>
+</ul>
+<hr/>
+<h3>Maven</h3>
+<ul>
+<li>Ant의 대안으로 만들어진 자바용 프로젝트 관리 도구</li>
+<li>표준화된 포맷을 제공 (<strong>pom.xml</strong>)</li>
+<li>외부저장소에서 필요한 라이브러리와 플러그인들을 로컬시스템의 캐시하여 관리</li>
+<li>프로젝트의 전체적인 라이프사이클을 관리</li>
+<li>상속구조를 이용한 멀티 모듈 구현</li>
+</ul>
+<hr/>
+<h3>Gradle</h3>
+<ul>
+<li>groovy 라는 스크립트 언어 사용</li>
+<li>XML에 비해 가독성이 좋음</li>
+<li>변수선언, if, else, for등의 로직으로 동적 요소를 간결하게 구성 가능하다.</li>
+<li><a href="https://gradle.org/gradle-vs-maven-performance/">Maven에 비해 100배 빠름</a></li>
+<li>Configuration Injection(의존성 주입) 방식을 사용→ 상속하지 않아도 됨</li>
+<li>단위 테스트 시 의존성 관리</li>
+<li>일관된 디렉토리 구조를 가지고 빌드 프로세스를 유지</li>
+</ul>
+<hr/>
+
+{% endraw %}

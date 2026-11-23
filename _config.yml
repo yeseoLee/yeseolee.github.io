@@ -1,0 +1,16 @@
+title: 개발자 이예서
+description: 인공지능과 소프트웨어 개발 이야기
+url: "https://yeseolee.github.io"
+baseurl: ""
+theme: minima
+lang: ko
+timezone: Asia/Seoul
+future: true
+header_pages:
+  - categories.html
+plugins:
+  - jekyll-feed
+  - jekyll-seo-tag
+exclude:
+  - migration-report.json
+  - README.md

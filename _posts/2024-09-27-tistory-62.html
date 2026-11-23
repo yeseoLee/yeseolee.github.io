@@ -1,0 +1,492 @@
+---
+layout: post
+title: 네이버 부스트캠프 AI Tech 7기 Level1 STS Competition 프로젝트 최종 리포트
+date: '2024-09-27T16:33:35+09:00'
+categories:
+- 강의노트
+- 네이버 부스트캠프 AI Tech 7기
+source_url: https://ohge.tistory.com/62
+source_blog: tistory
+permalink: /tistory/62/
+---
+{% raw %}
+<p data-ke-size="size16">Level1를 마무리하는 프로젝트로 진행했던 STS(Semantic Text Similarity) 대회가 끝났다.<br/>우리 팀에서는 기록보다는 end-to-end로 경험하는 것을 목표로 하며 하고 싶은 파트를 자유롭게 진행했다.<br/>NLP 코스의 첫 프로젝트에서 어떤 시행착오를 겪었으며, 무엇을 배웠고, 아쉬웠던 점을 차례로 작성하고자 한다.</p>
+<h1>대회 소개</h1>
+<table data-ke-align="alignLeft">
+<thead>
+<tr>
+<th>특징</th>
+<th>설명</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>목표</td>
+<td>의미 유사도 판별(Semantic Text Similarity, STS): 두 문장이 의미적으로 얼마나 유사한지를 수치화하는 자연어처리 태스크</td>
+</tr>
+<tr>
+<td>평가지표</td>
+<td><b>피어슨 상관 계수</b>(두 변수 X 와 Y 간의 선형 상관 관계를 계량화한 수치)를 사용</td>
+</tr>
+<tr>
+<td>규칙</td>
+<td>일일 제출횟수는 '팀 단위 10회'로 제한 외부 데이터셋 사용 금지</td>
+</tr>
+<tr>
+<td>기간</td>
+<td>2024.09.11 10:00~2024.09.26 19:00</td>
+</tr>
+<tr>
+<td>서버</td>
+<td>대회에서 사용할 GPU 서버를 팀당 4대 제공 V100 GPU 32GB * 4</td>
+</tr>
+</tbody>
+</table>
+<h1>진행 과정</h1>
+<h2 data-ke-size="size26">1. EDA</h2>
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>이미지는 train 데이터셋 위주로 구성하였습니다. 코드를 확인하고 싶다면 Git Repository를 참고해주세요.Label 분포</li>
+<li>아래 표는 라벨 구간별 문장들의 특징으로, 작년 AI Tech 6기 4조에서 분석했던 내용을 가져왔다.</li>
+</ul>
+<table data-ke-align="alignLeft">
+<thead>
+<tr>
+<th align="center">Label 구간</th>
+<th align="left">sentence_1</th>
+<th align="left">sentence_2</th>
+<th align="left">특징</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center">5.0</td>
+<td align="left">검정고시가 페지되어야 한다고 봅니다</td>
+<td align="left">검정고시 페지해야 한다고 봅니다</td>
+<td align="left">문장부호의 개수 및 띄어쓰기, 조사가 생략되거나 하는 다소의 차이가 존재하나, 문장이 거의 일치합니다.</td>
+</tr>
+<tr>
+<td align="center">4.0 ~ 4.9</td>
+<td align="left">나는 이걸 왜 보았을까??</td>
+<td align="left">이거 내가 왜 봤지?</td>
+<td align="left">문장의 의미가 거의 일치하나, 단어의 어순이 다르거나 일부 단어가 유의어로 교체되었습니다.</td>
+</tr>
+<tr>
+<td align="center">3.0 ~ 3.9</td>
+<td align="left">히딩크감독을 다시 대한민국 축구 감독으로</td>
+<td align="left">히딩크감독님을 모셔와야합니다</td>
+<td align="left">문장의 맥락이 거의 일치하나, 주요한 보어 혹은 목적어가 누락되거나 유의어 대체 등에서 뚜렷한 차이를 보입니다.</td>
+</tr>
+<tr>
+<td align="center">2.0 ~ 2.9</td>
+<td align="left">대회 때문에 정신 없어서 오늘 올립니다.</td>
+<td align="left">오늘은 대회로 바쁘지 않아서 올립니다.</td>
+<td align="left">문장에서 다루는 주제와 상황은 유사하지만, 읽는 사람에 따라 다르게 해석될 여지가 있습니다.</td>
+</tr>
+<tr>
+<td align="center">1.0 ~ 1.9</td>
+<td align="left">다크나이트와 함께 최고의 히어로물</td>
+<td align="left">히트했던 드라마인 각시탈 또한 제대로된 히어로물입니다;</td>
+<td align="left">일부 단어가 일치하거나 주제는 유사하지만, 서로 다른 의미를 가지는 문장입니다.</td>
+</tr>
+<tr>
+<td align="center">0.1 ~ 0.9</td>
+<td align="left">공짜로 주어지는 것은 아무 것도 없다.</td>
+<td align="left">아무 것도 남는게 없다..</td>
+<td align="left">일부 단어는 일치하나, 맥락과 의미가 전혀 다릅니다.</td>
+</tr>
+<tr>
+<td align="center">0.0</td>
+<td align="left">부모님 댁으로 받았는데 너무 맛있다고 하셔요!! ㅎㅎㅎ</td>
+<td align="left">타고 싶은데 넘 비싸요 ㅎㅎ</td>
+<td align="left">공통점이 없는 전혀 다른 문장입니다.</td>
+</tr>
+</tbody>
+</table>
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>Label 데이터는 0.0 ~ 5.0 사이의 값으로 존재하는데, dev 데이터셋은 비교적 고르게 분포하고 있으나 train 데이터셋은 0.0값에 편중된 분포를 보인다.</li>
+</ul>
+<p><figure class="imageblock alignCenter" data-ke-mobilestyle="widthOrigin" data-origin-height="555" data-origin-width="1479"><span data-phocus="https://blog.kakaocdn.net/dna/xQWL8/btsJOda4MqG/AAAAAAAAAAAAAAAAAAAAAOxfYOmtU2SKStyFbOtggYnFl63_XgHRZ_3Hl8cZhmNW/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&amp;expires=1796050799&amp;allow_ip=&amp;allow_referer=&amp;signature=pHPigd92nOeK%2FWKp1NWUNk%2BQVr0%3D" data-url="https://blog.kakaocdn.net/dna/xQWL8/btsJOda4MqG/AAAAAAAAAAAAAAAAAAAAAOxfYOmtU2SKStyFbOtggYnFl63_XgHRZ_3Hl8cZhmNW/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&amp;expires=1796050799&amp;allow_ip=&amp;allow_referer=&amp;signature=pHPigd92nOeK%2FWKp1NWUNk%2BQVr0%3D"><img data-origin-height="555" data-origin-width="1479" height="555" loading="lazy" onerror="this.onerror=null; this.src='//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png'; this.srcset='//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png';" src="/assets/images/03d958bca19177ffcfad0a6e.png" width="1479"/></span></figure>
+</p>
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>다음은 Label 구간별로 개수를 확인하였다.</li>
+</ul>
+<pre class="yaml"><code>train
+0 3711 
+1 1368 
+2 1137 
+3 1715 
+4 1302 
+Name: id, dtype: int64
+
+dev
+0 88 
+1 110
+2 110
+3 110 
+4 110 
+Name: id, dtype: int64</code></pre>
+<h3 data-ke-size="size23">데이터 source</h3>
+<h4 data-ke-size="size20">데이터셋의 출처는 총 3가지 source로 구성되어 있었다.</h4>
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>petition 데이터셋은 국민청원 게시판 제목 데이터로, 대체로 오탈자가 적은 격식체의 문장들로 구성되어 있다.</li>
+<li>NSMC(Naver Sentiment Movie Corpus) 데이터셋은 네이버 영화 감성 분석 코퍼스로, 문어체와 구어체가 섞여 있었고, 일부 문장에서 특수문자가 발견되었다.</li>
+<li>Slack 데이터셋은 Upstage에서 제공한 slack 데이터셋으로, 전반적으로 구어체의 문장으로 구성되어 있었으며, 오탈자와 함께 문장 부호, 특수문자(이모티콘, 이모지 등)가 발견되었다.RTT</li>
+<li>RTT(round-trip translation)란 한국어 문장을 영어로 번역했다가 다시 한국어로 번역하여 유사한 문장 쌍을 생성하는 기법이다.</li>
+<li>동일한 source에서 가져온 데이터셋에서도 RTT로 생성한 데이터와 아닌 데이터의 분포에는 차이를 보인다.</li>
+<li>RTT로 생성한 데이터셋은 비교적 높은 유사도가 큰 비중을 차지하는 모습을 보입니다. 이는 RRT 기법을 생각해볼 때 어쩌면 자연스러운 결과라고 생각된다.Source별 Label의 분포를 시각화하면 다음과 같다.문장 길이<br/><figure class="imageblock alignCenter" data-ke-mobilestyle="widthOrigin" data-origin-height="490" data-origin-width="1489"><span data-phocus="https://blog.kakaocdn.net/dna/AaLje/btsJO2T7gCg/AAAAAAAAAAAAAAAAAAAAAONYGTaQ__NksaBUPbw8Q3rLX6ot1GjdCoHSM_RnGEA1/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&amp;expires=1796050799&amp;allow_ip=&amp;allow_referer=&amp;signature=IhT9m9H4C0hXVnH9a5zNjB6oX%2FM%3D" data-url="https://blog.kakaocdn.net/dna/AaLje/btsJO2T7gCg/AAAAAAAAAAAAAAAAAAAAAONYGTaQ__NksaBUPbw8Q3rLX6ot1GjdCoHSM_RnGEA1/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&amp;expires=1796050799&amp;allow_ip=&amp;allow_referer=&amp;signature=IhT9m9H4C0hXVnH9a5zNjB6oX%2FM%3D"><img data-origin-height="490" data-origin-width="1489" height="490" loading="lazy" onerror="this.onerror=null; this.src='//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png'; this.srcset='//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png';" src="/assets/images/4c76fa923e0cba3415031f46.png" width="1489"/></span></figure>
+- 다음은 각 문장의 길이와 문장 길이의 차이를 시각화하였다. 너무 긴 문장과 짧은 문장 사이의 유사도는 서로의 의미보다 다른 요소들에 의해 측정될 가능성이 높다고 생각하여 확인해보았다.<br/><figure class="imageblock alignCenter" data-ke-mobilestyle="widthOrigin" data-origin-height="455" data-origin-width="580"><span data-phocus="https://blog.kakaocdn.net/dna/oDmSD/btsJOndq4Hv/AAAAAAAAAAAAAAAAAAAAAIhJ_wmLQAg8a4dHLkkgkabGeMTj1I9CoJ7Y-6jgNHf2/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&amp;expires=1796050799&amp;allow_ip=&amp;allow_referer=&amp;signature=ia6LIrzLHtm%2BEC1gyIwPsY%2FAImc%3D" data-url="https://blog.kakaocdn.net/dna/oDmSD/btsJOndq4Hv/AAAAAAAAAAAAAAAAAAAAAIhJ_wmLQAg8a4dHLkkgkabGeMTj1I9CoJ7Y-6jgNHf2/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&amp;expires=1796050799&amp;allow_ip=&amp;allow_referer=&amp;signature=ia6LIrzLHtm%2BEC1gyIwPsY%2FAImc%3D"><img data-origin-height="455" data-origin-width="580" height="455" loading="lazy" onerror="this.onerror=null; this.src='//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png'; this.srcset='//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png';" src="/assets/images/965ad34f3ca6b94cec1d73df.png" width="580"/></span></figure>
+<figure class="imageblock alignCenter" data-ke-mobilestyle="widthOrigin" data-origin-height="590" data-origin-width="1189"><span data-phocus="https://blog.kakaocdn.net/dna/R0S86/btsJPmLmje0/AAAAAAAAAAAAAAAAAAAAAPtEIpiVXt8oSLQVLxbXoUL3pmBPI9s2L0xNpCYQj3bU/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&amp;expires=1796050799&amp;allow_ip=&amp;allow_referer=&amp;signature=MsckVJ0UiIFrvMWkv%2BsAaxMUjWU%3D" data-url="https://blog.kakaocdn.net/dna/R0S86/btsJPmLmje0/AAAAAAAAAAAAAAAAAAAAAPtEIpiVXt8oSLQVLxbXoUL3pmBPI9s2L0xNpCYQj3bU/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&amp;expires=1796050799&amp;allow_ip=&amp;allow_referer=&amp;signature=MsckVJ0UiIFrvMWkv%2BsAaxMUjWU%3D"><img data-origin-height="590" data-origin-width="1189" height="590" loading="lazy" onerror="this.onerror=null; this.src='//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png'; this.srcset='//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png';" src="/assets/images/46b334031bef139816cb2060.png" width="1189"/></span></figure>
+2. 데이터 전처리다양한 데이터 전처리 기법을 사용하였다. 이 중에는 실제로 적용하지 않았거나 혹은 적용했지만 최고 성능의 모델에는 포함되지 않았을 수도 있다.특수문자 제거</li>
+<li>정규표현식을 사용하여 특수문자를 제거할 수 있다.</li>
+<li>특수문자를 제거한 데이터셋과 제거하지 않은 데이터셋을 모두 사용하였다.</li>
+</ul>
+<pre class="python"><code># 초성(ㄱ-ㅎ), 중성(ㅏ-ㅣ), 완성된 한글(가-힣), 알파벳(A-Za-z), 숫자(0-9), 그리고 공백(\s)만 허용
+
+def replace_special_letters(df):
+    df["sentence_1"] = df["sentence_1"].str.replace(r"[^A-Za-z0-9가-힣ㄱ-ㅎㅏ-ㅣ\s]", "", regex=True)
+    df["sentence_2"] = df["sentence_2"].str.replace(r"[^A-Za-z0-9가-힣ㄱ-ㅎㅏ-ㅣ\s]", "", regex=True)</code></pre>
+<h3 data-ke-size="size23">띄어쓰기 교정</h3>
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li><a href="https://github.com/haven-jeon/PyKoSpacing">https://github.com/haven-jeon/PyKoSpacing</a> 패키지를 사용하였다.</li>
+<li>hanspell 맞춤법 교정에서 띄어쓰기까지 함께 교정되므로 따로 사용하지 않았다.</li>
+</ul>
+<pre class="nix"><code># 띄어쓰기 교정
+# !pip install git+https://github.com/haven-jeon/PyKoSpacing.git
+
+import pykospacing
+spacing = pykospacing.Spacing()
+
+def spacing_text(df):
+    df["sentence_1"] = df["sentence_1"].map(spacing)
+    df["sentence_2"] = df["sentence_2"].map(spacing)</code></pre>
+<h3 data-ke-size="size23">맞춤법 교정</h3>
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li><a href="https://github.com/ssut/py-hanspell">https://github.com/ssut/py-hanspell</a> 라이브러리를 사용하였다.</li>
+<li>네이버 맞춤법 검사기에 의존적인 패키지이며 현재 유지되고 있지 않은 패키지이다. (오류가 있어 패키지를 install &amp; import 해서는 사용할 수 없다.)</li>
+<li>깃허브에서 직접 다운받아서 하위 폴더에 설치한 후, <a href="https://github.com/ssut/py-hanspell/issues/48">https://github.com/ssut/py-hanspell/issues/48</a> 이슈 48번 기반으로 passportKey.py을 작성하여 사용했다.</li>
+</ul>
+<pre class="python"><code>from hanspell import passportKey, spell_checker
+
+# passportKey 설정
+passportKey.init()
+
+
+def spell_check(df):
+    """맞춤법(오탈자, 띄어쓰기 등 전부) 교정"""
+    df["sentence_1"] = df.apply(lambda row: spell_checker.check(row["sentence_1"]).checked, axis=1)
+    df["sentence_2"] = df.apply(lambda row: spell_checker.check(row["sentence_2"]).checked, axis=1)
+    return df</code></pre>
+<h3 data-ke-size="size23">초성 대체</h3>
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>다음과 같은 방법으로 <code>ㅋ,ㅎ,ㅜ.ㅠㅠ</code> 등과 같은 초성들을 대체할 수 있다.</li>
+<li>관련한 잘 알려진 방법을 찾을 수 없어 따로 사용하지 않았다.</li>
+</ul>
+<pre class="python"><code>df["sentence_1"] = df["sentence_1"].str.replace(r"[ㅋ]+", "웃음", regex=True)
+df["sentence_2"] = df["sentence_2"].str.replace(r"[ㅋ]+", "웃음", regex=True)</code></pre>
+<h3 data-ke-size="size23">불용어 제거</h3>
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>불용어 사전을 기반으로 제거하는 전처리 방법이다.</li>
+<li>영어에 비해 한국어 자연어처리에서는 불용어 제거가 효과적이지 못하고 판단하여 사용하지 않았다.</li>
+</ul>
+<pre class="python"><code># 불용어 제거
+from nltk.tokenize import word_tokenize
+
+def remove_stop_word(df):
+    def _do(target):
+        stop_words = "아 휴 아이구 아이쿠 아이고 어"
+        stop_words = stop_words.split(" ")
+        word_tokens = word_tokenize(target)
+        result = [word for word in word_tokens if not word in stop_words]
+        return " ".join(result)
+
+    df["sentence_1"] = df["sentence_1"].apply(_do)
+    df["sentence_2"] = df["sentence_2"].apply(_do)</code></pre>
+<h2 data-ke-size="size26">3. 데이터 증강</h2>
+<p data-ke-size="size16">다양한 데이터 증강 기법을 사용하였다. 이 중에는 실제로 적용하지 않았거나 혹은 적용했지만 최고 성능의 모델에는 포함되지 않았을 수도 있다.</p>
+<h3 data-ke-size="size23">swap (문장1과 문장2 교체)</h3>
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li><code>sentence_1</code> 컬럼과 <code>sentence_2</code> 컬럼을 교체한 데이터를 생성하여 증강하였다.</li>
+<li>불균형 정도에 따라 조건부로 swap 하는 방식을 적용할 수도 있다.</li>
+</ul>
+<pre class="python"><code>def swap(df):
+    """sentence 1과 2를 교환한 데이터 추가"""
+    df_swaped = df.rename(columns={"sentence_1": "sentence_2", "sentence_2": "sentence_1"})
+    return pd.concat([df, df_swaped])
+
+def swap_over_one_label(df):
+    """sentence 1과 2를 교환한 데이터 추가"""
+    df_swaped = df.rename(columns={"sentence_1": "sentence_2", "sentence_2": "sentence_1"})
+    df_filtered = df_swaped[df_swaped["label"] &gt;= 1]
+    return pd.concat([df, df_filtered])</code></pre>
+<h3 data-ke-size="size23">KorEDA (Easy Data Augmentation의 한국어 버전)</h3>
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li><a href="https://github.com/toriving/KoEDA">https://github.com/toriving/KoEDA</a> 패키지를 사용하였다.</li>
+<li>논문 내용은 <a href="https://catsirup.github.io/ai/2020/04/21/nlp_data_argumentation.html">https://catsirup.github.io/ai/2020/04/21/nlp_data_argumentation.html</a> 를 참고하면 좋다.</li>
+<li><code>SR</code>: Synonym Replacement, 특정 단어를 유의어로 교체</li>
+<li><code>RI</code>: Random Insertion, 임의의 단어를 삽입</li>
+<li><code>RS</code>: Random Swap, 문장 내 임의의 두 단어의 위치를 바꿈</li>
+<li><code>RD</code>: Random Deletion: 임의의 단어를 삭제</li>
+<li>간단한 테스트에서 성능 저하가 발생했던 <code>RD</code>를 사용하지 않도록 커스텀하여 <code>SR</code>,<code>RI</code>,<code>RS</code> 3가지 방법만을 사용했다.K-TACC (문맥을 고려한 한국어 텍스트 데이터 증강)</li>
+<li><a href="https://github.com/kyle-bong/K-TACC">https://github.com/kyle-bong/K-TACC</a> 패키지를 사용하였다.</li>
+<li>해당 패키지에 여러 재밌는 증강 방법론이 구현되어 있다. 그 중에 저자의 벤치마크에서 높은 점수가 나온 아래 두 가지 방법을 사용하였다.</li>
+</ul>
+<table data-ke-align="alignLeft">
+<thead>
+<tr>
+<th>Model</th>
+<th>Pearson's correlation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>base</td>
+<td>0.9232</td>
+</tr>
+<tr>
+<td>EDA (Random Deletion)</td>
+<td>0.8960</td>
+</tr>
+<tr>
+<td>EDA (Random Swap)</td>
+<td>0.9243</td>
+</tr>
+<tr>
+<td>EDA (Random Synonym Replacement)</td>
+<td>0.9250</td>
+</tr>
+<tr>
+<td>EDA (Random Insertion</td>
+<td>0.9259</td>
+</tr>
+<tr>
+<td>AEDA</td>
+<td>0.9252</td>
+</tr>
+<tr>
+<td>Adverb augmentation</td>
+<td><b>0.9299</b></td>
+</tr>
+<tr>
+<td>BERT_Augmentation (Random Masking Replacement)</td>
+<td>0.9023</td>
+</tr>
+<tr>
+<td><b>BERT_Augmentation (Random Masking Insertion)</b></td>
+<td><b>0.9300</b></td>
+</tr>
+</tbody>
+</table>
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li><code>BERT_Augmentation (Random Masking Insertion)</code>
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>BERT based 모델을 활용하여, 의미상 자연스러운 토큰을 삽입하는 형식으로 증강</li>
+</ul>
+</li>
+<li><code>Adverb augmentation</code>
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>사전 크롤링 기반 부사 대체 방식으로 증강이전 기수 증강 기법 참고</li>
+</ul>
+</li>
+<li>6기 NLP 3조의 증강 기법을 참고하여 꼬꼬마 형태소 분석, 동의어 대체 2가지를 활용하였다.</li>
+<li><a href="https://github.com/boostcampaitech6/level1-semantictextsimilarity-nlp-03/blob/main/augmentation.py">https://github.com/boostcampaitech6/level1-semantictextsimilarity-nlp-03/blob/main/augmentation.py</a> 에서 코드를 확인할 수 있다.4. 데이터 불균형 의도하기 / 해소하기</li>
+<li>불균형 의도하기</li>
+<li>0.0~ 2.5 사이의 데이터를 증강한 데이터셋과 2.5~5.0 사이의 데이터를 증강한 데이터셋을 만들고 앙상블에 활용하고자 학습시켰다.</li>
+<li>0.0<del>2.5 사이의 데이터를 증강한 셋을 학습한 모델은 비교적 성능이 떨어지지 않게 잘 나왔으나 2.5</del>5.0 사이의 데이터를 증강한 셋을 학습한 모델은 성능이 매우 낮게 나왔다.</li>
+<li>또한 기본적으로 데이터 셋이 불균형한데, 전처리를 거치지 않은 raw dataset에서 비교적 성능이 꽤 잘 나오는 점에서, <b>5.0에 가까운 유사한 문장들을 판단하는 것 보다 0.0에 가까운 유사하지 않은 문장을 판단하는 것이 더 어려운 테스크라고 추정했다.</b></li>
+<li><b>아마 유사하지 않은 문장에는 엉뚱한 문장, 의미가 반대인 문장 등을 판단해야 하기 때문에 더 풍부한 문맥 표현을 학습해야 했을 것이라고 생각했다.따라서 위 실험으로 추정했던 내용을 앙상블 할 때 가정으로 사용하였다.</b>불균형 해소하기<br/><figure class="imageblock alignCenter" data-ke-mobilestyle="widthOrigin" data-origin-height="590" data-origin-width="1189"><span data-phocus="https://blog.kakaocdn.net/dna/cePaVN/btsJOnR00kM/AAAAAAAAAAAAAAAAAAAAAEtWTmLcNN9wGHZ_pZ341ku0t0-eun1JUg3DiX-dXvwi/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&amp;expires=1796050799&amp;allow_ip=&amp;allow_referer=&amp;signature=VJ7cHVt%2BoqFiHcACFsFI%2FCKdBzg%3D" data-url="https://blog.kakaocdn.net/dna/cePaVN/btsJOnR00kM/AAAAAAAAAAAAAAAAAAAAAEtWTmLcNN9wGHZ_pZ341ku0t0-eun1JUg3DiX-dXvwi/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&amp;expires=1796050799&amp;allow_ip=&amp;allow_referer=&amp;signature=VJ7cHVt%2BoqFiHcACFsFI%2FCKdBzg%3D"><img data-origin-height="590" data-origin-width="1189" height="590" loading="lazy" onerror="this.onerror=null; this.src='//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png'; this.srcset='//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png';" src="/assets/images/a429ac297deaeea010964e09.png" width="1189"/></span></figure>
+- 기본적으로 데이터셋은 Label이 0.0 값인 데이터가 압도적으로 많다.</li>
+<li>Label이 0.0 값인 데이터셋을 분리하고, 그중 일부를 문장1과 문장2를 동일하게 만들고 5.0값의 Label을 부여한다.</li>
+</ul>
+<pre class="nix"><code>def zero_five_balancing(df):
+    # 0.0 분리
+    zero_label_df = df[df["label"] == 0.0]
+    non_zero_label_df = df[df["label"] != 0.0] 
+
+    # 0.0 라벨 데이터를 n개와 나머지로 분리
+    fixed_zero_label_df = zero_label_df.iloc[:2000] # 0.0 데이터 개수
+    remaining_zero_label_df = zero_label_df.iloc[2000:2500] # 5.0 데이터 개수
+
+    # 5.0 라벨 증강
+    remaining_zero_label_df["label"] = 5.0
+
+    # 5.0 라벨인 데이터에 sentence_2에 sentence_1 복사
+    remaining_zero_label_df["sentence_2"] = remaining_zero_label_df["sentence_1"]
+
+    # 3000개 0.0 라벨 데이터 + 증강된 5.0 라벨 데이터 + 나머지 데이터 합침
+    reduced_df = pd.concat([fixed_zero_label_df, remaining_zero_label_df, non_zero_label_df])
+
+    return reduced_df.reset_index(drop=True)</code></pre>
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>이후 유독 적은 개수의 Label들에 대해 EDA를 수행하고, 나머지는 swap을 통해 증강한다.</li>
+</ul>
+<pre class="python"><code>from eda import eda
+
+def swap_or_eda(df, alpha_sr=0.1, alpha_ri=0.1, alpha_rs=0.1, num_aug=1):
+    """
+    EDA 적용 함수 \n
+    주의: 한글 제외한 나머지 문자 제거됨 \n
+    alpha_sr: 특정 단어를 유의어로 교체할 확률 \n
+    alpha_ri: 임의의 단어를 삽입할 확률 \n
+    alpha_rs: 문장 내 임의의 두 단어의 위치를 바꿀 확률 \n
+    num_aug: 데이터 증강하는 개수 \n
+    """
+
+    def _conditional_eda(row, column_name):
+        if row["label"] in [4.6, 4.8]:
+            return eda.EDA(row[column_name], alpha_sr, alpha_ri, alpha_rs, num_aug+1)
+        if row["label"] in [1.6, 2.2, 2.4, 4.4]:
+            return eda.EDA(row[column_name], alpha_sr, alpha_ri, alpha_rs, num_aug)
+        else:
+            return [row[column_name]]
+
+
+    def _conditional_swap(df):
+        """sentence_1과 sentence_2를 교환한 데이터 추가"""
+        df_swaped = df.rename( columns={"sentence_1": "sentence_2", "sentence_2": "sentence_1"})
+        df_filtered = df_swaped[~df_swaped["label"].isin([0.0, 1.6, 2.2, 2.4, 4.4, 4.6, 4.8])]
+        return pd.concat([df, df_filtered])
+
+
+    # sentence_1에 EDA 적용
+    df["sentence_1"] = df.apply(lambda row: _conditional_eda(row, "sentence_1"), axis=1)
+    df = df.explode("sentence_1").reset_index(drop=True)
+
+    # sentence_2에 EDA 적용
+    df["sentence_2"] = df.apply(lambda row: _conditional_eda(row, "sentence_2"), axis=1)
+    df = df.explode("sentence_2").reset_index(drop=True)
+
+    # sentence_1과 sentence_2를 교환
+    df = _conditional_swap(df)
+    return df.reset_index(drop=True)</code></pre>
+<p><figure class="imageblock alignCenter" data-ke-mobilestyle="widthOrigin" data-origin-height="590" data-origin-width="1189"><span data-phocus="https://blog.kakaocdn.net/dna/XVxTH/btsJPGit1yc/AAAAAAAAAAAAAAAAAAAAAIPBX-AAK_onf6Ia-rCZYNch7W-_7jI4Y0q5Q-PdWpiK/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&amp;expires=1796050799&amp;allow_ip=&amp;allow_referer=&amp;signature=Wx7V3sAmh07BxJhX7smHdtKY%2Fa4%3D" data-url="https://blog.kakaocdn.net/dna/XVxTH/btsJPGit1yc/AAAAAAAAAAAAAAAAAAAAAIPBX-AAK_onf6Ia-rCZYNch7W-_7jI4Y0q5Q-PdWpiK/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&amp;expires=1796050799&amp;allow_ip=&amp;allow_referer=&amp;signature=Wx7V3sAmh07BxJhX7smHdtKY%2Fa4%3D"><img data-origin-height="590" data-origin-width="1189" height="590" loading="lazy" onerror="this.onerror=null; this.src='//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png'; this.srcset='//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png';" src="/assets/images/b9c06caf524e483fdfb8d303.png" width="1189"/></span></figure>
+</p>
+<p data-ke-size="size16">다음과 같이 비교적 균형잡힌 데이터셋을 획득할 수 있다.</p>
+<h2 data-ke-size="size26">5. 앙상블</h2>
+<h3 data-ke-size="size23"><b>앙상블 모델 선택하기</b></h3>
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>다양한 모델 선택
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>앙상블의 성능은 각 모델이 독립일수록 성능이 오르기 때문에 3~4개 이상의 모델을 섞는 것을 기준으로 했으며, 성능이 잘 나오는 모델은 중복해서 사용했다.</li>
+</ul>
+</li>
+<li>다양한 데이터셋 선택
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>여러 전처리 / 증강 기법을 통해 생성한 다양한 데이터셋을 활용한 모델을 앙상블에 활용했다. 단일 로 비교적 성능이 잘 나온 모델의 예측 결과를 바탕으로 예측 분포상 잘 학습하지 못한 구간을 증강한 데이터셋을 활용하는 등의 방식을 사용했다.앙상블 성능을 간접적으로 추정하기</li>
+</ul>
+</li>
+<li>데이터 분포 눈으로 확인하기
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li>어떤 모델의 예측 결과는 <code>-0.1 ~ 5.2</code> 처럼 범위를 벗어나거나 <code>0.2 ~ 4.6</code> 처럼 범위 안쪽에서 예측하는 경우가 있었다.</li>
+<li>단일 모델로 제출할 때는 크게 상관없으나 여러 모델을 앙상블하기 위해서는 예측 범위를 맞춰줄 필요가 있었다. 그래서 <code>0.0 ~ 5.0 사이로 정규화</code> 하는 과정을 추가했다.</li>
+<li><code>def postprocessing(df: pd.DataFrame) -&gt; pd.DataFrame: """ 후처리 함수 : 정규화 """ # target 컬럼의 최소값과 최대값 min_val = df["target"].min() max_val = df["target"].max() # 정규화: 0.0~1.0 범위로 변환 df["target"] = (df["target"] - min_val) / (max_val - min_val) # 다시 0.0~5.0 범위로 변환 df["target"] = df["target"] * 5.0 return df</code></li>
+</ul>
+</li>
+<li>엔트로피, 지니계수 확인하기
+<ul data-ke-list-type="disc" style="list-style-type: disc;">
+<li><b>“테스트 셋의 분포는 각 라벨이 균등하게 분포되어있을 것”</b> 이라는 가정을 바탕으로, 앙상블 결과가 균등하면 균등할 수록 제출시 더 높은 점수를 획득할 것이라고 추정했다.</li>
+<li>엔트로피나 지니계수 등을 이용해 얼마나 분포가 얼마나 불균등한지를 수치적으로 확인했다. (그러나 반드시 균등하다고 점수가 높게 나오는 것은 아니기 때문에, 보조적인 지표로만 활용했다.)</li>
+</ul>
+</li>
+</ul>
+<pre class="python"><code>def entropy(data):
+    value_counts = data.value_counts(normalize=True)
+    entropy = -np.sum(
+        value_counts * np.log2(value_counts + 1e-9)
+    )  # 작은 값 추가로 로그 계산시 0 방지
+    return entropy
+
+def gini(data):
+    sorted_data = np.sort(data)  # 데이터를 정렬
+    n = len(data)
+
+    # 지니 계수 계산
+    cumulative_values = np.cumsum(sorted_data)  # 누적 합계
+    gini = (2 * np.sum(cumulative_values) / cumulative_values[-1] - (n + 1)) / n
+
+    # 지니 계수는 양수여야 하므로 절대값을 취해 0에서 1 사이로 맞춤
+    return np.abs(gini)</code></pre>
+<h1>최종 제출 결과</h1>
+<table data-ke-align="alignLeft">
+<thead>
+<tr>
+<th>순위</th>
+<th>분류</th>
+<th>점수</th>
+<th>제출쵯수</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>7</td>
+<td>Public Score</td>
+<td>0.9348</td>
+<td>96</td>
+</tr>
+<tr>
+<td>5</td>
+<td>Private Score</td>
+<td>0.9408</td>
+<td>96</td>
+</tr>
+<tr>
+<td><figure class="imageblock alignCenter" data-ke-mobilestyle="widthOrigin" data-origin-height="1086" data-origin-width="1936"><span data-phocus="https://blog.kakaocdn.net/dna/8Vq2e/btsJPRFrrzg/AAAAAAAAAAAAAAAAAAAAAG-DERO8uFxKpV-_GxuDKfaNGiBy_h2538wJGCITe16c/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&amp;expires=1796050799&amp;allow_ip=&amp;allow_referer=&amp;signature=g5Wk%2Bh9ynvf%2BiOPtDY%2BbwbxNxMU%3D" data-url="https://blog.kakaocdn.net/dna/8Vq2e/btsJPRFrrzg/AAAAAAAAAAAAAAAAAAAAAG-DERO8uFxKpV-_GxuDKfaNGiBy_h2538wJGCITe16c/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&amp;expires=1796050799&amp;allow_ip=&amp;allow_referer=&amp;signature=g5Wk%2Bh9ynvf%2BiOPtDY%2BbwbxNxMU%3D"><img data-origin-height="1086" data-origin-width="1936" height="1086" loading="lazy" onerror="this.onerror=null; this.src='//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png'; this.srcset='//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png';" src="/assets/images/781e61c3079f784ee15bed4c.png" width="1936"/></span></figure>
+</td>
+<td> </td>
+<td> </td>
+<td> </td>
+</tr>
+<tr>
+<td><figure class="imageblock alignCenter" data-ke-mobilestyle="widthOrigin" data-origin-height="878" data-origin-width="1956"><span data-phocus="https://blog.kakaocdn.net/dna/mOvFP/btsJPSRRVNv/AAAAAAAAAAAAAAAAAAAAANbi0dpJe7jX9FP23uzD3SSq-XLQ8InYJFdfzOdH6Jgx/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&amp;expires=1796050799&amp;allow_ip=&amp;allow_referer=&amp;signature=Ucq5zaFJBVYDDcfTju0gRlLE3PY%3D" data-url="https://blog.kakaocdn.net/dna/mOvFP/btsJPSRRVNv/AAAAAAAAAAAAAAAAAAAAANbi0dpJe7jX9FP23uzD3SSq-XLQ8InYJFdfzOdH6Jgx/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&amp;expires=1796050799&amp;allow_ip=&amp;allow_referer=&amp;signature=Ucq5zaFJBVYDDcfTju0gRlLE3PY%3D"><img data-origin-height="878" data-origin-width="1956" height="878" loading="lazy" onerror="this.onerror=null; this.src='//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png'; this.srcset='//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png';" src="/assets/images/35207294817fa468cd9fda0e.png" width="1956"/></span></figure>
+</td>
+<td> </td>
+<td> </td>
+<td> </td>
+</tr>
+<tr>
+<td>- Private Score에서 Public Score에 비해 0.006점이 올라 최종 5위로 마감했다.</td>
+<td> </td>
+<td> </td>
+<td> </td>
+</tr>
+<tr>
+<td>- 대부분은 점수가 오르는데, 앞선 두 팀이 점수가 떨어지면서 운좋게 5위를 차지할 수 있었다.</td>
+<td> </td>
+<td> </td>
+<td> </td>
+</tr>
+</tbody>
+</table>
+<h1>후기</h1>
+<p data-ke-size="size16">첫 번째 프로젝트이자 대회에서 기대 이상의 높은 순위를 차지하게 되어 기쁘다. 그러나 순위와 별개로 아쉬운 점들이 많았다. 위에서 대부분의 기술적인 내용을 녹였기 때문에, 아래 후기에서는 그보다는 개인적으로 느꼈던 점들에 대해서 작성해보려한다.</p>
+<h2 data-ke-size="size26">프로젝트 개선 내용</h2>
+<p data-ke-size="size16">나는 주로 데이터 파트를 담당하여 EDA부터 데이터 전처리, 데이터 증강 등을 주로 진행하였다. 먼저 EDA를 통해 인사이트를 뽑아내고자 했고 이를 팀원들과 공유하여 다양한 아이디어를 도출하고자 했다. 먼저 문장의 source에 따라 다른 문체를 가지고 있던 점과 특수문자나 초성들이 얽혀있는 점을 파악했다. 이를 개선하기 위해 특수문자 제거, 띄어쓰기 교정, 맞춤법 검사 등을 적용해보고, 특정 모델을 기준으로 적은 epoch로 빠르게 실험을 진행했다.</p>
+<p data-ke-size="size16">그 다음은 데이터셋은 Label별 불균형이 존재했는데, 이를 개선하고자 Label 구간별로 다른 증강과 샘플링을 적용하여 분포를 맞춰주는 등의 노력을 했다. 또한 Swap, KorEDA, K-TACC 등 다양한 증강 기법을 활용한 데이터셋을 생성하고 비교하였다.</p>
+<p data-ke-size="size16">또한 어떤 문장 페어에 유사도 점술를 어떻게 부여했는가에 집중했다. 유사한 문장에 대한 평가는 동일한 문장이거나 한 단어가 유사어로 대체된 수준의 문장들이였고, 유사하지 않은 문장에 대해서는 반대 의미의 문장 페어와 엉뚱한 문장 페어가 있었다. 그래서 일부러 불균형을 의도한 데이터셋을 생성하여 성능을 비교하며 유사도가 적은 문장 페어를 예측하는 것이 유사도 높은 문장 페어를 예측하는 것보다 어려울 것이라고 가설을 세우고 이에 대한 실험도 함께 진행하였다.</p>
+<p data-ke-size="size16">이렇게 다양한 실험을 진행하여 꽤 여러 데이터 셋을 생성하였기 때문에, 비슷한 데이터셋으로 학습한 것보다 각 모델이 독립적일 확률이 높아질 것이라고 생각했고 각 데이터셋을 학습한 모델들의 앙상블을 시도할 때 좋은 결과가 나올 수 있었다.</p>
+<p data-ke-size="size16">파라미터 튜닝에서는 성능 개선 효과가 미미했다. 아무래도 적은 epoch에 대해 학습이 잘 되는 파라미터를 찾기만 하면 거기서부터 튜닝을 한다고 해서 성능이 크게 올라가지는 않아 시간 대비 효율이 그다지 높지 않았다. 그래서 파라미터 튜닝보다는 모델 종류 선택과 데이터에 좀 더 집중하였다.</p>
+<h2 data-ke-size="size26">아쉬운 점</h2>
+<h3 data-ke-size="size23">역할 분배와 협업</h3>
+<p data-ke-size="size16">End-to-End로 경험하는 것이 중요하다고 생각해서 역할 분배나 분업을 빡빡하게 구분짓지 않았다. 거기서 오는 몇가지 문제점이 있었는데, 하나의 코드로 다같이 작업하는 것이 아닌 거의 각자의 브랜치에서 작업하고 결과만 공유하는 식이 되었다. 나를 포함하여 다들 AI 프로젝트 경험도 적었고 헤매면서 진행했기 때문에 코드 리뷰도 거의 못한 점이 아쉬웠다.</p>
+<h3 data-ke-size="size23">프로젝트 기간 분배</h3>
+<p data-ke-size="size16">초기부터 미리 계획을 세우고 언제까지 이걸 진행하고 다음은 언제부터 진행한다는 계획이 있었다면 막바지 앙상블을 포함하여 여러 실험적인 도전을 할 시간이 있었을텐데 초반에 시간을 너무 허비했던 점이 아쉬웠다.</p>
+<h3 data-ke-size="size23">빠르게 레퍼런스 파악하기</h3>
+<p data-ke-size="size16">이번 대회를 참가해보면서 느꼈던 중요했던 점 중 하나가 <b>모든 일은 밑바닥부터 시작하는 것이 아니라는 점이다.</b> 적어도 베이스라인 코드에서 시작하고, 지난 기수의 프로젝트에서 시작할 수 있고, 또 여러 pre-trained된 모델과 그걸 비교해놓은 레퍼런스 자료들에서 시작할 수 있었다. 빠르게 레퍼런스를 분석해서 최대한 앞선 상태에서 시작하는 것이 중요하다고 느꼈다. 이번 대회 뿐만 아니라 모든 작업에서 통용되는 부분이라 느껴졌다.</p>
+<h3 data-ke-size="size23">가장 중요한 것은 데이터셋</h3>
+<p data-ke-size="size16">가장 먼저 EDA(탐색적 데이터 분석)을 통해 데이터를 확인했지만 거기서 머물렀다. 결과를 바탕으로 계속 의문을 품고 더 깊이 더 깊이 파악할 수 있는 부분과 그걸 바탕으로 실험할 수 있는 근거와 정보를 충분히 파악했어야 했는데, 그냥 기계적으로 "가장 먼저 해야할 단계는 EDA 이니까" 정도의 생각으로 하지 않았나 싶다. 분석한 만큼 실험하지 못했고, 실험할 만큼 깊이 분석하지 못했다. 특히 당장 눈 앞에 보이는 Label에 대해서만 실험으로 이어졌고, 문장 길이나 source, binary-label 에 대한 부분에서 뭔가 이렇다할 내용을 뽑아내지 못한 것이 정말 아쉬웠다.</p>
+<h3 data-ke-size="size23">인프라 / 자동화 구축</h3>
+<p data-ke-size="size16">4개의 GPU 서버(Linux 환경)에서 개발하기 때문에 인프라 쪽으로 개발 환경 세팅 및 자동화를 구축하고 싶었다. 하나의 서버에 구축한 내용을 스크립트화 하면 빠르게 다른 서버에도 세팅할 수 있고, 서버가 터지더라도 금방 복구할 수 있었기 때문이다. 그러나 생각보다 그렇게 여유있고 아름답게 작업할 시간이 부족했다. 빠르게 기본 환경만 세팅하고 바로 각자 환경 구성하고 개발에 들어갔다.</p>
+<h2 data-ke-size="size26">잘한 점</h2>
+<h3 data-ke-size="size23">아이디어 공유</h3>
+<p data-ke-size="size16">효율적인 협업에서는 어려움이 있었으나 우리 팀은 팀워크가 좋았기 때문에 활발하게 의견 공유를 많이 나눴다. 팀 미팅 시간에 계속 각자의 가설과 실험 결과를 공유하면서 아이디어를 많이 얻을 수 있었다. 내가 얘기했던 아이디어를 바탕으로 팀원이 좋은 결과를 보였을 때 기분이 좋았다.</p>
+<h3 data-ke-size="size23">데이터 전처리/증강 기법</h3>
+<p data-ke-size="size16">거의 모든 데이터 전처리 및 증강 기법을 구현하고 시도했다. 프로젝트 초반부터 데이터에 관심이 많았고 많은 비중을 두고 싶었다. 그래서 관련한 자연어 전처리 및 증강 기법은 전부 찾아보고 하나 하나씩 적옹해보았다. 성능 개선이 없었던 방법론도 있었지만 그래도 성과를 냈던 부분이 많았다.</p>
+<h2 data-ke-size="size26">다음 프로젝트에서는</h2>
+<h3 data-ke-size="size23">전략적으로 기간 분배하기</h3>
+<p data-ke-size="size16">프로젝트의 전반적인 내용을 빠르게 파악하고 계획을 구체적으로 수립하고 시작할 것이다. 우선 베이스라인 코드 + 레퍼런스를 빠르게 파악하는 것이 중요하다고 생각했다. 파악한 내용을 바탕으로 첫날~둘째날 동안 빠르게 계획을 세워 매일 매일의 진척도를 파악할 수 있도록 프로젝트를 진행할 것이다.</p>
+<h3 data-ke-size="size23">작업 단위를 쪼개기</h3>
+<p data-ke-size="size16">역할 분배를 가져가지 않더라도 작업 단위를 쪼개는 것은 중요하다고 느껴졌다. 결국 팀 프로젝트이기 때문에 중복하는 작업이 적고 공유하는 내용이 많아야한다. 그렇기 때문에 작업 단위를 나누고 분배하는 과정에서 많은 공유가 이루어지도록 노력할 계획이다.</p>
+<h3 data-ke-size="size23">“왜?” 파고들기</h3>
+<p data-ke-size="size16">조금이라도 더 근거있는 의사결정과 깊은 고민을 하기 위해 “왜?” 라는 질문을 한번이라도 더 던지려고 노력할 것이다. 더 퀄리티 높은 가설을 세울 수 있을 것이고, 더 좋은 실험을 진행할 수 있을 것이다.</p>
+<h2 data-ke-size="size26">총평</h2>
+<p data-ke-size="size16">첫 프로젝트이다보니 아쉬움 투성이였지만 그럼에도 배울 점이 많았다는 점이 가장 좋았다. 프로젝트 시작부터 마무리까지 배울 점이 한가득이였다. 프로젝트 기간에는 아무래도 결과를 내기 위해 행동했다면, 프로젝트가 마무리 되었으니 회고한 내용을 바탕으로 내가 성장할 수 있는 부분에 집중하여 한번 더 프로젝트를 돌아보는 시간을 가질 계획이다.</p>
+{% endraw %}

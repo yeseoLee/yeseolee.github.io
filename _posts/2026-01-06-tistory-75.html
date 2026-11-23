@@ -1,0 +1,130 @@
+---
+layout: post
+title: 'MiniRAG: Extremely Simple Retrieval-Augmented Generation 논문 리뷰'
+date: '2026-01-06T04:35:03+09:00'
+categories:
+- 개발
+- 논문읽기
+source_url: https://ohge.tistory.com/75
+source_blog: tistory
+permalink: /tistory/75/
+---
+{% raw %}
+<h2>ABSTRACT &amp; INTRODUCTION</h2>
+<ul>
+<li>문제 의식 (Problem Statement)<ul>
+<li>기존 RAG 프레임워크는 주로 LLM(Large Language Models)에 의존하고 있어, 자원이 제한된 환경(엣지 디바이스 등)에서 SLM(Small Language Models)을 사용할 때 심각한 성능 저하가 발생한다.</li>
+<li>SLM은 복잡한 의미 이해(Semantic Understanding)와 텍스트 처리 능력이 부족하여 기존의 정교한 RAG 파이프라인(LightRAG, GraphRAG 등)을 소화하지 못한다.</li>
+</ul>
+</li>
+<li>MiniRAG의 목표<ul>
+<li>SLM의 제약 사항(제한된 추론 능력)을 고려하여 극도로 단순하고 효율적인 RAG 시스템을 설계한다.</li>
+<li>SLM이 <strong>복잡한 의미 이해</strong>는 못 해도 <strong>패턴 매칭</strong>은 잘한다는 점에 착안한다.</li>
+</ul>
+</li>
+<li>핵심 솔루션<ul>
+<li>복잡한 의미적 추론 대신 <strong>구조적 지식 표현(Structural Knowledge Representation)</strong>을 우선시한다.</li>
+<li>저장 공간을 25%만 사용하면서도 LLM 기반 방식과 유사한 성능을 달성.</li>
+</ul>
+</li>
+</ul>
+<p><figure class="imageblock alignCenter" width="100%"><span data-phocus="https://blog.kakaocdn.net/dna/kB0zY/dJMcagKXPMW/AAAAAAAAAAAAAAAAAAAAAEoLAYTPpemzvIH52NHHVQqzECL3UePD_bHda2uOnWKz/img.webp?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&amp;expires=1796050799&amp;allow_ip=&amp;allow_referer=&amp;signature=ioxaj8uqwis%2Br0i1yiOIOdgg3q0%3D" data-url="https://blog.kakaocdn.net/dna/kB0zY/dJMcagKXPMW/AAAAAAAAAAAAAAAAAAAAAEoLAYTPpemzvIH52NHHVQqzECL3UePD_bHda2uOnWKz/img.webp?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&amp;expires=1796050799&amp;allow_ip=&amp;allow_referer=&amp;signature=ioxaj8uqwis%2Br0i1yiOIOdgg3q0%3D"><img onerror="this.onerror=null; this.src='//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png'; this.srcset='//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png';" src="/assets/images/768adbdb790460fa0cfad3bf.webp" width="100%"/></span></figure>
+</p>
+<hr/>
+<h2>THE MINIRAG FRAMEWORK (방법론)</h2>
+<p>MiniRAG는 크게 <strong>인덱싱(Indexing)</strong>과 <strong>검색(Retrieval)</strong> 두 가지 단계에서 방법론을 제안한다.</p>
+<p><figure class="imageblock alignCenter" width="100%"><span data-phocus="https://blog.kakaocdn.net/dna/pzBHU/dJMcahJR334/AAAAAAAAAAAAAAAAAAAAALJSgVGEOmWMZE628BrUD82Ts0X8TKfqIqBppof0qyLj/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&amp;expires=1796050799&amp;allow_ip=&amp;allow_referer=&amp;signature=dx7Xux%2BbtwNY5frXnLVKCXS5OZg%3D" data-url="https://blog.kakaocdn.net/dna/pzBHU/dJMcahJR334/AAAAAAAAAAAAAAAAAAAAALJSgVGEOmWMZE628BrUD82Ts0X8TKfqIqBppof0qyLj/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&amp;expires=1796050799&amp;allow_ip=&amp;allow_referer=&amp;signature=dx7Xux%2BbtwNY5frXnLVKCXS5OZg%3D"><img onerror="this.onerror=null; this.src='//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png'; this.srcset='//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png';" src="/assets/images/6a4676ff8e7088a650dd5632.png" width="100%"/></span></figure>
+<br/>Indexing과 Answering의 한계</p>
+<h3>1. Semantic-Aware Heterogeneous Graph Indexing (인덱싱)</h3>
+<ul>
+<li>구조: 텍스트 청크와 명명된 개체(Named Entity)를 통합된 그래프 구조로 결합한다.</li>
+<li>노드(Node) 구성:<ul>
+<li>Text Chunk Node ($V_c$): 문맥 정보를 담고 있는 원본 텍스트 조각.</li>
+<li>Entity Node ($V_e$): 텍스트에서 추출된 핵심 의미 요소 (이벤트, 장소 등).</li>
+</ul>
+</li>
+<li>엣지(Edge) 구성:<ul>
+<li>Entity-Entity ($\mathcal{E}_{\alpha}$): 개체 간의 의미적 관계 및 계층 구조이다.</li>
+<li>Entity-Chunk ($\mathcal{E}_{\beta}$): 개체와 그 개체가 포함된 텍스트 청크 간의 연결한다.</li>
+</ul>
+</li>
+<li>특징: SLM이 요약하기 어려운 긴 텍스트 대신, 추출된 개체를 중심으로 데이터를 구조화하여 의미 이해의 부담을 줄인다.<ul>
+<li>지식 그래프의 각 엣지를 언어 모델이 생성한 의미 설명으로 강화한다.</li>
+<li>구체적으로, 개체를 해당 청크에 연결하는 각 엣지 $e_{\beta} \in \mathcal{E}{\beta}$에 대해, 우리는 언어 모델을 사용하여 개체의 설명 $d{e_{\beta}}$를 생성하고 이를 이 엣지의 보충 정보로 사용한다.</li>
+<li>Entity-Chunk 엣지에 대한 텍스트 설명이 있으면, 이는 텍스트 속성 엣지 $(e_{\beta}, d_{e_{\beta}}) \in \mathcal{E}_{\beta}$가 된다.</li>
+</ul>
+</li>
+</ul>
+<p>$G = ({ \mathcal{V}_{c}, \mathcal{V}_{e} }, { \mathcal{E}_{\alpha}, (e_{\beta}, d_{e_{\beta}}) \in \mathcal{E}_{\beta} })$</p>
+<h3>2. Lightweight Graph-Based Knowledge Retrieval (검색)</h3>
+<ul>
+<li>Query Semantic Mapping (Pre-retrieval 단계):<ul>
+<li>SLM을 이용해 쿼리에서 <strong>개체(Entity)를 추출</strong>하고 그 유형(Type)을 예측한다.</li>
+<li>쿼리 전체를 벡터화하는 대신, 추출된 개체를 사용하여 그래프의 진입점(Entry point)을 찾는다.</li>
+</ul>
+</li>
+<li>Reasoning Path Discovery:<ul>
+<li>쿼리 개체와 의미적으로 유사한 노드에서 시작하여, 그래프의 연결(Topology)을 따라 답변 후보 노드와 텍스트 청크를 찾아내는 경로를 탐색한다.</li>
+</ul>
+</li>
+</ul>
+<hr/>
+<h2>기존 GraphRAG / LightRAG와의 차이점 (비유)</h2>
+<p>생성(Generation) vs. 추출(Extraction)의 차이</p>
+<ul>
+<li>GraphRAG / LightRAG (소설가 - Generation):<ul>
+<li>LLM이 텍스트를 읽고 새로운 요약문(Community Report)이나 추상적 개념(Concept)을 작문하여 인덱스에 추가한다.</li>
+<li><strong>높은 수준의 추상화 및 요약 능력</strong>이 필수적이다.</li>
+</ul>
+</li>
+<li>MiniRAG (지도 제작자 - Extraction):<ul>
+<li>SLM이 텍스트 내의 <strong>단어(Entity)를 추출</strong>하고, 이를 <strong>물리적으로 연결</strong>하는 데 집중한다.</li>
+<li>복잡한 생성 과정 없이, 있는 정보를 구조화하여 SLM의 한계를 우회한다.</li>
+</ul>
+</li>
+</ul>
+<hr/>
+<h2>Naive RAG vs. Advanced RAG 및 MiniRAG</h2>
+<ul>
+<li>Naive RAG (Vector Search Only):<ul>
+<li>Input -&gt; VectorDB -&gt; Context의 단순 구조.</li>
+</ul>
+</li>
+<li>Advanced RAG (LLM Based):<ul>
+<li>LLM의 높은 지능을 활용해 쿼리를 재구성(Rewrite)하거나, 문서를 정교하게 요약하여 검색 성능을 높인다.</li>
+<li>SLM 사용 시 쿼리의 의도를 제대로 파악하지 못해 엉뚱한 벡터를 검색하는 문제가 발생한다.</li>
+<li><strong>Pre-Retrieval</strong><ul>
+<li><strong>Query Rewrite</strong>: 사용자의 자연어 쿼리를 데이터베이스 검색에 적합한 형태로 변환</li>
+<li><strong>Query Expansion</strong>: 입력된 쿼리에 관련된 추가 키워드를 더해 검색 결과를 풍부하게 만든다.</li>
+<li><strong>Query Transformation</strong>: 특정 문맥이나 패턴을 기반으로 쿼리 자체를 변환하여 검색 성능을 향상시킨다.</li>
+</ul>
+</li>
+<li>Post-Retrieval<ul>
+<li>Reranker / Reorder</li>
+<li>Prompt Compression</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>MiniRAG의 핵심 아이디어 (SLM 최적화):<ul>
+<li>Pre-retrieval 개선: 모델이 쿼리를 해석하지 못하니, 단순한 <strong>개체 추출(Entity Extraction)</strong> 작업으로 변환하여 검색 대상을 명확히 한다.</li>
+<li>Indexing 개선: 모델이 요약을 못 하니, <strong>지식 그래프(Heterogeneous Graph)</strong>를 미리 구축해 두어 "지능의 부족함"을 "데이터의 구조"로 보완한다.</li>
+</ul>
+</li>
+</ul>
+<hr/>
+<h2>Keyword Search와의 차이 및 Topology-Enhanced Retrieval 원리</h2>
+<p>MiniRAG는 Lexical Search(키워드)의 명확성과 Semantic Search(의미)의 유연성을 결합한 방식.</p>
+<ul>
+<li>Keyword Search와의 차이점:<ul>
+<li>단순한 String Matching이 아닌,  추출된 개체(Entity)를 그래프 노드와 매칭할 때 Vector Similarity을 사용하여 유의어나 비슷한 의미를 가진 단어까지 찾아낸다.</li>
+</ul>
+</li>
+<li>Topology-Enhanced Retrieval (위상 강화 검색) 동작 원리:<ol>
+<li>앵커링 (Anchoring): 쿼리에서 추출한 개체(Entity)와 의미적으로 유사한 그래프 노드를 찾아 시작점으로 삼는다.</li>
+<li>확장 (Expansion): 단순히 유사한 단어만 찾는 것이 아니라, <strong>그래프의 엣지(Edge/Topology)</strong>를 타고 이동하여 연결된 다른 개체나 텍스트 청크를 수집한다.</li>
+<li>결과: "단어의 의미" 뿐만 아니라 "단어 간의 관계"를 통해 더 정확한 맥락을 파악한다.</li>
+</ol>
+</li>
+</ul>
+{% endraw %}

@@ -1,0 +1,128 @@
+---
+layout: post
+title: '[강의노트] 05-1 Text Representation II - Distributed Representation Part 1 (NNLM)'
+date: '2024-07-10T16:32:42+09:00'
+categories:
+- 강의노트
+- Text Analytics (강필성 교수님)
+source_url: https://ohge.tistory.com/39
+source_blog: tistory
+permalink: /tistory/39/
+---
+{% raw %}
+<blockquote data-ke-style="style1"><p data-ke-size="size16"><span style="font-family: 'Noto Serif KR';"><p>위 강의노트는 고려대학교 산업경영공학부 대학원 강필성 교수님의<br/><a href="https://www.youtube.com/playlist?list=PLetSlH8YjIfVzHuSXtG4jAC2zbEAErXWm">비정형데이터분석 (Text Analytics)</a> 을 듣고 정리한 강의노트입니다.</p>
+</span></p></blockquote><h1>Word-level: NNLM</h1>
+<h2>Distributed Representation: Word Embedding</h2>
+<h3>Word Embedding</h3>
+<p>어떤 단어를 <strong>의미론적으로 유사한 단어는 서로 가까운 공간상에 위치하도록</strong> 특정 공간의 vector space로 매핑하는 것</p>
+<h3>Word vectors: one-hot vector</h3>
+<ul>
+<li>가장 단순하고 직관적인 표현</li>
+<li>특정 단어의 인덱스에 대해 그 단어가 맞으면 1, 아니면 0<br/>$w^{at} = [0,0,1, \dots , 0]$, $w^{zebra} = [0,0,0,\dots, 1]$</li>
+<li>단어 사이의 유사도가 보존되지 않는다.<br/>$(w^{hotel})^Tw^{motel} = (w^{hotel})^Tw^{cat}=0$</li>
+</ul>
+<h3>Word vectors: distributed representation</h3>
+<ul>
+<li>단어들을 임의의 차원을 갖는 벡터로 바꾸는 parameterized function(하나의 표현식에 대해 다른 parameter를 사용하여 다시 표현하는 과정)을 찾는다.<br/>$W: words \rightarrow R^n$ , $(n &lt;&lt; |V|)$</li>
+<li>의미론적인 차이가 단어의 벡터 차이에 보존이 된다.<ul>
+<li>$v(king) - v(queen) \simeq v(man) - v(woman)$</li>
+<li>$v(walking) - v(walked) \simeq v(swimming) - v(swam)$Neural Network Language Model (NNLM)</li>
+</ul>
+</li>
+</ul>
+<h3>Purpose</h3>
+<p>distributed representation을 통해 one-hot-encoding의 <strong>curse of dimensionality(차원의 저주)</strong>를 해결</p>
+<ul>
+<li>각 단어들을 분산된 word feature vector로 표현</li>
+<li>단어 sequences의 결합 확률 분포를 통해 해당하는 단어들의 조합이 발생할 확률을 계산</li>
+<li><ol>
+<li>어떤 feature vector가 좋은 것인가 2. 단어 sequences의 probability가 높게 / 두 가지를 학습하겠다.</li>
+</ol>
+</li>
+</ul>
+<h3>Why it works?</h3>
+<p>우리가 <code>dog and cat</code>이 (의미적으로나 종합적으로) 비슷한 역할을 한다는 것과 <code>(the,a), (bedroom, room), (is, was), (running,walking)</code>에 대한 유사성을 안다면 자연스럽게 일반화할 수 있다.</p>
+<p>e.g.) The cat is walking in the bedroom 이 하나의 문장을 통해</p>
+<ul>
+<li><code>A</code> <code>dog</code> <code>was</code> <code>running</code> in <code>a</code> <code>room</code></li>
+<li>The cat is <code>running</code> in <code>a</code> <code>room</code></li>
+<li><code>A</code> <code>dog</code> is walking in <code>a</code> bedroom</li>
+<li>The <code>dog</code> <code>was</code> walking in the <code>room</code><br/>등을 전부 generation 할 수 있다.</li>
+</ul>
+<h2>Comparison with Count-based Language Models</h2>
+<h3>Count-based Language Models</h3>
+<ul>
+<li>Chain rule에 의해 $w_1$ 부터 $w_t$ 까지 발생할 결합확률분포는 $P(w_1)P(w_2|w_1)P(w_3|w_1w_2) \dots$</li>
+<li>100번째 단어를 만드는 Language Model을 사용하려면 99개의 단어를 모두 본 다음 100번째 단어를 봐야하는데, 99개 단어 sequence가 같은 조합을 찾기가 거의 불가능함</li>
+<li><strong>Markov assumption</strong>: 모두 보는 것이 아닌 기존의 n-gram 만큼만 보고 예측하자</li>
+</ul>
+<h2>NNLM</h2>
+<ul>
+<li>단어는 특정 공간 $R^n$상의 dense vector이다. ($n &lt;&lt; |V|$)</li>
+<li>$w_t \in R^{|V|}$ : <strong>One-hot representation</strong> of word $\in V$ at time $t$</li>
+<li>$\Rightarrow x_t = Xw_t$ : <strong>Word embedding</strong> ($X \in R^{n\times |V|}, n &lt; |V|$)<br/>(X가 가져올 look-up table이고 embedding matrix이다.)</li>
+<li>다음 단어를 예측하는 neural network을 학습<br/><figure class="imageblock alignCenter" data-ke-mobilestyle="widthOrigin" data-origin-height="516" data-origin-width="1302"><span data-phocus="https://blog.kakaocdn.net/dna/pxitr/btsItE8Jvot/AAAAAAAAAAAAAAAAAAAAAMfXv2WFmDhkZCcz7nDOT_eyNC5GGrVXx1q-o3uxuxeY/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&amp;expires=1796050799&amp;allow_ip=&amp;allow_referer=&amp;signature=BaU8HUtiWMqQx8ENW%2FRwm9jm2%2BM%3D" data-url="https://blog.kakaocdn.net/dna/pxitr/btsItE8Jvot/AAAAAAAAAAAAAAAAAAAAAMfXv2WFmDhkZCcz7nDOT_eyNC5GGrVXx1q-o3uxuxeY/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&amp;expires=1796050799&amp;allow_ip=&amp;allow_referer=&amp;signature=BaU8HUtiWMqQx8ENW%2FRwm9jm2%2BM%3D"><img data-origin-height="516" data-origin-width="1302" height="516" loading="lazy" onerror="this.onerror=null; this.src='//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png'; this.srcset='//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png';" src="/assets/images/af4e451cb4126023bd14e2d5.png" width="1302"/></span></figure>
+<br/>($w_1$ 부터 $w_t-1$ 가 주어지면 $w_t$가 과연 $j$일지를 찾고자 하는 것)</li>
+</ul>
+<h3>NNLM Architecture</h3>
+<p><figure class="imageblock alignCenter" data-ke-mobilestyle="widthOrigin" data-origin-height="956" data-origin-width="1122"><span data-phocus="https://blog.kakaocdn.net/dna/ZVIAc/btsIuv376o4/AAAAAAAAAAAAAAAAAAAAAAtTs0aJDiOnJ-rhRVheaCvOCQz6-6JqHvm7Xdt646CB/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&amp;expires=1796050799&amp;allow_ip=&amp;allow_referer=&amp;signature=Y4gEG4rJuY%2FKvlbZxMu5XQb9J%2F4%3D" data-url="https://blog.kakaocdn.net/dna/ZVIAc/btsIuv376o4/AAAAAAAAAAAAAAAAAAAAAAtTs0aJDiOnJ-rhRVheaCvOCQz6-6JqHvm7Xdt646CB/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&amp;expires=1796050799&amp;allow_ip=&amp;allow_referer=&amp;signature=Y4gEG4rJuY%2FKvlbZxMu5XQb9J%2F4%3D"><img data-origin-height="956" data-origin-width="1122" height="956" loading="lazy" onerror="this.onerror=null; this.src='//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png'; this.srcset='//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png';" src="/assets/images/691b0ef3f92685f98852b140.png" width="1122"/></span></figure>
+</p>
+<ul>
+<li>shared parameters across words: look-up table (word embedding이 저장되어 있는 table)은 전부 다 공용으로 사용한다. (각 Matrix $C(w_i)$들이 같은 table에서 왔다는 뜻)</li>
+<li>초록색의 실선은 모델이 그대로 연결되어있는 부분, 점선은 Optional (output을 만들 때 hidden node를 뛰어넘고 input-&gt;output 연결하는 skip connection이 존재할 수도 있다)</li>
+</ul>
+<h3>Learning NNLM</h3>
+<ul>
+<li>좋은 모델 $f$(전체 단어가 아닌 window에 해당하는)를 찾는 것<br/>e.g.) 5-gram: 앞선 4개에 단어에 대해 5번째 단어를 예측하는 상황에서 확률이 극대화되는 함수 또는 모델</li>
+<li>제약 조건<ol>
+<li>어떤 조건에서도 이후 단어들이 생성될 확률의 총합은 1</li>
+<li>$f\geq0$ (각 단어가 생성될 확률은 0보다 크거나 같아야 함)</li>
+</ol>
+</li>
+</ul>
+<h4>Decompose the function $f$</h4>
+<p>$f(w_t, \dots w_{t-n+1} = \hat{P}(w_t|w_1^{t-1})$</p>
+<ul>
+<li>A mapping C (look-up table)</li>
+<li>The probability function over words, expressed with C<br/>$f(i, w_t, \dots, w_{t-n+1} = g(i, C(w_t), \dots, C(w_1^{t-1}))$</li>
+<li>The function $f$ is a composition of these two mappings (C and g), with <strong>C being shared across all the words in the context</strong></li>
+</ul>
+<h4>$y = b + Wx+ U \cdot tanh(d + Hx)$</h4>
+<ul>
+<li>$Wx$는 optional, $U \cdot tanh(d + Hx)$ 는 필수적인 부분</li>
+<li>$x$는 word features</li>
+<li>$h$는 hidden units 개수</li>
+</ul>
+<h4>Stochastic gradient ascent</h4>
+<hr/>
+<h1>요약</h1>
+<ul>
+<li>Word Embedding<br/>단어를 의미가 비슷한 단어끼리 서로 가까운 공간에 위치하도록 매핑하는 것</li>
+<li>Word Vectors<ul>
+<li>one-hot vector<ul>
+<li>특정 단어의 인덱스에 대해 그 단어가 맞으면 1, 아니면 0</li>
+<li>단어 사이의 유사도가 보존되지 않는다. (내적이 무조건 0)</li>
+</ul>
+</li>
+<li>distributed representation<ul>
+<li>단어들을 임의의 차원을 갖는 벡터로 바꾸는 parameterized function을 찾는다.</li>
+<li>단어 사이의 유사도가 보존된다.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>Neural Network Language Model (NNLM)<ul>
+<li>Count-based Language Models<ul>
+<li>Chain rule에 의해 $w_1$ 부터 $w_t$ 까지 발생할 결합확률분포를 계산</li>
+<li>모든 이전 단어들을 보기 힘드니 마르코프 가정을 통해 n개만 보자</li>
+</ul>
+</li>
+<li>NNLM<ul>
+<li>look-up table에서 word embedding을 가져와 다음 단어를 예측하는 neural network을 학습한다.</li>
+<li>어떤 조건에서도 이후 단어들이 생성될 확률의 총합은 1이고, 각 단어의 확률은 0 이상이다는 제약조건을 가진다.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+{% endraw %}
