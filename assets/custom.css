@@ -36,7 +36,7 @@
 .post-content figure[data-ke-type="opengraph"] .og-title {
   font-weight: 600;
 }
-.post-content figure[data-ke-type="opengraph"] .og-desc {
+.post-content figure[data-ke-type="opengraph"] .og-text .og-desc {
   margin-top: 6px;
   color: #555;
   font-size: 0.9em;
@@ -45,7 +45,7 @@
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
-.post-content figure[data-ke-type="opengraph"] .og-host {
+.post-content figure[data-ke-type="opengraph"] .og-text .og-host {
   margin-top: 8px;
   color: #666;
   font-size: 0.85em;
