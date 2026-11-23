@@ -20,7 +20,7 @@ permalink: /posts/52/
 </div>
 </a></figure>
 <h3 data-ke-size="size23">Iris 데이터 불러오기</h3>
-<pre class="nix"><code>from sklearn.datasets import load_iris
+<pre><code class="language-python">from sklearn.datasets import load_iris
 from sklearn.model_selection import train_test_split
 
 # iris 데이터 불러오기
@@ -31,7 +31,7 @@ y = iris.data[:, 2] # 타겟 데이터로 세 번째 특성 사용
 # 학습-테스트 데이터 분리
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)</code></pre>
 <h3 data-ke-size="size23">데이터 Tensor 형식으로 변경</h3>
-<pre class="routeros"><code>import torch
+<pre><code class="language-python">import torch
 device = "cuda" if torch.cuda.is_available() else "cpu"
 
 # 데이터 tensor 형태로 변환하기
@@ -46,13 +46,13 @@ print(X_test_tensor.shape, y_test_tensor.shape)
 &gt;&gt;&gt; torch.Size([120, 1]) torch.Size([120, 1]) 
 &gt;&gt;&gt; torch.Size([30, 1]) torch.Size([30, 1])</code></pre>
 <h3 data-ke-size="size23">torch DataLoader</h3>
-<pre class="routeros"><code>from torch.utils.data import DataLoader, TensorDataset
+<pre><code class="language-python">from torch.utils.data import DataLoader, TensorDataset
 
 # DataLoader 설정하기
 train_dataset = TensorDataset(X_train_tensor, y_train_tensor)
 train_loader = DataLoader(train_dataset, batch_size=32, shuffle=True)</code></pre>
 <h3 data-ke-size="size23">nn.Module(기본 모델 클래스)을 상속받은 Linear Regression 모델 구현</h3>
-<pre class="ruby"><code>import torch.nn as nn
+<pre><code class="language-python">import torch.nn as nn
 
 # nn.Module 상속받아 LinearRegression 구현
 class MultipleLinearRegression(nn.Module):
@@ -63,11 +63,11 @@ class MultipleLinearRegression(nn.Module):
     def forward(self, x):
         return self.linear(x)</code></pre>
 <h3 data-ke-size="size23">모델 생성</h3>
-<pre class="reasonml"><code>input_size = X_train_tensor.shape[1]
+<pre><code class="language-python">input_size = X_train_tensor.shape[1]
 model = MultipleLinearRegression(input_size,1)
 model.to(device)</code></pre>
 <h3 data-ke-size="size23">모델 학습</h3>
-<pre class="yaml"><code>import torch.optim as optim
+<pre><code class="language-python">import torch.optim as optim
 import numpy as np
 
 criterion = nn.MSELoss()
@@ -95,7 +95,7 @@ for epoch in range(10000):
 &gt;&gt;&gt; Epoch 9000, Loss: 0.7906377911567688
 &gt;&gt;&gt; Epoch 10000, Loss: 0.9563422799110413</code></pre>
 <h3 data-ke-size="size23">모델 평가 및 시각화</h3>
-<pre class="maxima"><code>import matplotlib.pyplot as plt
+<pre><code class="language-python">import matplotlib.pyplot as plt
 
 model.eval()
 with torch.no_grad():

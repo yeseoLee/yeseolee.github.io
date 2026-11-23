@@ -49,7 +49,7 @@ permalink: /posts/47/
 <li><code>torch.rand(size) # 연속 균등 분포를 따르는 난수 Tensor torch.randn(size) # 표준 정규 분포를 따르는 난수 Tensor torch.randint(low,high,size) # [low, high) 범위의 정수 난수 Tensor</code></li>
 </ul>
 <p data-ke-size="size16">torch.rand_like(t) # t와 동일한 형태의 연속 균등 분포 난수 Tensor<br/>torch.randn_like(t) # t와 동일한 형태의 표준 정규 분포 난수 Tensor</p>
-<pre class="angelscript"><code>
+<pre><code class="language-python">
 - list, numpy에서 가져오기  
 ```python
 s = [1, 2, 3, 4, 5, 6]
@@ -61,7 +61,7 @@ v = torch.from_numpy(s)</code></pre>
 <ul data-ke-list-type="disc" style="list-style-type: disc;">
 <li>초기화하지 않고 생성<br/>목적: 성능 향상, 메모리 최적화</li>
 </ul>
-<pre class="angelscript"><code>t = torch.empty([2, 4])</code></pre>
+<pre><code class="language-python">t = torch.empty([2, 4])</code></pre>
 <h3 data-ke-size="size23">Tensor 복제</h3>
 <ul data-ke-list-type="disc" style="list-style-type: disc;">
 <li><code>torch.clone()</code>
@@ -95,7 +95,7 @@ v = torch.from_numpy(s)</code></pre>
 <li>1차원 tensor는 python list와 동일하다.</li>
 <li>2차원 tensor 조작은 다음과 같다.</li>
 </ul>
-<pre class="angelscript"><code>t = torch.tensor([[1, 2, 3], [4, 5, 6]])
+<pre><code class="language-python">t = torch.tensor([[1, 2, 3], [4, 5, 6]])
 
 t[1, 2] # 1행, 2열의 요소에 접근 -&gt; tensor(6)
 t[0, 1:] # 0행, 1열 부터 끝열(2열)까지 -&gt; tensor([2, 3])
@@ -104,7 +104,7 @@ t[-1, ...] # 뒤에서부터 첫번째 행(1행), 전체 열 -&gt; tensor([4, 5,
 <hr data-ke-style="style1"/>
 <h2 data-ke-size="size26">Tensor 모양 변경</h2>
 <h3 data-ke-size="size23"><code>contiguous</code> , <code>storage</code>에 대한 이해</h3>
-<pre class="haxe"><code>t = torch.tensor([[1, 2, 3],[4, 5, 6]])
+<pre><code class="language-python">t = torch.tensor([[1, 2, 3],[4, 5, 6]])
 
 new_t = t[:2, :2] # tensor([[1, 2], [4, 5]])
 new_t.is_contiguous() # False
@@ -115,14 +115,14 @@ new_t_cont.is_contiguous() # True</code></pre>
 <p data-ke-size="size16"><code>contiguous()</code>를 사용하면 연속체로 만들어 주는데, 만약 연속체가 아닌 경우 새로운 <code>storage</code>를 만들어 할당한다.</p>
 <h3 data-ke-size="size23"><code>view()</code></h3>
 <p data-ke-size="size16">입력</p>
-<pre class="angelscript"><code>t = torch.tensor([[1, 2, 3],[4, 5, 6]])
+<pre><code class="language-python">t = torch.tensor([[1, 2, 3],[4, 5, 6]])
 
 print(t.view(1, -1))
 print(t.view(2,-1))
 print(t.view(3, -1))
 print(t.view(6, -1))</code></pre>
 <p data-ke-size="size16">출력</p>
-<pre class="angelscript"><code>tensor([[1, 2, 3, 4, 5, 6]])
+<pre><code class="language-python">tensor([[1, 2, 3, 4, 5, 6]])
 
 tensor([[1, 2, 3],
         [4, 5, 6]])
@@ -152,7 +152,7 @@ tensor([[1],
 </li>
 </ul>
 <p data-ke-size="size16">입력</p>
-<pre class="stylus"><code>t = torch.tensor([[1, 2, 3], [4, 5, 6]])
+<pre><code class="language-python">t = torch.tensor([[1, 2, 3], [4, 5, 6]])
 
 s1 = t[:2,:1]
 print(s1)
@@ -160,19 +160,19 @@ print(s1.is_contiguous())
 print(s1.view(1,-1))
 print(t.untyped_storage().data_ptr() == s1.untyped_storage().data_ptr())  </code></pre>
 <p data-ke-size="size16">출력</p>
-<pre class="lua"><code>tensor([[1],
+<pre><code class="language-python">tensor([[1],
         [4]])
 False
 tensor([[1, 4]])
 True</code></pre>
 <p data-ke-size="size16">입력</p>
-<pre class="stylus"><code>s2 = t[:, :2]
+<pre><code class="language-python">s2 = t[:, :2]
 print(s2)
 print(s2.is_contiguous())
 print(s2.view(1,-1))
 print(t.untyped_storage().data_ptr() == s2.untyped_storage().data_ptr())</code></pre>
 <p data-ke-size="size16">출력</p>
-<pre class="yaml"><code>
+<pre><code class="language-python">
 tensor([[1, 2],
         [4, 5]])
 False
@@ -184,7 +184,7 @@ True</code></pre>
 <li><code>t = torch.tensor([[1, 2, 3], [4, 5, 6]])</code></li>
 </ul>
 <p data-ke-size="size16">t.flatten() # 또는 torch.flatten(t)</p>
-<pre class="angelscript"><code>
+<pre><code class="language-python">
 출력
 ``` python
 tensor([1, 2, 3, 4, 5, 6])</code></pre>
@@ -193,7 +193,7 @@ tensor([1, 2, 3, 4, 5, 6])</code></pre>
 <li><code>t = torch.tensor([[[1, 2], [3, 4]], [[5, 6], [7, 8]]])</code></li>
 </ul>
 <p data-ke-size="size16">print(t.flatten(0))<br/>print(t.flatten(1))<br/>print(t.flatten(2))</p>
-<pre class="angelscript"><code>
+<pre><code class="language-python">
 출력
 ``` python
 
@@ -210,12 +210,12 @@ tensor([[[1, 2],
 <ul data-ke-list-type="disc" style="list-style-type: disc;">
 <li><code>reshape()</code> vs <code>view()</code><br/><code>view()</code> 메서드와 달리 메모리가 연속적이지 않아도 사용 가능<br/>입력</li>
 </ul>
-<pre class="angelscript"><code>t = torch.tensor([[1, 2, 3], [4, 5, 6]])
+<pre><code class="language-python">t = torch.tensor([[1, 2, 3], [4, 5, 6]])
 print(t.reshape(1, 6))
 print(t.reshape(3,2))
 print(t.reshape(6, 1))</code></pre>
 <p data-ke-size="size16">출력</p>
-<pre class="angelscript"><code>tensor([[1, 2, 3, 4, 5, 6]])
+<pre><code class="language-python">tensor([[1, 2, 3, 4, 5, 6]])
 tensor([[1, 2],
         [3, 4],
         [5, 6]])
@@ -242,7 +242,7 @@ tensor([[1],
 <ul data-ke-list-type="disc" style="list-style-type: disc;">
 <li>Tensor들을 새로운 차원으로 결합 - 차원의 개수가 증가</li>
 </ul>
-<pre class="angelscript"><code>t1 = torch.zeros(2, 2)
+<pre><code class="language-python">t1 = torch.zeros(2, 2)
 t2 = torch.ones(2, 2)
 
 t3 = torch.stack([t1, t2], dim=0)
@@ -274,7 +274,7 @@ print(t4.shape)
 <li>Tensor들을 주어진 차원에 맞춰 연결 - 개수가 유지되고 해당 차원이 늘어남</li>
 <li><code>dim</code> 옵션에 따라 concat 되는 방향 설정</li>
 </ul>
-<pre class="angelscript"><code>t1 = torch.ones(2, 2)
+<pre><code class="language-python">t1 = torch.ones(2, 2)
 t2 = torch.zeros(2, 2)
 
 t3 = torch.cat([t1, t2], dim=0)
@@ -345,7 +345,7 @@ print(t4.shape)
 <li>L2 Norm (euclidean norm)</li>
 <li>L∞ Norm (infinite norm)</li>
 </ul>
-<pre class="angelscript"><code>t = torch.tensor([4, 3], dtype=torch.float32)
+<pre><code class="language-python">t = torch.tensor([4, 3], dtype=torch.float32)
 torch.norm(t, p=1)
 &gt;&gt;&gt; 7.0
 
@@ -365,7 +365,7 @@ torch.norm(t, p=float('inf')) # torch.max(t.abs())와 같음
 <li>euclidean similarity (유클리드 유사도)</li>
 <li>cosine similarity (코사인 유사도)</li>
 </ul>
-<pre class="makefile"><code>t1 = torch.tensor([1, 0, 2], dtype=torch.float32)
+<pre><code class="language-python">t1 = torch.tensor([1, 0, 2], dtype=torch.float32)
 t2= torch.tensor([0, 1, 2], dtype=torch.float32)
 
 # 맨해튼 유사도
@@ -395,7 +395,7 @@ cosine_similarity
 <li>Broadcasting: 텐서 연산을 수행할 때 자동적으로 크기를 맞춰서 연산을 수행하는 기능</li>
 <li>Broadcasting은 의도와 다르게 연산이 동작할 수 있어 주의가 필요하다(<code>mm()</code>이 비교적 안전)</li>
 </ul>
-<pre class="sas"><code>weight = torch.randn(out_features, in_features)
+<pre><code class="language-python">weight = torch.randn(out_features, in_features)
 bias = torch.randn(out_features)
 
 x @ weight.t() + bias

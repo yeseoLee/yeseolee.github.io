@@ -109,7 +109,7 @@ permalink: /posts/62/
 <ul data-ke-list-type="disc" style="list-style-type: disc;">
 <li>다음은 Label 구간별로 개수를 확인하였다.</li>
 </ul>
-<pre class="yaml"><code>train
+<pre><code class="language-plaintext">train
 0 3711 
 1 1368 
 2 1137 
@@ -139,7 +139,7 @@ Name: id, dtype: int64</code></pre>
 <li>정규표현식을 사용하여 특수문자를 제거할 수 있다.</li>
 <li>특수문자를 제거한 데이터셋과 제거하지 않은 데이터셋을 모두 사용하였다.</li>
 </ul>
-<pre class="python"><code># 초성(ㄱ-ㅎ), 중성(ㅏ-ㅣ), 완성된 한글(가-힣), 알파벳(A-Za-z), 숫자(0-9), 그리고 공백(\s)만 허용
+<pre><code class="language-python"># 초성(ㄱ-ㅎ), 중성(ㅏ-ㅣ), 완성된 한글(가-힣), 알파벳(A-Za-z), 숫자(0-9), 그리고 공백(\s)만 허용
 
 def replace_special_letters(df):
     df["sentence_1"] = df["sentence_1"].str.replace(r"[^A-Za-z0-9가-힣ㄱ-ㅎㅏ-ㅣ\s]", "", regex=True)
@@ -149,7 +149,7 @@ def replace_special_letters(df):
 <li><a href="https://github.com/haven-jeon/PyKoSpacing">https://github.com/haven-jeon/PyKoSpacing</a> 패키지를 사용하였다.</li>
 <li>hanspell 맞춤법 교정에서 띄어쓰기까지 함께 교정되므로 따로 사용하지 않았다.</li>
 </ul>
-<pre class="nix"><code># 띄어쓰기 교정
+<pre><code class="language-python"># 띄어쓰기 교정
 # !pip install git+https://github.com/haven-jeon/PyKoSpacing.git
 
 import pykospacing
@@ -164,7 +164,7 @@ def spacing_text(df):
 <li>네이버 맞춤법 검사기에 의존적인 패키지이며 현재 유지되고 있지 않은 패키지이다. (오류가 있어 패키지를 install &amp; import 해서는 사용할 수 없다.)</li>
 <li>깃허브에서 직접 다운받아서 하위 폴더에 설치한 후, <a href="https://github.com/ssut/py-hanspell/issues/48">https://github.com/ssut/py-hanspell/issues/48</a> 이슈 48번 기반으로 passportKey.py을 작성하여 사용했다.</li>
 </ul>
-<pre class="python"><code>from hanspell import passportKey, spell_checker
+<pre><code class="language-python">from hanspell import passportKey, spell_checker
 
 # passportKey 설정
 passportKey.init()
@@ -180,14 +180,14 @@ def spell_check(df):
 <li>다음과 같은 방법으로 <code>ㅋ,ㅎ,ㅜ.ㅠㅠ</code> 등과 같은 초성들을 대체할 수 있다.</li>
 <li>관련한 잘 알려진 방법을 찾을 수 없어 따로 사용하지 않았다.</li>
 </ul>
-<pre class="python"><code>df["sentence_1"] = df["sentence_1"].str.replace(r"[ㅋ]+", "웃음", regex=True)
+<pre><code class="language-python">df["sentence_1"] = df["sentence_1"].str.replace(r"[ㅋ]+", "웃음", regex=True)
 df["sentence_2"] = df["sentence_2"].str.replace(r"[ㅋ]+", "웃음", regex=True)</code></pre>
 <h3 data-ke-size="size23">불용어 제거</h3>
 <ul data-ke-list-type="disc" style="list-style-type: disc;">
 <li>불용어 사전을 기반으로 제거하는 전처리 방법이다.</li>
 <li>영어에 비해 한국어 자연어처리에서는 불용어 제거가 효과적이지 못하고 판단하여 사용하지 않았다.</li>
 </ul>
-<pre class="python"><code># 불용어 제거
+<pre><code class="language-python"># 불용어 제거
 from nltk.tokenize import word_tokenize
 
 def remove_stop_word(df):
@@ -207,7 +207,7 @@ def remove_stop_word(df):
 <li><code>sentence_1</code> 컬럼과 <code>sentence_2</code> 컬럼을 교체한 데이터를 생성하여 증강하였다.</li>
 <li>불균형 정도에 따라 조건부로 swap 하는 방식을 적용할 수도 있다.</li>
 </ul>
-<pre class="python"><code>def swap(df):
+<pre><code class="language-python">def swap(df):
     """sentence 1과 2를 교환한 데이터 추가"""
     df_swaped = df.rename(columns={"sentence_1": "sentence_2", "sentence_2": "sentence_1"})
     return pd.concat([df, df_swaped])
@@ -296,7 +296,7 @@ def swap_over_one_label(df):
 - 기본적으로 데이터셋은 Label이 0.0 값인 데이터가 압도적으로 많다.</li>
 <li>Label이 0.0 값인 데이터셋을 분리하고, 그중 일부를 문장1과 문장2를 동일하게 만들고 5.0값의 Label을 부여한다.</li>
 </ul>
-<pre class="nix"><code>def zero_five_balancing(df):
+<pre><code class="language-python">def zero_five_balancing(df):
     # 0.0 분리
     zero_label_df = df[df["label"] == 0.0]
     non_zero_label_df = df[df["label"] != 0.0] 
@@ -318,7 +318,7 @@ def swap_over_one_label(df):
 <ul data-ke-list-type="disc" style="list-style-type: disc;">
 <li>이후 유독 적은 개수의 Label들에 대해 EDA를 수행하고, 나머지는 swap을 통해 증강한다.</li>
 </ul>
-<pre class="python"><code>from eda import eda
+<pre><code class="language-python">from eda import eda
 
 def swap_or_eda(df, alpha_sr=0.1, alpha_ri=0.1, alpha_rs=0.1, num_aug=1):
     """
@@ -387,7 +387,7 @@ def swap_or_eda(df, alpha_sr=0.1, alpha_ri=0.1, alpha_rs=0.1, num_aug=1):
 </ul>
 </li>
 </ul>
-<pre class="python"><code>def entropy(data):
+<pre><code class="language-python">def entropy(data):
     value_counts = data.value_counts(normalize=True)
     entropy = -np.sum(
         value_counts * np.log2(value_counts + 1e-9)

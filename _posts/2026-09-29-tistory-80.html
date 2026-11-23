@@ -37,7 +37,7 @@ permalink: /posts/80/
 </ul>
 <p data-ke-size="size16">일반적인 Decoder LLM은 Prompt 전체를 처리하는 <b>Prefill</b> 이후, <b>Autoregressive Decode</b>를 반복하며 Token을 생성한다.</p>
 <p data-ke-size="size16">하지만 분류, Routing, Tool Selection처럼 최종적으로 선택지만 고르면 되는 문제라면 굳이 Token을 여러 개 생성할 필요가 없다.</p>
-<pre class="stata"><code>일반 LLM
+<pre><code class="language-plaintext">일반 LLM
 
 Prompt
   ↓
@@ -51,7 +51,7 @@ Token
   ↓
 Decode ...</code></pre>
 <p data-ke-size="size16">Decision Model은 다음과 같이 생각할 수 있다.</p>
-<pre class="angelscript"><code>Context + Candidates
+<pre><code class="language-plaintext">Context + Candidates
         ↓
       Prefill
         ↓
@@ -67,7 +67,7 @@ A 0.82 / B 0.13 / C 0.05</code></pre>
 </ul>
 <p data-ke-size="size16">사실 Decoder LLM은 Prefill이 끝난 시점에 이미 다음 Token의 Logit을 가지고 있다.</p>
 <p data-ke-size="size16">4지선다 문제라면 다음과 같이 사용할 수 있다.</p>
-<pre class="makefile"><code>outputs = model(**inputs)
+<pre><code class="language-python">outputs = model(**inputs)
 
 logits = outputs.logits[:, -1]
 
@@ -80,7 +80,7 @@ choice_logits = logits[:, [
 
 probs = softmax(choice_logits)</code></pre>
 <p data-ke-size="size16">결과는 바로 Decision Probability가 된다.</p>
-<pre class="angelscript"><code>A    0.02
+<pre><code class="language-plaintext">A    0.02
 B    0.91
 C    0.04
 D    0.03</code></pre>
@@ -94,7 +94,7 @@ D    0.03</code></pre>
 <li>Calibration을 적용해 Probability 반환</li>
 <li>선택지 순서가 바뀌어도 일관되게 판단하도록 Fine-tuning</li>
 </ul>
-<pre class="properties"><code>Context + Question + Candidates
+<pre><code class="language-plaintext">Context + Question + Candidates
               ↓
            OpenJev
               ↓
@@ -109,7 +109,7 @@ D    0.03</code></pre>
 <li>따라서 Logit을 읽는 대신 Context와 후보를 함께 인코딩해 점수를 계산하는 방식으로 보임 (미확인, 구조 기반 추정)</li>
 <li>모델이 작아 Router, Guardrail처럼 호출 빈도가 높은 위치에 적합</li>
 </ul>
-<pre class="properties"><code>Context + Candidate_i
+<pre><code class="language-plaintext">Context + Candidate_i
         ↓
   ModernBERT Encoder
         ↓
@@ -119,11 +119,11 @@ D    0.03</code></pre>
 <p data-ke-size="size16">방식은 달라도 결과는 같다. 별도의 자연어 답변 없이 한 번의 Forward Pass로 각 후보의 확률을 얻는다.</p>
 <p data-ke-size="size16">따라서 하나의 모델로 서로 다른 형태의 Decision을 처리할 수 있다.</p>
 <h3 data-ke-size="size23">예시</h3>
-<pre class="gams"><code>Sentiment
+<pre><code class="language-plaintext">Sentiment
 [positive, neutral, negative]</code></pre>
-<pre class="routeros"><code>Agent Routing
+<pre><code class="language-plaintext">Agent Routing
 [search, coding, reasoning]</code></pre>
-<pre class="mipsasm"><code>Customer Support
+<pre><code class="language-plaintext">Customer Support
 [billing, shipping, technical]</code></pre>
 <hr contenteditable="false" data-ke-style="style5" data-ke-type="horizontalRule"/>
 <h2 data-ke-size="size26">3. 어디에 사용하는가</h2>
@@ -136,7 +136,7 @@ D    0.03</code></pre>
 <li>Human Review 판단</li>
 </ul>
 <p data-ke-size="size16">예를 들어 Agent가 모든 요청에 비싼 LLM을 호출하는 대신 먼저 Decision Model을 사용할 수 있다.</p>
-<pre class="routeros"><code>사용자 요청
+<pre><code class="language-plaintext">사용자 요청
     ↓
 Decision Model
     ↓
@@ -144,7 +144,7 @@ simple      0.81 → 작은 모델
 reasoning   0.14 → 큰 모델
 search      0.05 → Search Agent</code></pre>
 <p data-ke-size="size16">또 Confidence가 낮을 때만 큰 모델이나 사람에게 넘기는 구조 역시 합리적이다.</p>
-<pre class="angelscript"><code>confidence &gt;= 0.9
+<pre><code class="language-plaintext">confidence &gt;= 0.9
 → 자동 처리
 
 confidence &lt; 0.9
