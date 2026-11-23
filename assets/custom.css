@@ -4,3 +4,53 @@
 .post-content pre { overflow-x: auto; }
 .post-content .math { overflow-x: auto; }
 .post-content table { display: block; overflow-x: auto; }
+
+/* Tistory link previews */
+.post-content figure[data-ke-type="opengraph"] {
+  margin: 1.5em 0;
+}
+.post-content figure[data-ke-type="opengraph"] > a {
+  display: flex;
+  min-height: 140px;
+  border: 1px solid #ddd;
+  color: inherit;
+  text-decoration: none;
+  overflow: hidden;
+}
+.post-content figure[data-ke-type="opengraph"] > a:hover,
+.post-content figure[data-ke-type="opengraph"] > a:focus-visible {
+  border-color: #777;
+}
+.post-content figure[data-ke-type="opengraph"] .og-image {
+  flex: 0 0 160px;
+  background: center / cover no-repeat;
+}
+.post-content figure[data-ke-type="opengraph"] .og-text {
+  min-width: 0;
+  padding: 16px 18px;
+}
+.post-content figure[data-ke-type="opengraph"] .og-text p {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+.post-content figure[data-ke-type="opengraph"] .og-title {
+  font-weight: 600;
+}
+.post-content figure[data-ke-type="opengraph"] .og-desc {
+  margin-top: 6px;
+  color: #555;
+  font-size: 0.9em;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.post-content figure[data-ke-type="opengraph"] .og-host {
+  margin-top: 8px;
+  color: #666;
+  font-size: 0.85em;
+}
+@media (max-width: 480px) {
+  .post-content figure[data-ke-type="opengraph"] .og-image { flex-basis: 96px; }
+  .post-content figure[data-ke-type="opengraph"] .og-text { padding: 12px; }
+}
